@@ -1,0 +1,9 @@
+<h2>Document Signed</h2>
+
+<p>Hello <%= @signature_request.requester.full_name %>,</p>
+
+<p><strong><%= @signature_request.signer_display_name %></strong> has signed the document "<strong><%= @document.name %></strong>".</p>
+
+<p>Signed on: <%= @signature_request.signed_at&.strftime("%B %d, %Y at %l:%M %p") %></p>
+
+<p style="color: #666; font-size: 14px;">You can view the signed document in your Pact account.</p>

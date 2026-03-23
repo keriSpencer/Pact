@@ -1,0 +1,14 @@
+<h2>Signature Declined</h2>
+
+<p>Hello <%= @signature_request.requester.full_name %>,</p>
+
+<p><strong><%= @signature_request.signer_display_name %></strong> has declined to sign the document "<strong><%= @document.name %></strong>".</p>
+
+<% if @signature_request.decline_reason.present? %>
+  <p>Reason provided:</p>
+  <blockquote style="border-left: 3px solid #ccc; padding-left: 12px; color: #555;">
+    <%= @signature_request.decline_reason %>
+  </blockquote>
+<% end %>
+
+<p style="color: #666; font-size: 14px;">You can view this signature request in your Pact account.</p>

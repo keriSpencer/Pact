@@ -1,0 +1,43 @@
+<div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="bg-white rounded-lg shadow">
+    <div class="px-6 py-5 border-b border-gray-200">
+      <h1 class="text-xl font-bold text-gray-900">New Folder</h1>
+    </div>
+    <%= form_with(model: @folder, url: folders_path, method: :post, class: "px-6 py-5 space-y-6") do |form| %>
+      <% if @folder.errors.any? %>
+        <div class="bg-red-50 border border-red-200 rounded-md p-4">
+          <ul class="list-disc list-inside text-sm text-red-700">
+            <% @folder.errors.full_messages.each do |message| %>
+              <li><%= message %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+
+      <% if @folder.parent %>
+        <%= form.hidden_field :parent_id, value: @folder.parent.id %>
+        <p class="text-sm text-gray-500">Creating subfolder in: <strong><%= @folder.parent.full_path %></strong></p>
+      <% end %>
+
+      <div>
+        <%= form.label :name, class: "block text-sm font-medium text-gray-700" %>
+        <%= form.text_field :name, class: "mt-1 block w-full", required: true %>
+      </div>
+
+      <div>
+        <%= form.label :description, class: "block text-sm font-medium text-gray-700" %>
+        <%= form.text_area :description, rows: 3, class: "mt-1 block w-full" %>
+      </div>
+
+      <div>
+        <%= form.label :visibility, class: "block text-sm font-medium text-gray-700" %>
+        <%= form.select :visibility, [["Private (only me)", "folder_private"], ["Organization (all members)", "organization"]], {}, class: "mt-1 block w-full" %>
+      </div>
+
+      <div class="flex justify-end space-x-3 pt-4">
+        <%= link_to "Cancel", folders_path, class: "px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50" %>
+        <%= form.submit "Create Folder", class: "px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 cursor-pointer" %>
+      </div>
+    <% end %>
+  </div>
+</div>

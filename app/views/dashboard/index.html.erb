@@ -1,0 +1,47 @@
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="mb-8">
+    <h1 class="text-2xl font-bold text-gray-900">Dashboard</h1>
+    <p class="mt-1 text-sm text-gray-500">Welcome back, <%= current_user.full_name %></p>
+  </div>
+
+  <!-- Stats -->
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
+    <div class="bg-white rounded-lg shadow p-6">
+      <div class="text-sm font-medium text-gray-500">Total Contacts</div>
+      <div class="mt-1 text-3xl font-bold text-gray-900"><%= @contacts_count %></div>
+    </div>
+    <div class="bg-white rounded-lg shadow p-6">
+      <div class="text-sm font-medium text-gray-500">Organization</div>
+      <div class="mt-1 text-lg font-semibold text-gray-900"><%= current_organization.name %></div>
+    </div>
+    <div class="bg-white rounded-lg shadow p-6">
+      <div class="text-sm font-medium text-gray-500">Team Members</div>
+      <div class="mt-1 text-3xl font-bold text-gray-900"><%= current_organization.member_count %></div>
+    </div>
+  </div>
+
+  <!-- Recent Contacts -->
+  <div class="bg-white rounded-lg shadow">
+    <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+      <h2 class="text-lg font-semibold text-gray-900">Recent Contacts</h2>
+      <%= link_to "View all", contacts_path, class: "text-sm text-blue-600 hover:text-blue-800" %>
+    </div>
+    <% if @recent_contacts.any? %>
+      <ul class="divide-y divide-gray-200">
+        <% @recent_contacts.each do |contact| %>
+          <li class="px-6 py-4 flex items-center justify-between">
+            <div>
+              <p class="text-sm font-medium text-gray-900"><%= contact.full_name %></p>
+              <p class="text-sm text-gray-500"><%= contact.company %></p>
+            </div>
+            <p class="text-xs text-gray-400"><%= time_ago_in_words(contact.created_at) %> ago</p>
+          </li>
+        <% end %>
+      </ul>
+    <% else %>
+      <div class="px-6 py-12 text-center">
+        <p class="text-sm text-gray-500">No contacts yet. Add your first contact to get started.</p>
+      </div>
+    <% end %>
+  </div>
+</div>

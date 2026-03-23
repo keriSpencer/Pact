@@ -1,0 +1,43 @@
+<div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="bg-white rounded-lg shadow">
+    <div class="px-6 py-5 border-b border-gray-200">
+      <h1 class="text-xl font-bold text-gray-900">Edit Document</h1>
+    </div>
+    <%= form_with(model: @document, url: document_path(@document), method: :patch, class: "px-6 py-5 space-y-6") do |form| %>
+      <% if @document.errors.any? %>
+        <div class="bg-red-50 border border-red-200 rounded-md p-4">
+          <ul class="list-disc list-inside text-sm text-red-700">
+            <% @document.errors.full_messages.each do |message| %>
+              <li><%= message %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+
+      <div>
+        <%= form.label :name, class: "block text-sm font-medium text-gray-700" %>
+        <%= form.text_field :name, class: "mt-1 block w-full" %>
+      </div>
+
+      <div>
+        <%= form.label :description, class: "block text-sm font-medium text-gray-700" %>
+        <%= form.text_area :description, rows: 3, class: "mt-1 block w-full" %>
+      </div>
+
+      <div>
+        <%= form.label :folder_id, "Folder", class: "block text-sm font-medium text-gray-700" %>
+        <%= form.select :folder_id, @folders.map { |f| [f.full_path, f.id] }, { include_blank: "No folder (unfiled)" }, class: "mt-1 block w-full" %>
+      </div>
+
+      <div>
+        <%= form.label :visibility, class: "block text-sm font-medium text-gray-700" %>
+        <%= form.select :visibility, [["Private (only me)", "doc_private"], ["Organization (all members)", "organization"]], {}, class: "mt-1 block w-full" %>
+      </div>
+
+      <div class="flex justify-end space-x-3 pt-4">
+        <%= link_to "Cancel", document_path(@document), class: "px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50" %>
+        <%= form.submit "Save Changes", class: "px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 cursor-pointer" %>
+      </div>
+    <% end %>
+  </div>
+</div>

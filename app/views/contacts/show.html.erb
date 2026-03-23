@@ -1,0 +1,224 @@
+<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="flex justify-between items-start mb-6">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900"><%= @contact.full_name %></h1>
+      <% if @contact.title.present? || @contact.company.present? %>
+        <p class="mt-1 text-sm text-gray-500">
+          <%= [@contact.title, @contact.company].compact.join(" at ") %>
+        </p>
+      <% end %>
+      <!-- Tags -->
+      <% if @contact.tags.any? %>
+        <div class="mt-2 flex flex-wrap gap-1">
+          <% @contact.tags.each do |tag| %>
+            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium <%= tag.bg_class %> <%= tag.text_class %>">
+              <%= tag.name %>
+              <%= link_to "×", untag_contact_path(@contact, tag_id: tag.id), data: { "turbo-method": "delete" }, class: "ml-1 hover:opacity-70" %>
+            </span>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+    <div class="flex space-x-3">
+      <%= link_to "Edit", edit_contact_path(@contact), class: "px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50" %>
+      <%= link_to "Delete", contact_path(@contact), data: { "turbo-method": "delete", turbo_confirm: "Are you sure you want to delete #{@contact.full_name}?" }, class: "px-4 py-2 text-sm font-medium text-red-600 bg-white border border-red-300 rounded-md hover:bg-red-50" %>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- Sidebar -->
+    <div class="lg:col-span-1 space-y-6">
+      <!-- Contact Info -->
+      <div class="bg-white rounded-lg shadow">
+        <div class="px-6 py-4 border-b border-gray-200">
+          <h2 class="text-sm font-semibold text-gray-900 uppercase tracking-wider">Contact Information</h2>
+        </div>
+        <div class="px-6 py-4 space-y-4">
+          <div>
+            <dt class="text-xs font-medium text-gray-500 uppercase">Email</dt>
+            <dd class="mt-1 text-sm text-gray-900">
+              <%= mail_to @contact.email, @contact.email, class: "text-blue-600 hover:text-blue-800" %>
+            </dd>
+          </div>
+          <% if @contact.phone.present? %>
+            <div>
+              <dt class="text-xs font-medium text-gray-500 uppercase">Phone</dt>
+              <dd class="mt-1 text-sm text-gray-900"><%= @contact.phone %></dd>
+            </div>
+          <% end %>
+          <% if @contact.company.present? %>
+            <div>
+              <dt class="text-xs font-medium text-gray-500 uppercase">Company</dt>
+              <dd class="mt-1 text-sm text-gray-900"><%= @contact.company %></dd>
+            </div>
+          <% end %>
+          <% if @contact.title.present? %>
+            <div>
+              <dt class="text-xs font-medium text-gray-500 uppercase">Title</dt>
+              <dd class="mt-1 text-sm text-gray-900"><%= @contact.title %></dd>
+            </div>
+          <% end %>
+          <% if @contact.linkedin_url.present? %>
+            <div>
+              <dt class="text-xs font-medium text-gray-500 uppercase">LinkedIn</dt>
+              <dd class="mt-1 text-sm">
+                <%= link_to @contact.linkedin_display, @contact.linkedin_url, target: "_blank", rel: "noopener", class: "text-blue-600 hover:text-blue-800" %>
+              </dd>
+            </div>
+          <% end %>
+          <div>
+            <dt class="text-xs font-medium text-gray-500 uppercase">Added</dt>
+            <dd class="mt-1 text-sm text-gray-900"><%= @contact.created_at.strftime("%B %d, %Y") %></dd>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tags -->
+      <div class="bg-white rounded-lg shadow">
+        <div class="px-6 py-4 border-b border-gray-200">
+          <h2 class="text-sm font-semibold text-gray-900 uppercase tracking-wider">Tags</h2>
+        </div>
+        <div class="px-6 py-4">
+          <% available_tags = current_organization.tags.ordered - @contact.tags %>
+          <% if available_tags.any? %>
+            <div class="flex flex-wrap gap-2">
+              <% available_tags.each do |tag| %>
+                <%= link_to tag_contact_path(@contact, tag_id: tag.id), data: { "turbo-method": "post" }, class: "inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium #{tag.bg_class} #{tag.text_class} opacity-60 hover:opacity-100 cursor-pointer" do %>
+                  + <%= tag.name %>
+                <% end %>
+              <% end %>
+            </div>
+          <% elsif @contact.tags.empty? %>
+            <p class="text-sm text-gray-500">No tags available. <% if current_user.admin? %><%= link_to "Create tags", tags_path, class: "text-blue-600 hover:text-blue-800" %><% end %></p>
+          <% else %>
+            <p class="text-sm text-gray-500">All tags applied.</p>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- Assignments -->
+      <div class="bg-white rounded-lg shadow">
+        <div class="px-6 py-4 border-b border-gray-200">
+          <h2 class="text-sm font-semibold text-gray-900 uppercase tracking-wider">Assigned To</h2>
+        </div>
+        <div class="px-6 py-4">
+          <% if @contact.assigned_users.any? %>
+            <div class="space-y-3">
+              <% @contact.assigned_users.each do |user| %>
+                <div class="flex items-center">
+                  <div class="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center">
+                    <span class="text-xs font-medium text-white"><%= user.initials %></span>
+                  </div>
+                  <div class="ml-3">
+                    <p class="text-sm font-medium text-gray-900"><%= user.full_name %></p>
+                  </div>
+                </div>
+              <% end %>
+            </div>
+          <% else %>
+            <p class="text-sm text-amber-600">No one assigned</p>
+          <% end %>
+          <% if current_user.admin? %>
+            <details class="mt-4">
+              <summary class="text-sm text-blue-600 cursor-pointer hover:text-blue-800">Update assignments</summary>
+              <%= form_with url: assign_contact_path(@contact), method: :patch, class: "mt-3 space-y-2" do %>
+                <% current_organization.users.order(:first_name).each do |user| %>
+                  <label class="flex items-center">
+                    <input type="checkbox" name="user_ids[]" value="<%= user.id %>" class="mr-2"
+                           <%= "checked" if @contact.assigned_users.include?(user) %>>
+                    <span class="text-sm text-gray-700"><%= user.full_name %></span>
+                  </label>
+                <% end %>
+                <button type="submit" class="mt-2 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 cursor-pointer">Save</button>
+              <% end %>
+            </details>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main content -->
+    <div class="lg:col-span-2 space-y-6">
+      <!-- Add Note Form -->
+      <div class="bg-white rounded-lg shadow">
+        <div class="px-6 py-4 border-b border-gray-200">
+          <h2 class="text-sm font-semibold text-gray-900 uppercase tracking-wider">Add Note</h2>
+        </div>
+        <%= form_with(model: ContactNote.new, url: contact_contact_notes_path(@contact), method: :post, class: "px-6 py-4 space-y-4") do |form| %>
+          <div class="flex space-x-4">
+            <div class="w-40">
+              <%= form.select :contact_type, ContactNote::CONTACT_TYPES, { include_blank: "Type..." }, class: "block w-full text-sm" %>
+            </div>
+            <div class="flex-1">
+              <%= form.date_field :follow_up_date, class: "block w-full text-sm", placeholder: "Follow-up date" %>
+            </div>
+          </div>
+          <%= form.text_area :note, rows: 3, class: "block w-full text-sm", placeholder: "Write a note..." %>
+          <div class="flex justify-end">
+            <%= form.submit "Add Note", class: "px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 cursor-pointer" %>
+          </div>
+        <% end %>
+      </div>
+
+      <!-- Notes Timeline -->
+      <div class="bg-white rounded-lg shadow">
+        <div class="px-6 py-4 border-b border-gray-200">
+          <h2 class="text-sm font-semibold text-gray-900 uppercase tracking-wider">Notes (<%= @contact.contact_notes.count %>)</h2>
+        </div>
+        <% notes = @contact.contact_notes.recent.includes(:user) %>
+        <% if notes.any? %>
+          <div class="divide-y divide-gray-200">
+            <% notes.each do |note| %>
+              <div class="px-6 py-4">
+                <div class="flex justify-between items-start">
+                  <div class="flex items-center space-x-2">
+                    <% if note.user %>
+                      <div class="h-6 w-6 rounded-full bg-blue-600 flex items-center justify-center">
+                        <span class="text-xs font-medium text-white"><%= note.user.initials %></span>
+                      </div>
+                      <span class="text-sm font-medium text-gray-900"><%= note.user.full_name %></span>
+                    <% end %>
+                    <% if note.contact_type.present? %>
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
+                        <%= note.contact_type_display %>
+                      </span>
+                    <% end %>
+                    <span class="text-xs text-gray-400"><%= time_ago_in_words(note.contacted_at) %> ago</span>
+                  </div>
+                  <div class="flex items-center space-x-2">
+                    <%= link_to "Edit", edit_contact_contact_note_path(@contact, note), class: "text-xs text-gray-400 hover:text-gray-600" %>
+                    <%= link_to "Delete", contact_contact_note_path(@contact, note), data: { "turbo-method": "delete", turbo_confirm: "Delete this note?" }, class: "text-xs text-red-400 hover:text-red-600" %>
+                  </div>
+                </div>
+                <p class="mt-2 text-sm text-gray-700 whitespace-pre-wrap"><%= note.note %></p>
+                <% if note.follow_up_date.present? %>
+                  <div class="mt-2 flex items-center space-x-2">
+                    <% if note.follow_up_completed? %>
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700">
+                        Follow-up completed
+                      </span>
+                    <% elsif note.follow_up_overdue? %>
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-700">
+                        <%= note.follow_up_display %>
+                      </span>
+                      <%= link_to "Complete", complete_follow_up_contact_contact_note_path(@contact, note), data: { "turbo-method": "patch" }, class: "text-xs text-blue-600 hover:text-blue-800" %>
+                    <% else %>
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-700">
+                        Follow up: <%= note.follow_up_display %>
+                      </span>
+                      <%= link_to "Complete", complete_follow_up_contact_contact_note_path(@contact, note), data: { "turbo-method": "patch" }, class: "text-xs text-blue-600 hover:text-blue-800" %>
+                    <% end %>
+                  </div>
+                <% end %>
+              </div>
+            <% end %>
+          </div>
+        <% else %>
+          <div class="px-6 py-12 text-center">
+            <p class="text-sm text-gray-500">No notes yet. Add your first note above.</p>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

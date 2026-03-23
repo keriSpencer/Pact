@@ -1,0 +1,166 @@
+<% content_for(:title) { "Sign Document - Pact" } %>
+
+<div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+  <% if @signature_request.signed? %>
+    <!-- Signed confirmation -->
+    <div class="bg-white rounded-lg shadow p-8 text-center">
+      <svg class="mx-auto h-16 w-16 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+      </svg>
+      <h2 class="mt-4 text-2xl font-bold text-gray-900">Document Signed</h2>
+      <p class="mt-2 text-gray-600">You signed "<strong><%= @signature_request.document.name %></strong>" on <%= @signature_request.signed_at&.strftime("%B %d, %Y at %l:%M %p") %>.</p>
+    </div>
+
+  <% elsif @signature_request.declined? %>
+    <div class="bg-white rounded-lg shadow p-8 text-center">
+      <h2 class="text-2xl font-bold text-gray-900">Signature Declined</h2>
+      <p class="mt-2 text-gray-600">You declined to sign "<strong><%= @signature_request.document.name %></strong>".</p>
+    </div>
+
+  <% elsif @signature_request.cancelled? || @signature_request.voided? || @signature_request.expired? %>
+    <div class="bg-white rounded-lg shadow p-8 text-center">
+      <h2 class="text-2xl font-bold text-gray-900">Request <%= @signature_request.status.humanize %></h2>
+      <p class="mt-2 text-gray-600">This signature request is no longer active.</p>
+    </div>
+
+  <% elsif @signature_request.can_sign? %>
+    <!-- Signing interface -->
+    <div class="bg-white rounded-lg shadow mb-6">
+      <div class="px-6 py-4 border-b border-gray-200">
+        <h2 class="text-lg font-semibold text-gray-900">Sign: <%= @signature_request.document.name %></h2>
+        <p class="text-sm text-gray-500 mt-1">Requested by <%= @signature_request.requester.full_name %></p>
+        <% if @signature_request.message.present? %>
+          <p class="text-sm text-gray-600 mt-2 italic">"<%= @signature_request.message %>"</p>
+        <% end %>
+      </div>
+
+      <% if @signature_request.uses_multi_field? %>
+        <!-- Multi-field signing -->
+        <div class="px-6 py-4">
+          <div class="mb-4">
+            <div class="flex justify-between items-center mb-2">
+              <span class="text-sm font-medium text-gray-700">Completion Progress</span>
+              <span class="text-sm text-gray-500"><%= @signature_request.completion_progress %>%</span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-2">
+              <div class="bg-blue-600 h-2 rounded-full" style="width: <%= @signature_request.completion_progress %>%"></div>
+            </div>
+          </div>
+
+          <div class="space-y-4">
+            <% @fields.each do |field| %>
+              <div class="border rounded-lg p-4 <%= field.completed? ? 'bg-green-50 border-green-200' : 'bg-white border-gray-200' %>">
+                <div class="flex justify-between items-start">
+                  <div>
+                    <span class="text-sm font-medium text-gray-900"><%= field.label %></span>
+                    <% if field.required? %><span class="text-red-500">*</span><% end %>
+                    <span class="text-xs text-gray-500 block">Page <%= field.page_number %> - <%= field.field_type.humanize %></span>
+                  </div>
+                  <% if field.completed? %>
+                    <span class="text-xs px-2 py-1 bg-green-100 text-green-800 rounded-full">Completed</span>
+                  <% else %>
+                    <span class="text-xs px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full">Pending</span>
+                  <% end %>
+                </div>
+
+                <% unless field.completed? %>
+                  <div class="mt-3">
+                    <% if %w[signature initials].include?(field.field_type) %>
+                      <!-- Capture artifact first, then complete field -->
+                      <%= form_with url: capture_artifact_signature_path(@signature_request.signature_token), method: :post, class: "space-y-2" do |f| %>
+                        <input type="hidden" name="artifact_type" value="<%= field.field_type %>">
+                        <input type="hidden" name="capture_method" value="typed">
+                        <div>
+                          <label class="block text-xs text-gray-600">Type your <%= field.field_type %></label>
+                          <input type="text" name="artifact_data" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" placeholder="Type here...">
+                          <input type="hidden" name="typed_text" value="">
+                        </div>
+                        <button type="submit" class="px-3 py-1.5 text-xs font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700">Capture <%= field.field_type.humanize %></button>
+                      <% end %>
+
+                      <% artifact = @signature_request.signature_artifacts.find_by(artifact_type: field.field_type) %>
+                      <% if artifact %>
+                        <%= form_with url: complete_field_signature_path(@signature_request.signature_token), method: :post, class: "mt-2" do %>
+                          <input type="hidden" name="field_id" value="<%= field.id %>">
+                          <input type="hidden" name="artifact_id" value="<%= artifact.id %>">
+                          <button type="submit" class="px-3 py-1.5 text-xs font-medium text-white bg-green-600 rounded-md hover:bg-green-700">Apply to This Field</button>
+                        <% end %>
+                      <% end %>
+                    <% elsif field.field_type == "date" %>
+                      <p class="text-xs text-gray-500">This field will be auto-filled with today's date upon submission.</p>
+                    <% else %>
+                      <!-- Text, name, email, etc. -->
+                      <%= form_with url: capture_artifact_signature_path(@signature_request.signature_token), method: :post, class: "space-y-2" do %>
+                        <input type="hidden" name="artifact_type" value="<%= field.field_type %>">
+                        <input type="hidden" name="capture_method" value="typed">
+                        <div>
+                          <label class="block text-xs text-gray-600">Enter <%= field.field_type.humanize.downcase %></label>
+                          <input type="text" name="artifact_data" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
+                        </div>
+                        <button type="submit" class="px-3 py-1.5 text-xs font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700">Save</button>
+                      <% end %>
+
+                      <% artifact = @signature_request.signature_artifacts.find_by(artifact_type: field.field_type) %>
+                      <% if artifact %>
+                        <%= form_with url: complete_field_signature_path(@signature_request.signature_token), method: :post, class: "mt-2" do %>
+                          <input type="hidden" name="field_id" value="<%= field.id %>">
+                          <input type="hidden" name="artifact_id" value="<%= artifact.id %>">
+                          <button type="submit" class="px-3 py-1.5 text-xs font-medium text-white bg-green-600 rounded-md hover:bg-green-700">Apply to This Field</button>
+                        <% end %>
+                      <% end %>
+                    <% end %>
+                  </div>
+                <% else %>
+                  <div class="mt-2">
+                    <%= form_with url: reset_field_signature_path(@signature_request.signature_token), method: :post, class: "inline" do %>
+                      <input type="hidden" name="field_id" value="<%= field.id %>">
+                      <button type="submit" class="text-xs text-gray-500 underline hover:text-gray-700">Reset</button>
+                    <% end %>
+                  </div>
+                <% end %>
+              </div>
+            <% end %>
+          </div>
+
+          <!-- Finalize button -->
+          <div class="mt-6">
+            <%= form_with url: finalize_signature_path(@signature_request.signature_token), method: :post do %>
+              <button type="submit" class="w-full px-4 py-3 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700 <%= @signature_request.all_required_fields_completed? ? '' : 'opacity-50 cursor-not-allowed' %>" <%= @signature_request.all_required_fields_completed? ? '' : 'disabled' %>>
+                Submit Signed Document
+              </button>
+            <% end %>
+          </div>
+        </div>
+
+      <% else %>
+        <!-- Single-field (legacy) signing -->
+        <div class="px-6 py-4">
+          <%= form_with url: sign_signature_path(@signature_request.signature_token), method: :post, class: "space-y-4" do %>
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Type your signature</label>
+              <input type="text" name="signature_data" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-lg" placeholder="Type your full name..." style="font-family: 'Brush Script MT', cursive;">
+            </div>
+            <p class="text-xs text-gray-500">By signing, you agree that this electronic signature is the legal equivalent of your manual/handwritten signature.</p>
+            <button type="submit" class="w-full px-4 py-3 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700">
+              Sign Document
+            </button>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+
+    <!-- Decline option -->
+    <div class="bg-white rounded-lg shadow p-6">
+      <h3 class="text-sm font-medium text-gray-700 mb-3">Don't want to sign?</h3>
+      <%= form_with url: decline_signature_path(@signature_request.signature_token), method: :post, class: "space-y-3" do %>
+        <div>
+          <label class="block text-xs text-gray-600">Reason (optional)</label>
+          <textarea name="decline_reason" rows="2" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" placeholder="Explain why you're declining..."></textarea>
+        </div>
+        <button type="submit" class="px-4 py-2 text-sm font-medium text-red-600 bg-white border border-red-300 rounded-md hover:bg-red-50" data-turbo-confirm="Are you sure you want to decline signing this document?">
+          Decline to Sign
+        </button>
+      <% end %>
+    </div>
+  <% end %>
+</div>

@@ -1,0 +1,65 @@
+<div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="mb-8">
+    <h1 class="text-2xl font-bold text-gray-900">Tags</h1>
+    <p class="mt-1 text-sm text-gray-500">Manage tags for organizing contacts</p>
+  </div>
+
+  <!-- Create Tag -->
+  <div class="bg-white rounded-lg shadow mb-8">
+    <div class="px-6 py-4 border-b border-gray-200">
+      <h2 class="text-lg font-semibold text-gray-900">New Tag</h2>
+    </div>
+    <%= form_with(model: @tag, url: tags_path, method: :post, class: "px-6 py-5") do |form| %>
+      <% if @tag.errors.any? %>
+        <div class="bg-red-50 border border-red-200 rounded-md p-4 mb-4">
+          <ul class="list-disc list-inside text-sm text-red-700">
+            <% @tag.errors.full_messages.each do |message| %>
+              <li><%= message %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+
+      <div class="flex items-end space-x-4">
+        <div class="flex-1">
+          <%= form.label :name, class: "block text-sm font-medium text-gray-700" %>
+          <%= form.text_field :name, class: "mt-1 block w-full", placeholder: "Tag name" %>
+        </div>
+        <div class="w-40">
+          <%= form.label :color, class: "block text-sm font-medium text-gray-700" %>
+          <%= form.select :color, Tag::COLORS.map { |c| [c.capitalize, c] }, {}, class: "mt-1 block w-full" %>
+        </div>
+        <%= form.submit "Create", class: "px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 cursor-pointer" %>
+      </div>
+    <% end %>
+  </div>
+
+  <!-- Existing Tags -->
+  <div class="bg-white rounded-lg shadow">
+    <div class="px-6 py-4 border-b border-gray-200">
+      <h2 class="text-lg font-semibold text-gray-900">All Tags (<%= @tags.count %>)</h2>
+    </div>
+    <% if @tags.any? %>
+      <ul class="divide-y divide-gray-200">
+        <% @tags.each do |tag| %>
+          <li class="px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center">
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium <%= tag.bg_class %> <%= tag.text_class %>">
+                <%= tag.name %>
+              </span>
+              <% if tag.description.present? %>
+                <span class="ml-3 text-sm text-gray-500"><%= tag.description %></span>
+              <% end %>
+              <span class="ml-3 text-xs text-gray-400"><%= tag.contacts.count %> contacts</span>
+            </div>
+            <%= link_to "Delete", tag_path(tag), data: { "turbo-method": "delete", turbo_confirm: "Delete tag '#{tag.name}'?" }, class: "text-sm text-red-600 hover:text-red-800" %>
+          </li>
+        <% end %>
+      </ul>
+    <% else %>
+      <div class="px-6 py-12 text-center">
+        <p class="text-sm text-gray-500">No tags yet. Create your first tag above.</p>
+      </div>
+    <% end %>
+  </div>
+</div>

@@ -1,0 +1,27 @@
+<h2>Signature Requested</h2>
+
+<p>Hello <%= @signature_request.signer_display_name %>,</p>
+
+<p><strong><%= @signature_request.requester.full_name %></strong> has requested your signature on the document "<strong><%= @document.name %></strong>".</p>
+
+<% if @signature_request.message.present? %>
+  <p>Message from the sender:</p>
+  <blockquote style="border-left: 3px solid #ccc; padding-left: 12px; color: #555;">
+    <%= @signature_request.message %>
+  </blockquote>
+<% end %>
+
+<p>
+  <a href="<%= @signing_url %>" style="display: inline-block; padding: 12px 24px; background-color: #2563eb; color: #ffffff; text-decoration: none; border-radius: 6px; font-weight: bold;">
+    Review &amp; Sign Document
+  </a>
+</p>
+
+<p style="color: #666; font-size: 14px;">
+  If the button above doesn't work, copy and paste this link into your browser:<br>
+  <%= @signing_url %>
+</p>
+
+<% if @signature_request.expires_at.present? %>
+  <p style="color: #666; font-size: 14px;">This request expires on <%= @signature_request.expires_at.strftime("%B %d, %Y") %>.</p>
+<% end %>

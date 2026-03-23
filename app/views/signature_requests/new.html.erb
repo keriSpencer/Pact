@@ -1,0 +1,41 @@
+<div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <h1 class="text-2xl font-bold text-gray-900 mb-6">Request Signature</h1>
+  <p class="text-sm text-gray-500 mb-4">Document: <strong><%= @document.name %></strong></p>
+
+  <%= form_with model: [@document, @signature_request], method: :post, class: "space-y-6" do |f| %>
+    <% if @signature_request.errors.any? %>
+      <div class="bg-red-50 border border-red-200 rounded-md p-4">
+        <ul class="list-disc list-inside text-sm text-red-700">
+          <% @signature_request.errors.full_messages.each do |msg| %>
+            <li><%= msg %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <div>
+      <%= f.label :signer_email, "Signer Email", class: "block text-sm font-medium text-gray-700" %>
+      <%= f.email_field :signer_email, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm", required: true %>
+    </div>
+
+    <div>
+      <%= f.label :signer_name, "Signer Name", class: "block text-sm font-medium text-gray-700" %>
+      <%= f.text_field :signer_name, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" %>
+    </div>
+
+    <div>
+      <%= f.label :message, "Message (optional)", class: "block text-sm font-medium text-gray-700" %>
+      <%= f.text_area :message, rows: 3, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm", placeholder: "Add a personal message for the signer..." %>
+    </div>
+
+    <div>
+      <%= f.label :expires_at, "Expires At (optional)", class: "block text-sm font-medium text-gray-700" %>
+      <%= f.datetime_local_field :expires_at, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" %>
+    </div>
+
+    <div class="flex justify-end space-x-3">
+      <%= link_to "Cancel", document_path(@document), class: "px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50" %>
+      <%= f.submit "Create & Place Fields", class: "px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 cursor-pointer" %>
+    </div>
+  <% end %>
+</div>

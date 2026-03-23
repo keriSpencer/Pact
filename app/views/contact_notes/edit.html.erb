@@ -1,0 +1,38 @@
+<div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="bg-white rounded-lg shadow">
+    <div class="px-6 py-5 border-b border-gray-200">
+      <h1 class="text-xl font-bold text-gray-900">Edit Note</h1>
+    </div>
+    <%= form_with(model: @contact_note, url: contact_contact_note_path(@contact, @contact_note), method: :patch, class: "px-6 py-5 space-y-4") do |form| %>
+      <% if @contact_note.errors.any? %>
+        <div class="bg-red-50 border border-red-200 rounded-md p-4">
+          <ul class="list-disc list-inside text-sm text-red-700">
+            <% @contact_note.errors.full_messages.each do |message| %>
+              <li><%= message %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+
+      <div>
+        <%= form.label :contact_type, "Type", class: "block text-sm font-medium text-gray-700" %>
+        <%= form.select :contact_type, ContactNote::CONTACT_TYPES, { include_blank: "Select type..." }, class: "mt-1 block w-full" %>
+      </div>
+
+      <div>
+        <%= form.label :note, class: "block text-sm font-medium text-gray-700" %>
+        <%= form.text_area :note, rows: 4, class: "mt-1 block w-full" %>
+      </div>
+
+      <div>
+        <%= form.label :follow_up_date, "Follow-up date", class: "block text-sm font-medium text-gray-700" %>
+        <%= form.date_field :follow_up_date, class: "mt-1 block w-full" %>
+      </div>
+
+      <div class="flex justify-end space-x-3 pt-4">
+        <%= link_to "Cancel", contact_path(@contact), class: "px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50" %>
+        <%= form.submit "Save", class: "px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 cursor-pointer" %>
+      </div>
+    <% end %>
+  </div>
+</div>

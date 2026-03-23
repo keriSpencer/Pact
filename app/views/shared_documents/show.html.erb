@@ -1,0 +1,44 @@
+<% content_for(:title) { "#{@document.name} - Shared Document" } %>
+
+<div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+  <div class="bg-white rounded-lg shadow">
+    <div class="px-6 py-4 border-b border-gray-200">
+      <h2 class="text-lg font-semibold text-gray-900"><%= @document.name %></h2>
+      <% if @document.description.present? %>
+        <p class="mt-1 text-sm text-gray-500"><%= @document.description %></p>
+      <% end %>
+    </div>
+
+    <div class="px-6 py-4 space-y-4">
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <dt class="text-xs font-medium text-gray-500 uppercase">File type</dt>
+          <dd class="mt-1 text-sm text-gray-900"><%= @document.file_type_category.capitalize %></dd>
+        </div>
+        <div>
+          <dt class="text-xs font-medium text-gray-500 uppercase">Size</dt>
+          <dd class="mt-1 text-sm text-gray-900"><%= @document.formatted_file_size %></dd>
+        </div>
+      </div>
+
+      <% if @document_share.can_view? && @document.pdf? && @document.file.attached? %>
+        <div class="mt-4">
+          <iframe src="<%= rails_blob_path(@document.file, disposition: 'inline') %>" class="w-full h-96 border border-gray-200 rounded" title="Document preview"></iframe>
+        </div>
+      <% end %>
+
+      <div class="flex space-x-3 pt-4">
+        <% if @document_share.can_view? && @document.file.attached? %>
+          <%= link_to "Download", download_shared_document_path(@document_share.share_token), class: "px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700" %>
+        <% end %>
+      </div>
+
+      <p class="text-xs text-gray-400 mt-4">
+        Shared by <%= @document_share.shared_by.full_name %>
+        <% if @document_share.expires_at.present? %>
+          &middot; Expires <%= @document_share.expires_at.strftime("%B %d, %Y") %>
+        <% end %>
+      </p>
+    </div>
+  </div>
+</div>

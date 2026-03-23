@@ -1,0 +1,110 @@
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="flex justify-between items-center mb-6">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900">Contacts</h1>
+      <p class="mt-1 text-sm text-gray-500"><%= @contacts.count %> total</p>
+    </div>
+    <%= link_to new_contact_path, class: "px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700" do %>
+      New Contact
+    <% end %>
+  </div>
+
+  <!-- Search & Filters -->
+  <div class="mb-6 space-y-3">
+    <%= form_with url: contacts_path, method: :get, local: true, class: "flex" do |form| %>
+      <%= form.text_field :search, value: params[:search], placeholder: "Search contacts...", class: "flex-1 max-w-md" %>
+      <%= form.submit "Search", class: "ml-3 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer" %>
+      <% if params[:search].present? || params[:tag_id].present? %>
+        <%= link_to "Clear", contacts_path, class: "ml-2 px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-700" %>
+      <% end %>
+    <% end %>
+    <% if @filter_tags.any? %>
+      <div class="flex flex-wrap gap-2">
+        <% @filter_tags.each do |tag| %>
+          <%= link_to contacts_path(tag_id: tag.id, search: params[:search]), class: "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium #{tag.bg_class} #{tag.text_class} #{params[:tag_id].to_s == tag.id.to_s ? 'ring-2 ring-offset-1 ring-blue-500' : 'opacity-70 hover:opacity-100'}" do %>
+            <%= tag.name %>
+          <% end %>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+
+  <!-- Contacts Table -->
+  <div class="bg-white rounded-lg shadow overflow-hidden">
+    <% if @contacts.any? %>
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <%= sort_link("Name", "name") %>
+            </th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">
+              <%= sort_link("Email", "email") %>
+            </th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">
+              <%= sort_link("Company", "company") %>
+            </th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">
+              Assigned To
+            </th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">
+              <%= sort_link("Added", "created_at") %>
+            </th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          <% @contacts.each do |contact| %>
+            <tr class="hover:bg-gray-50">
+              <td class="px-6 py-4 whitespace-nowrap">
+                <%= link_to contact_path(contact), class: "block" do %>
+                  <div class="text-sm font-medium text-gray-900"><%= contact.full_name %></div>
+                  <div class="text-sm text-gray-500 sm:hidden"><%= contact.email %></div>
+                  <% if contact.tags.any? %>
+                    <div class="flex flex-wrap gap-1 mt-1">
+                      <% contact.tags.each do |tag| %>
+                        <span class="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium <%= tag.bg_class %> <%= tag.text_class %>"><%= tag.name %></span>
+                      <% end %>
+                    </div>
+                  <% end %>
+                <% end %>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 hidden sm:table-cell">
+                <%= contact.email %>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 hidden md:table-cell">
+                <%= contact.company %>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap hidden lg:table-cell">
+                <% if contact.assigned_users.any? %>
+                  <div class="flex -space-x-1">
+                    <% contact.assigned_users.each do |user| %>
+                      <div class="h-6 w-6 rounded-full bg-blue-600 flex items-center justify-center ring-2 ring-white" title="<%= user.full_name %>">
+                        <span class="text-xs font-medium text-white"><%= user.initials %></span>
+                      </div>
+                    <% end %>
+                  </div>
+                <% else %>
+                  <span class="text-xs text-amber-600">Unassigned</span>
+                <% end %>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400 hidden lg:table-cell">
+                <%= contact.created_at.strftime("%b %d, %Y") %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    <% else %>
+      <div class="px-6 py-12 text-center">
+        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+        </svg>
+        <h3 class="mt-2 text-sm font-medium text-gray-900">No contacts</h3>
+        <p class="mt-1 text-sm text-gray-500">Get started by adding your first contact.</p>
+        <div class="mt-6">
+          <%= link_to "New Contact", new_contact_path, class: "px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700" %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>

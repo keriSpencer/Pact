@@ -1,0 +1,169 @@
+<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="flex justify-between items-start mb-6">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900"><%= @document.name %></h1>
+      <% if @document.description.present? %>
+        <p class="mt-1 text-sm text-gray-500"><%= @document.description %></p>
+      <% end %>
+    </div>
+    <div class="flex space-x-3">
+      <%= link_to "Download", download_document_path(@document), class: "px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700" %>
+      <% if @document.pdf? %>
+        <%= link_to "Preview", preview_document_path(@document), target: "_blank", class: "px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50" %>
+      <% end %>
+      <% if @document.pdf? %>
+        <%= link_to "Request Signature", new_document_signature_request_path(@document), class: "px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700" %>
+      <% end %>
+      <% if @document.user == current_user || current_user.admin? %>
+        <%= link_to "Edit", edit_document_path(@document), class: "px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50" %>
+        <%= link_to "Delete", document_path(@document), data: { "turbo-method": "delete", turbo_confirm: "Delete '#{@document.name}'?" }, class: "px-4 py-2 text-sm font-medium text-red-600 bg-white border border-red-300 rounded-md hover:bg-red-50" %>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- Sidebar -->
+    <div class="lg:col-span-1 space-y-6">
+      <div class="bg-white rounded-lg shadow">
+        <div class="px-6 py-4 border-b border-gray-200">
+          <h2 class="text-sm font-semibold text-gray-900 uppercase tracking-wider">Details</h2>
+        </div>
+        <div class="px-6 py-4 space-y-4">
+          <div>
+            <dt class="text-xs font-medium text-gray-500 uppercase">File type</dt>
+            <dd class="mt-1 text-sm text-gray-900"><%= @document.file_type_category.capitalize %></dd>
+          </div>
+          <div>
+            <dt class="text-xs font-medium text-gray-500 uppercase">Size</dt>
+            <dd class="mt-1 text-sm text-gray-900"><%= @document.formatted_file_size %></dd>
+          </div>
+          <% if @document.folder %>
+            <div>
+              <dt class="text-xs font-medium text-gray-500 uppercase">Folder</dt>
+              <dd class="mt-1 text-sm">
+                <%= link_to @document.folder.name, folder_path(@document.folder), class: "text-blue-600 hover:text-blue-800" %>
+              </dd>
+            </div>
+          <% end %>
+          <% if @document.contact %>
+            <div>
+              <dt class="text-xs font-medium text-gray-500 uppercase">Contact</dt>
+              <dd class="mt-1 text-sm">
+                <%= link_to @document.contact.full_name, contact_path(@document.contact), class: "text-blue-600 hover:text-blue-800" %>
+              </dd>
+            </div>
+          <% end %>
+          <div>
+            <dt class="text-xs font-medium text-gray-500 uppercase">Uploaded by</dt>
+            <dd class="mt-1 text-sm text-gray-900"><%= @document.user.full_name %></dd>
+          </div>
+          <div>
+            <dt class="text-xs font-medium text-gray-500 uppercase">Uploaded</dt>
+            <dd class="mt-1 text-sm text-gray-900"><%= @document.created_at.strftime("%B %d, %Y at %l:%M %p") %></dd>
+          </div>
+          <div>
+            <dt class="text-xs font-medium text-gray-500 uppercase">Visibility</dt>
+            <dd class="mt-1 text-sm text-gray-900"><%= @document.visibility.humanize %></dd>
+          </div>
+        </div>
+      </div>
+
+      <!-- Versions -->
+      <% if @document.versions.any? %>
+        <div class="bg-white rounded-lg shadow">
+          <div class="px-6 py-4 border-b border-gray-200">
+            <h2 class="text-sm font-semibold text-gray-900 uppercase tracking-wider">Versions</h2>
+          </div>
+          <div class="divide-y divide-gray-200">
+            <% @document.versions.in_order.each do |version| %>
+              <div class="px-6 py-3">
+                <p class="text-sm font-medium text-gray-900"><%= version.display_label %></p>
+                <p class="text-xs text-gray-500"><%= version.formatted_date %></p>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+
+    <!-- Main content -->
+    <div class="lg:col-span-2 space-y-6">
+      <!-- Signature Requests -->
+      <% if @document.signature_requests.any? %>
+        <div class="bg-white rounded-lg shadow">
+          <div class="px-6 py-4 border-b border-gray-200">
+            <h2 class="text-sm font-semibold text-gray-900 uppercase tracking-wider">Signature Requests</h2>
+          </div>
+          <div class="divide-y divide-gray-200">
+            <% @document.signature_requests.order(created_at: :desc).each do |sr| %>
+              <div class="px-6 py-3 flex items-center justify-between">
+                <div>
+                  <p class="text-sm font-medium text-gray-900"><%= sr.signer_display_name %></p>
+                  <p class="text-xs text-gray-500"><%= sr.signer_email %></p>
+                </div>
+                <div class="flex items-center space-x-2">
+                  <span class="text-xs px-2 py-1 rounded-full <%= sr.status_color_class %>"><%= sr.status.humanize %></span>
+                  <% if sr.can_sign? %>
+                    <div class="flex space-x-1">
+                      <%= link_to "Edit", edit_document_signature_request_path(@document, sr), class: "text-xs text-blue-600 hover:text-blue-800" %>
+                      <%= link_to "Cancel", cancel_document_signature_request_path(@document, sr), data: { "turbo-method": "post", turbo_confirm: "Cancel this signature request?" }, class: "text-xs text-red-600 hover:text-red-800" %>
+                      <%= link_to "Resend", resend_document_signature_request_path(@document, sr), data: { "turbo-method": "post" }, class: "text-xs text-gray-600 hover:text-gray-800" %>
+                    </div>
+                  <% end %>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+
+      <!-- Document Shares -->
+      <% if @document.document_shares.any? %>
+        <div class="bg-white rounded-lg shadow">
+          <div class="px-6 py-4 border-b border-gray-200">
+            <h2 class="text-sm font-semibold text-gray-900 uppercase tracking-wider">Shares</h2>
+          </div>
+          <div class="divide-y divide-gray-200">
+            <% @document.document_shares.order(created_at: :desc).each do |share| %>
+              <div class="px-6 py-3 flex items-center justify-between">
+                <div>
+                  <p class="text-sm font-medium text-gray-900"><%= share.recipient_name %></p>
+                  <p class="text-xs text-gray-500"><%= share.recipient_email %></p>
+                </div>
+                <div class="flex items-center space-x-2">
+                  <span class="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-800"><%= share.permission_level.humanize %></span>
+                  <% if share.expired? %>
+                    <span class="text-xs px-2 py-1 rounded-full bg-red-100 text-red-800">Expired</span>
+                  <% else %>
+                    <span class="text-xs px-2 py-1 rounded-full bg-green-100 text-green-800">Active</span>
+                  <% end %>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+
+      <div class="bg-white rounded-lg shadow">
+        <div class="px-6 py-4 border-b border-gray-200">
+          <h2 class="text-sm font-semibold text-gray-900 uppercase tracking-wider">Preview</h2>
+        </div>
+        <div class="p-6">
+          <% if @document.pdf? && @document.file.attached? %>
+            <iframe src="<%= rails_blob_path(@document.file, disposition: 'inline') %>" class="w-full h-96 border border-gray-200 rounded" title="Document preview"></iframe>
+          <% elsif @document.image? && @document.file.attached? %>
+            <%= image_tag rails_blob_path(@document.file), class: "max-w-full rounded", alt: @document.name %>
+          <% else %>
+            <div class="text-center py-12">
+              <svg class="mx-auto h-16 w-16 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+              </svg>
+              <p class="mt-4 text-sm text-gray-500">Preview not available for this file type.</p>
+              <%= link_to "Download to view", download_document_path(@document), class: "mt-2 inline-block text-sm text-blue-600 hover:text-blue-800" %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
