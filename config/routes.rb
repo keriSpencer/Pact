@@ -68,6 +68,9 @@ Rails.application.routes.draw do
 
   # Contacts
   resources :contacts do
+    collection do
+      get :search
+    end
     member do
       patch :assign
       post :tag

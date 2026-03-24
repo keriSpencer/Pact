@@ -68,4 +68,20 @@ class SignatureField < ApplicationRecord
   def label
     self[:label].presence || field_type.humanize
   end
+
+  def pre_fillable?
+    field_type.in?(%w[name email date])
+  end
+
+  def text_input_type?
+    field_type.in?(%w[name email company title text])
+  end
+
+  def drawable?
+    field_type.in?(%w[signature initials])
+  end
+
+  def checkable?
+    field_type == "checkbox"
+  end
 end

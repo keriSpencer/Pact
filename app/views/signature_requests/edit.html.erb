@@ -34,8 +34,13 @@
             <select data-pdf-signature-placement-target="addFieldType" class="text-sm border-gray-300 rounded-md pr-8 py-1.5">
               <option value="signature">Signature</option>
               <option value="initials">Initials</option>
-              <option value="date">Date</option>
+              <option value="date">Date Signed</option>
               <option value="text">Text</option>
+              <option value="name">Printed Name</option>
+              <option value="email">Email</option>
+              <option value="company">Company</option>
+              <option value="title">Title/Role</option>
+              <option value="checkbox">Checkbox</option>
             </select>
           </div>
           <div class="flex items-center space-x-3">
@@ -79,18 +84,20 @@
                value="<%= @signature_request.signature_fields.map { |sf| { page_number: sf.page_number, x_percent: sf.x_percent, y_percent: sf.y_percent, width_percent: sf.width_percent, height_percent: sf.height_percent, field_type: sf.field_type, required: sf.required, position: sf.position, label: sf.read_attribute(:label) } }.to_json %>">
 
         <!-- Signer Details -->
-        <div class="bg-white rounded-lg shadow-sm">
+        <div class="bg-white rounded-lg shadow-sm" data-controller="contact-picker" data-contact-picker-url-value="<%= search_contacts_path %>">
           <div class="px-6 py-4 border-b border-gray-200">
             <h2 class="text-sm font-semibold text-gray-900">Signer Details</h2>
           </div>
           <div class="px-6 py-4 space-y-4">
-            <div>
+            <div class="relative">
               <%= f.label :signer_email, "Email", class: "block text-sm font-medium text-gray-700" %>
-              <%= f.email_field :signer_email, class: "mt-1 block w-full", required: true, placeholder: "signer@example.com" %>
+              <%= f.email_field :signer_email, class: "mt-1 block w-full", required: true, placeholder: "signer@example.com", data: { contact_picker_target: "email", action: "input->contact-picker#onEmailInput" } %>
+              <div data-contact-picker-target="suggestions" class="hidden absolute z-10 mt-1 w-full bg-white border border-gray-200 rounded-md shadow-lg max-h-48 overflow-y-auto"></div>
+              <div data-contact-picker-target="linkedBadge" class="hidden mt-1.5"></div>
             </div>
             <div>
               <%= f.label :signer_name, "Name", class: "block text-sm font-medium text-gray-700" %>
-              <%= f.text_field :signer_name, class: "mt-1 block w-full", placeholder: "Full name" %>
+              <%= f.text_field :signer_name, class: "mt-1 block w-full", placeholder: "Full name", data: { contact_picker_target: "name" } %>
             </div>
             <div>
               <%= f.label :message, "Message (optional)", class: "block text-sm font-medium text-gray-700" %>

@@ -15,9 +15,14 @@ export default class extends Controller {
   get fieldDefaults() {
     return {
       signature: { width: 25.0, height: 8.0 },
-      initials:  { width: 15.0, height: 6.0 },
+      initials:  { width: 12.0, height: 6.0 },
       date:      { width: 20.0, height: 5.0 },
-      text:      { width: 30.0, height: 5.0 }
+      text:      { width: 30.0, height: 5.0 },
+      name:      { width: 25.0, height: 5.0 },
+      email:     { width: 25.0, height: 5.0 },
+      company:   { width: 25.0, height: 5.0 },
+      title:     { width: 20.0, height: 5.0 },
+      checkbox:  { width: 4.0, height: 4.0 }
     }
   }
 
@@ -379,9 +384,15 @@ export default class extends Controller {
 
   fieldColor(type) {
     switch (type) {
+      case 'signature': return { solid: '#7c3aed', fill: 'rgba(124,58,237,0.1)', selectedFill: 'rgba(124,58,237,0.2)' }
       case 'initials': return { solid: '#0891b2', fill: 'rgba(8,145,178,0.1)', selectedFill: 'rgba(8,145,178,0.2)' }
       case 'date': return { solid: '#d97706', fill: 'rgba(217,119,6,0.1)', selectedFill: 'rgba(217,119,6,0.2)' }
       case 'text': return { solid: '#2563eb', fill: 'rgba(37,99,235,0.1)', selectedFill: 'rgba(37,99,235,0.2)' }
+      case 'name': return { solid: '#16a34a', fill: 'rgba(22,163,74,0.1)', selectedFill: 'rgba(22,163,74,0.2)' }
+      case 'email': return { solid: '#4f46e5', fill: 'rgba(79,70,229,0.1)', selectedFill: 'rgba(79,70,229,0.2)' }
+      case 'company': return { solid: '#0d9488', fill: 'rgba(13,148,136,0.1)', selectedFill: 'rgba(13,148,136,0.2)' }
+      case 'title': return { solid: '#ec4899', fill: 'rgba(236,72,153,0.1)', selectedFill: 'rgba(236,72,153,0.2)' }
+      case 'checkbox': return { solid: '#6b7280', fill: 'rgba(107,114,128,0.1)', selectedFill: 'rgba(107,114,128,0.2)' }
       default: return { solid: '#7c3aed', fill: 'rgba(124,58,237,0.1)', selectedFill: 'rgba(124,58,237,0.2)' }
     }
   }
@@ -389,10 +400,15 @@ export default class extends Controller {
   fieldDefaultLabel(field) {
     if (field.label) return field.label
     switch (field.type) {
+      case 'signature': return 'Sign Here'
       case 'initials': return 'Initial Here'
       case 'date': return 'Date'
-      case 'text': return 'Enter Text'
-      default: return 'Sign Here'
+      case 'name': return 'Print Name'
+      case 'email': return 'Email'
+      case 'company': return 'Company'
+      case 'title': return 'Title'
+      case 'checkbox': return '\u2610'
+      default: return 'Text'
     }
   }
 
@@ -459,8 +475,13 @@ export default class extends Controller {
       const typeConfig = {
         signature: { label: 'Signature', color: 'bg-purple-100 text-purple-800', badge: 'bg-purple-600' },
         initials: { label: 'Initials', color: 'bg-cyan-100 text-cyan-800', badge: 'bg-cyan-600' },
-        date: { label: 'Date', color: 'bg-amber-100 text-amber-800', badge: 'bg-amber-600' },
-        text: { label: 'Text', color: 'bg-blue-100 text-blue-800', badge: 'bg-blue-600' }
+        date: { label: 'Date Signed', color: 'bg-amber-100 text-amber-800', badge: 'bg-amber-600' },
+        text: { label: 'Text', color: 'bg-blue-100 text-blue-800', badge: 'bg-blue-600' },
+        name: { label: 'Name', color: 'bg-green-100 text-green-800', badge: 'bg-green-600' },
+        email: { label: 'Email', color: 'bg-indigo-100 text-indigo-800', badge: 'bg-indigo-600' },
+        company: { label: 'Company', color: 'bg-teal-100 text-teal-800', badge: 'bg-teal-600' },
+        title: { label: 'Title', color: 'bg-pink-100 text-pink-800', badge: 'bg-pink-600' },
+        checkbox: { label: 'Checkbox', color: 'bg-gray-100 text-gray-800', badge: 'bg-gray-600' }
       }
       this.fieldsListTarget.innerHTML = this.signatureFields.map((field, index) => {
         const cfg = typeConfig[field.type] || typeConfig.signature

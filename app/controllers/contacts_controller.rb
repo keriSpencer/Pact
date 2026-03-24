@@ -39,6 +39,18 @@ class ContactsController < ApplicationController
     end
   end
 
+  def search
+    query = params[:q].to_s.strip.downcase
+    contacts = organization_contacts.where(
+      "LOWER(first_name) LIKE :q OR LOWER(last_name) LIKE :q OR LOWER(email) LIKE :q OR LOWER(company) LIKE :q OR LOWER(first_name || ' ' || last_name) LIKE :q",
+      q: "%#{query}%"
+    ).limit(10)
+
+    render json: contacts.map { |c| {
+      id: c.id, email: c.email, name: c.full_name, company: c.company, title: c.title
+    }}
+  end
+
   def show
   end
 

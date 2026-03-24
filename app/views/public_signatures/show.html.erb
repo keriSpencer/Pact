@@ -139,7 +139,7 @@
                 </div>
               <% else %>
                 <div class="ml-8 mt-2">
-                  <% if %w[signature initials].include?(field.field_type) %>
+                  <% if field.drawable? %>
                     <!-- Signature/Initials with draw or type -->
                     <div data-controller="signature-pad">
                       <div data-signature-pad-target="modeToggle" class="flex rounded-md border border-gray-200 overflow-hidden mb-3 w-fit">
@@ -182,7 +182,7 @@
                     </div>
 
                   <% elsif field.field_type == "date" %>
-                    <!-- Date field -->
+                    <!-- Date field - auto-populated -->
                     <%= form_with url: capture_artifact_signature_path(@signature_request.signature_token), method: :post, class: "flex items-end space-x-3" do %>
                       <input type="hidden" name="artifact_type" value="date">
                       <input type="hidden" name="capture_method" value="typed">
@@ -190,16 +190,73 @@
                       <div class="flex-1">
                         <input type="text" name="artifact_data"
                                value="<%= Time.current.strftime('%B %d, %Y at %l:%M %p') %>"
-                               class="block w-full rounded-lg border-gray-300 text-sm"
+                               class="block w-full rounded-lg border-gray-300 text-sm bg-gray-50"
                                readonly>
+                        <p class="text-xs text-gray-400 mt-1">Filled automatically with the current date and time</p>
                       </div>
                       <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 shrink-0 transition-colors cursor-pointer" data-turbo-submits-with="Applying...">
                         Apply Date
                       </button>
                     <% end %>
 
+                  <% elsif field.field_type == "name" %>
+                    <!-- Name field - pre-filled with signer name -->
+                    <%= form_with url: capture_artifact_signature_path(@signature_request.signature_token), method: :post, class: "flex items-end space-x-3" do %>
+                      <input type="hidden" name="artifact_type" value="name">
+                      <input type="hidden" name="capture_method" value="typed">
+                      <input type="hidden" name="field_id" value="<%= field.id %>">
+                      <div class="flex-1">
+                        <input type="text" name="artifact_data" required
+                               value="<%= @signature_request.signer_name %>"
+                               class="block w-full rounded-lg border-gray-300 text-sm"
+                               placeholder="Enter your full name...">
+                        <% if @signature_request.signer_name.present? %>
+                          <p class="text-xs text-gray-400 mt-1">Pre-filled from your signing invitation</p>
+                        <% end %>
+                      </div>
+                      <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 shrink-0 transition-colors cursor-pointer" data-turbo-submits-with="Saving...">
+                        Save
+                      </button>
+                    <% end %>
+
+                  <% elsif field.field_type == "email" %>
+                    <!-- Email field - pre-filled and read-only -->
+                    <%= form_with url: capture_artifact_signature_path(@signature_request.signature_token), method: :post, class: "flex items-end space-x-3" do %>
+                      <input type="hidden" name="artifact_type" value="email">
+                      <input type="hidden" name="capture_method" value="typed">
+                      <input type="hidden" name="field_id" value="<%= field.id %>">
+                      <div class="flex-1">
+                        <input type="text" name="artifact_data" required
+                               value="<%= @signature_request.signer_email %>"
+                               class="block w-full rounded-lg border-gray-300 text-sm bg-gray-50"
+                               readonly>
+                        <p class="text-xs text-gray-400 mt-1">Pre-filled from your signing invitation</p>
+                      </div>
+                      <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 shrink-0 transition-colors cursor-pointer" data-turbo-submits-with="Saving...">
+                        Save
+                      </button>
+                    <% end %>
+
+                  <% elsif field.checkable? %>
+                    <!-- Checkbox field -->
+                    <%= form_with url: capture_artifact_signature_path(@signature_request.signature_token), method: :post, class: "flex items-center space-x-3" do %>
+                      <input type="hidden" name="artifact_type" value="checkbox">
+                      <input type="hidden" name="capture_method" value="typed">
+                      <input type="hidden" name="field_id" value="<%= field.id %>">
+                      <input type="hidden" name="artifact_data" value="\u2713">
+                      <label class="flex items-center space-x-2 cursor-pointer">
+                        <input type="checkbox" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500 h-5 w-5"
+                               onchange="this.form.querySelector('[type=submit]').disabled = !this.checked"
+                               required>
+                        <span class="text-sm text-gray-700">I confirm this checkbox</span>
+                      </label>
+                      <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 shrink-0 transition-colors cursor-pointer" disabled data-turbo-submits-with="Saving...">
+                        Save
+                      </button>
+                    <% end %>
+
                   <% else %>
-                    <!-- Text/name/email/etc. -->
+                    <!-- Text/Company/Title fields -->
                     <%= form_with url: capture_artifact_signature_path(@signature_request.signature_token), method: :post, class: "flex items-end space-x-3" do %>
                       <input type="hidden" name="artifact_type" value="<%= field.field_type %>">
                       <input type="hidden" name="capture_method" value="typed">
