@@ -27,31 +27,15 @@
     <!-- PDF Canvas -->
     <div class="lg:col-span-2">
       <div class="bg-white rounded-lg shadow-sm">
-        <!-- Toolbar -->
-        <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-          <div class="flex items-center space-x-2">
-            <span class="text-xs font-medium text-gray-500 uppercase mr-2">Place:</span>
-            <select data-pdf-signature-placement-target="addFieldType" class="text-sm border-gray-300 rounded-md pr-8 py-1.5">
-              <option value="signature">Signature</option>
-              <option value="initials">Initials</option>
-              <option value="date">Date Signed</option>
-              <option value="text">Text</option>
-              <option value="name">Printed Name</option>
-              <option value="email">Email</option>
-              <option value="company">Company</option>
-              <option value="title">Title/Role</option>
-              <option value="checkbox">Checkbox</option>
-            </select>
-          </div>
-          <div class="flex items-center space-x-3">
-            <button type="button" data-action="pdf-signature-placement#previousPage" aria-label="Previous page" class="p-1.5 text-gray-500 hover:text-gray-600 rounded-md hover:bg-gray-100 transition-colors">
-              <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-            </button>
-            <span data-pdf-signature-placement-target="pageIndicator" class="text-xs text-gray-500 tabular-nums">Page 1 of 1</span>
-            <button type="button" data-action="pdf-signature-placement#nextPage" aria-label="Next page" class="p-1.5 text-gray-500 hover:text-gray-600 rounded-md hover:bg-gray-100 transition-colors">
-              <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-            </button>
-          </div>
+        <!-- Page Navigation Only -->
+        <div class="px-6 py-3 border-b border-gray-200 flex items-center justify-center space-x-3">
+          <button type="button" data-action="pdf-signature-placement#previousPage" aria-label="Previous page" class="p-1.5 text-gray-500 hover:text-gray-600 rounded-md hover:bg-gray-100 transition-colors">
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+          </button>
+          <span data-pdf-signature-placement-target="pageIndicator" class="text-xs text-gray-500 tabular-nums">Page 1 of 1</span>
+          <button type="button" data-action="pdf-signature-placement#nextPage" aria-label="Next page" class="p-1.5 text-gray-500 hover:text-gray-600 rounded-md hover:bg-gray-100 transition-colors">
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+          </button>
         </div>
 
         <!-- Loading -->
@@ -170,10 +154,65 @@
           </div>
         </div>
 
-        <!-- Placed Fields -->
+        <!-- Field Type + Placed Fields -->
         <div class="bg-white rounded-lg shadow-sm">
-          <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-            <h2 class="text-sm font-semibold text-gray-900">Fields</h2>
+          <div class="px-6 py-4 border-b border-gray-200">
+            <h2 class="text-sm font-semibold text-gray-900 mb-3">Add Field</h2>
+            <p class="text-xs text-gray-500 mb-3">Select a type, then click on the document to place it.</p>
+            <!-- Hidden select that Stimulus reads -->
+            <select data-pdf-signature-placement-target="addFieldType" class="hidden" id="field-type-select">
+              <option value="signature">Signature</option>
+              <option value="initials">Initials</option>
+              <option value="name">Printed Name</option>
+              <option value="date">Date Signed</option>
+              <option value="text">Text</option>
+              <option value="email">Email</option>
+              <option value="company">Company</option>
+              <option value="title">Title/Role</option>
+              <option value="checkbox">Checkbox</option>
+            </select>
+            <!-- Visual pill buttons -->
+            <div class="flex flex-wrap gap-2" id="field-type-pills">
+              <button type="button" data-type="signature" class="field-type-pill active px-3 py-1.5 text-xs font-medium rounded-full border transition-colors bg-purple-100 text-purple-800 border-purple-300">Signature</button>
+              <button type="button" data-type="initials" class="field-type-pill px-3 py-1.5 text-xs font-medium rounded-full border transition-colors bg-white text-gray-600 border-gray-200 hover:bg-gray-50">Initials</button>
+              <button type="button" data-type="name" class="field-type-pill px-3 py-1.5 text-xs font-medium rounded-full border transition-colors bg-white text-gray-600 border-gray-200 hover:bg-gray-50">Printed Name</button>
+              <button type="button" data-type="date" class="field-type-pill px-3 py-1.5 text-xs font-medium rounded-full border transition-colors bg-white text-gray-600 border-gray-200 hover:bg-gray-50">Date</button>
+              <button type="button" data-type="text" class="field-type-pill px-3 py-1.5 text-xs font-medium rounded-full border transition-colors bg-white text-gray-600 border-gray-200 hover:bg-gray-50">Text</button>
+              <button type="button" data-type="checkbox" class="field-type-pill px-3 py-1.5 text-xs font-medium rounded-full border transition-colors bg-white text-gray-600 border-gray-200 hover:bg-gray-50">Checkbox</button>
+              <button type="button" data-type="email" class="field-type-pill px-3 py-1.5 text-xs font-medium rounded-full border transition-colors bg-white text-gray-600 border-gray-200 hover:bg-gray-50">Email</button>
+              <button type="button" data-type="company" class="field-type-pill px-3 py-1.5 text-xs font-medium rounded-full border transition-colors bg-white text-gray-600 border-gray-200 hover:bg-gray-50">Company</button>
+              <button type="button" data-type="title" class="field-type-pill px-3 py-1.5 text-xs font-medium rounded-full border transition-colors bg-white text-gray-600 border-gray-200 hover:bg-gray-50">Title</button>
+            </div>
+            <script>
+              // Wire pill buttons to the hidden select
+              const typeColors = {
+                signature: { bg: 'bg-purple-100', text: 'text-purple-800', border: 'border-purple-300' },
+                initials: { bg: 'bg-cyan-100', text: 'text-cyan-800', border: 'border-cyan-300' },
+                name: { bg: 'bg-green-100', text: 'text-green-800', border: 'border-green-300' },
+                date: { bg: 'bg-amber-100', text: 'text-amber-800', border: 'border-amber-300' },
+                text: { bg: 'bg-blue-100', text: 'text-blue-800', border: 'border-blue-300' },
+                checkbox: { bg: 'bg-gray-100', text: 'text-gray-800', border: 'border-gray-300' },
+                email: { bg: 'bg-indigo-100', text: 'text-indigo-800', border: 'border-indigo-300' },
+                company: { bg: 'bg-teal-100', text: 'text-teal-800', border: 'border-teal-300' },
+                title: { bg: 'bg-pink-100', text: 'text-pink-800', border: 'border-pink-300' }
+              };
+              document.querySelectorAll('.field-type-pill').forEach(pill => {
+                pill.addEventListener('click', () => {
+                  // Update hidden select
+                  document.getElementById('field-type-select').value = pill.dataset.type;
+                  // Reset all pills
+                  document.querySelectorAll('.field-type-pill').forEach(p => {
+                    p.className = 'field-type-pill px-3 py-1.5 text-xs font-medium rounded-full border transition-colors bg-white text-gray-600 border-gray-200 hover:bg-gray-50';
+                  });
+                  // Activate clicked pill
+                  const c = typeColors[pill.dataset.type] || typeColors.text;
+                  pill.className = `field-type-pill active px-3 py-1.5 text-xs font-medium rounded-full border transition-colors ${c.bg} ${c.text} ${c.border}`;
+                });
+              });
+            </script>
+          </div>
+          <div class="px-6 py-3 border-b border-gray-200 flex justify-between items-center">
+            <h2 class="text-sm font-semibold text-gray-900">Placed Fields</h2>
             <span data-pdf-signature-placement-target="fieldCount" class="text-xs text-gray-500">0 fields placed</span>
           </div>
           <div class="px-4 py-3 space-y-2" data-pdf-signature-placement-target="fieldsList">
