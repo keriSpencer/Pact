@@ -2,6 +2,8 @@ class PublicSignaturesController < ApplicationController
   skip_before_action :ensure_authenticated
   skip_before_action :set_current_organization
 
+  rate_limit to: 10, within: 1.minute, by: -> { request.remote_ip }, with: -> { head :too_many_requests }
+
   layout "signing"
 
   before_action :set_signature_request

@@ -10,6 +10,7 @@ class Organization < ApplicationRecord
             format: { with: /\A[a-z0-9\-]+\z/, message: "only allows lowercase letters, numbers, and hyphens" }
 
   before_validation :generate_slug, on: :create
+  before_create :generate_schema_name
 
   scope :active, -> { where(active: true) }
 
@@ -26,6 +27,10 @@ class Organization < ApplicationRecord
   end
 
   private
+
+  def generate_schema_name
+    self.schema_name ||= "tenant_#{slug.gsub('-', '_')}"
+  end
 
   def generate_slug
     return if slug.present?

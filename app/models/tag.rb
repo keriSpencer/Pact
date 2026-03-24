@@ -1,4 +1,6 @@
 class Tag < ApplicationRecord
+  include TenantIsolated
+
   belongs_to :organization
   has_many :contact_tags, dependent: :destroy
   has_many :contacts, through: :contact_tags

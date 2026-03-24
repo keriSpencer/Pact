@@ -88,6 +88,12 @@ class DocumentsController < ApplicationController
 
   def download
     if @document.file.attached?
+      unless @document.verify_integrity!
+        Rails.logger.error "Document integrity check failed for document #{@document.id}"
+        flash[:alert] = "Document integrity could not be verified. Please contact support."
+        redirect_to @document
+        return
+      end
       redirect_to rails_blob_path(@document.file, disposition: "attachment"), allow_other_host: true
     else
       flash[:alert] = "File not found."
@@ -97,7 +103,7 @@ class DocumentsController < ApplicationController
 
   def preview
     if @document.file.attached?
-      redirect_to rails_blob_path(@document.file, disposition: "inline"), allow_other_host: true
+      redirect_to rails_blob_path(@document.file, disposition: "inline")
     else
       head :not_found
     end

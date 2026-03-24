@@ -1,4 +1,6 @@
 class Folder < ApplicationRecord
+  include TenantIsolated
+
   belongs_to :organization
   belongs_to :parent, class_name: "Folder", optional: true
   belongs_to :user

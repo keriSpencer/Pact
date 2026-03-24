@@ -6,6 +6,6 @@ module ApplicationHelper
             else
               ""
             end
-    link_to "#{label}#{arrow}".html_safe, request.params.merge(sort: column, direction: direction), class: "hover:text-gray-700"
+    link_to safe_join([label, arrow]), url_for(request.query_parameters.merge(sort: column, direction: direction)), class: "hover:text-gray-700 transition-colors"
   end
 end

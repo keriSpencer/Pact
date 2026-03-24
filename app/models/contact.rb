@@ -1,4 +1,6 @@
 class Contact < ApplicationRecord
+  include TenantIsolated
+
   belongs_to :organization
   has_many :contact_assignments, dependent: :destroy
   has_many :assigned_users, through: :contact_assignments, source: :user

@@ -1,4 +1,6 @@
 class Document < ApplicationRecord
+  include TenantIsolated
+
   belongs_to :organization
   belongs_to :folder, optional: true
   belongs_to :user
@@ -126,6 +128,12 @@ class Document < ApplicationRecord
     when :shared then "Shared"
     else "Draft"
     end
+  end
+
+  def verify_integrity!
+    return true unless file.attached? && file_hash.present?
+    current_hash = Digest::SHA256.hexdigest(file.download)
+    current_hash == file_hash
   end
 
   private

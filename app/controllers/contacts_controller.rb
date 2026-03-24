@@ -33,9 +33,10 @@ class ContactsController < ApplicationController
 
     @contacts = case @sort_column
     when "name"
-      @contacts.order(Arel.sql("LOWER(contacts.first_name) #{@sort_direction}, LOWER(contacts.last_name) #{@sort_direction}"))
+      direction = @sort_direction == "asc" ? :asc : :desc
+      @contacts.order(Arel.sql("LOWER(contacts.first_name)") => direction, Arel.sql("LOWER(contacts.last_name)") => direction)
     else
-      @contacts.order("contacts.#{@sort_column} #{@sort_direction}")
+      @contacts.order(@sort_column => @sort_direction)
     end
   end
 

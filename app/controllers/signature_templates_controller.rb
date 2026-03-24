@@ -1,6 +1,7 @@
 class SignatureTemplatesController < ApplicationController
   before_action :authenticate_user!
   before_action :set_document
+  before_action :check_document_access
   before_action :set_template, only: [:destroy, :apply]
 
   def index
@@ -102,6 +103,13 @@ class SignatureTemplatesController < ApplicationController
 
   def set_document
     @document = Document.find(params[:document_id])
+  end
+
+  def check_document_access
+    unless @document.can_access?(current_user)
+      flash[:alert] = "You don't have permission to access this document."
+      redirect_to documents_path
+    end
   end
 
   def set_template
