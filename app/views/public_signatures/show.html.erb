@@ -44,256 +44,121 @@
     </div>
 
   <% elsif @signature_request.can_sign? %>
-    <%
-      completed_count = @fields.select(&:completed?).count
-      required_count = @fields.select(&:required?).count
-      total_count = @fields.count
-    %>
-
-    <!-- Document Info Header -->
-    <div class="bg-white rounded-xl shadow-sm mb-5">
-      <div class="px-6 py-5">
-        <div class="flex items-start justify-between">
-          <div>
-            <h2 class="text-lg font-semibold text-gray-900"><%= @signature_request.document.name %></h2>
-            <p class="text-sm text-gray-500 mt-1">
-              From <strong><%= @signature_request.requester.full_name %></strong>
-            </p>
-          </div>
-          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-            Action Required
-          </span>
-        </div>
-        <% if @signature_request.message.present? %>
-          <div class="mt-3 bg-gray-50 rounded-lg p-3">
-            <p class="text-sm text-gray-600 italic">"<%= @signature_request.message %>"</p>
-          </div>
-        <% end %>
-      </div>
-    </div>
-
-    <!-- Document Preview -->
-    <% if @signature_request.document.pdf? && @signature_request.document.file.attached? %>
-      <div class="bg-white rounded-xl shadow-sm mb-5">
-        <div class="px-6 py-4 border-b border-gray-200">
-          <h3 class="text-sm font-medium text-gray-700">Document Preview</h3>
-        </div>
-        <div class="p-4">
-          <iframe src="<%= rails_blob_path(@signature_request.document.file, disposition: 'inline') %>"
-                  class="w-full h-64 sm:h-80 border border-gray-200 rounded-lg"
-                  title="Document preview"></iframe>
-        </div>
-      </div>
-    <% end %>
-
     <% if @signature_request.uses_multi_field? %>
-      <!-- Multi-field Signing -->
-      <div class="bg-white rounded-xl shadow-sm mb-5">
-        <div class="px-6 py-4 border-b border-gray-200">
+      <!-- Guided Signing Stepper -->
+      <div class="bg-white rounded-xl shadow-sm overflow-hidden"
+           data-controller="signing-stepper"
+           data-signing-stepper-pdf-url-value="<%= rails_blob_path(@signature_request.document.file, disposition: 'inline') %>"
+           data-signing-stepper-sign-token-value="<%= @signature_request.signature_token %>"
+           data-signing-stepper-fields-value="<%= @signature_request.signature_fields.order(:position).map { |f| { id: f.id, page: f.page_number, x: f.x_percent, y: f.y_percent, width: f.width_percent, height: f.height_percent, type: f.field_type, label: f.label || f.field_type.humanize, required: f.required, completed: f.completed?, artifact_value: f.completed? ? f.completion&.signature_artifact&.typed_text || f.completion&.signature_artifact&.artifact_data : nil } }.to_json %>"
+           data-signing-stepper-signer-name-value="<%= @signature_request.signer_name %>"
+           data-signing-stepper-signer-email-value="<%= @signature_request.signer_email %>"
+           data-signing-stepper-capture-artifact-url-value="<%= capture_artifact_signature_path(@signature_request.signature_token) %>"
+           data-signing-stepper-complete-field-url-value="<%= complete_field_signature_path(@signature_request.signature_token) %>"
+           data-signing-stepper-reset-field-url-value="<%= reset_field_signature_path(@signature_request.signature_token) %>"
+           data-signing-stepper-finalize-url-value="<%= finalize_signature_path(@signature_request.signature_token) %>"
+           data-signing-stepper-success-url-value="<%= success_signature_path(@signature_request.signature_token) %>"
+           tabindex="0">
+
+        <!-- Header with document info and progress -->
+        <div class="px-6 py-4 border-b border-gray-100 bg-gray-50">
           <div class="flex justify-between items-center">
-            <h3 class="text-sm font-semibold text-gray-900">Complete Fields</h3>
-            <span class="text-sm text-gray-500"><%= completed_count %> of <%= total_count %> completed</span>
-          </div>
-          <div class="w-full bg-gray-200 rounded-full h-2 mt-3">
-            <div class="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                 style="width: <%= total_count > 0 ? ((completed_count.to_f / total_count) * 100).round : 0 %>%"></div>
-          </div>
-        </div>
-
-        <div class="divide-y divide-gray-100">
-          <% @fields.each_with_index do |field, index| %>
-            <div class="px-6 py-4 <%= field.completed? ? 'bg-green-50' : '' %>">
-              <div class="flex items-start justify-between mb-2">
-                <div class="flex items-center space-x-2">
-                  <span class="inline-flex items-center justify-center w-6 h-6 rounded-full text-xs font-medium
-                    <%= field.completed? ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-600' %>">
-                    <% if field.completed? %>
-                      <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
-                    <% else %>
-                      <%= index + 1 %>
-                    <% end %>
-                  </span>
-                  <div>
-                    <span class="text-sm font-medium text-gray-900"><%= field.label %></span>
-                    <% if field.required? %><span class="text-red-500 ml-0.5">*</span><% end %>
-                    <span class="text-xs text-gray-500 block">Page <%= field.page_number %> &middot; <%= field.field_type.humanize %></span>
-                  </div>
-                </div>
-                <% if field.completed? %>
-                  <span class="text-xs px-2 py-1 bg-green-100 text-green-700 rounded-full font-medium"
-                        title="<%= field.completion&.completed_at&.strftime('%B %d, %Y at %l:%M:%S %p') %>">
-                    Completed
-                  </span>
+            <div>
+              <h2 class="text-lg font-semibold text-gray-900"><%= @signature_request.document.name %></h2>
+              <p class="text-sm text-gray-500">
+                From: <%= @signature_request.requester.full_name %>
+                <% if @signature_request.message.present? %>
+                  — "<%= @signature_request.message %>"
                 <% end %>
-              </div>
-
-              <% if field.completed? %>
-                <div class="ml-8 flex items-center justify-between">
-                  <p class="text-xs text-gray-500" title="<%= field.completion&.completed_at&.strftime('%B %d, %Y at %l:%M:%S %p %Z') %>">
-                    Completed <%= field.completion&.completed_at&.strftime("%b %d at %l:%M %p") %>
-                  </p>
-                  <%= form_with url: reset_field_signature_path(@signature_request.signature_token), method: :post, class: "inline" do %>
-                    <input type="hidden" name="field_id" value="<%= field.id %>">
-                    <button type="submit" class="text-xs text-gray-500 hover:text-gray-600 underline transition-colors">Reset</button>
-                  <% end %>
-                </div>
-              <% else %>
-                <div class="ml-8 mt-2">
-                  <% if field.drawable? %>
-                    <!-- Signature/Initials with draw or type -->
-                    <div data-controller="signature-pad">
-                      <div data-signature-pad-target="modeToggle" class="flex rounded-md border border-gray-200 overflow-hidden mb-3 w-fit">
-                        <button type="button" data-mode="draw" data-action="click->signature-pad#switchToDraw"
-                                class="px-3 py-1.5 text-xs font-medium bg-blue-600 text-white transition-colors cursor-pointer">Draw</button>
-                        <button type="button" data-mode="type" data-action="click->signature-pad#switchToType"
-                                class="px-3 py-1.5 text-xs font-medium bg-white text-gray-700 transition-colors cursor-pointer">Type</button>
-                      </div>
-
-                      <%= form_with url: capture_artifact_signature_path(@signature_request.signature_token), method: :post do %>
-                        <input type="hidden" name="artifact_type" value="<%= field.field_type %>">
-                        <input type="hidden" name="field_id" value="<%= field.id %>">
-                        <input type="hidden" name="capture_method" value="drawn" data-signature-pad-target="input" id="sig_data_<%= field.id %>">
-
-                        <!-- Draw mode -->
-                        <div data-signature-pad-target="drawMode">
-                          <canvas data-signature-pad-target="canvas"
-                                  class="border-2 border-dashed border-gray-300 rounded-lg bg-white cursor-crosshair w-full touch-none"
-                                  style="height: min(200px, 30vh);"></canvas>
-                          <div class="flex justify-end mt-1">
-                            <button type="button" data-action="click->signature-pad#clear"
-                                    class="text-xs text-gray-500 hover:text-gray-700 transition-colors cursor-pointer">Clear</button>
-                          </div>
-                        </div>
-
-                        <!-- Type mode -->
-                        <div data-signature-pad-target="typeMode" class="hidden">
-                          <input type="text" data-signature-pad-target="typedInput"
-                                 data-action="input->signature-pad#updateFromTyped"
-                                 name="typed_text"
-                                 class="block w-full rounded-lg border-gray-300 text-xl py-3 px-4"
-                                 style="font-family: 'Brush Script MT', 'Segoe Script', cursive;"
-                                 placeholder="Type your <%= field.field_type %>...">
-                        </div>
-
-                        <button type="submit" class="mt-3 w-full sm:w-auto px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors cursor-pointer" data-turbo-submits-with="Applying...">
-                          Apply <%= field.field_type.humanize %>
-                        </button>
-                      <% end %>
-                    </div>
-
-                  <% elsif field.field_type == "date" %>
-                    <!-- Date field - auto-populated -->
-                    <%= form_with url: capture_artifact_signature_path(@signature_request.signature_token), method: :post, class: "flex items-end space-x-3" do %>
-                      <input type="hidden" name="artifact_type" value="date">
-                      <input type="hidden" name="capture_method" value="typed">
-                      <input type="hidden" name="field_id" value="<%= field.id %>">
-                      <div class="flex-1">
-                        <input type="text" name="artifact_data"
-                               value="<%= Time.current.strftime('%B %d, %Y at %l:%M %p') %>"
-                               class="block w-full rounded-lg border-gray-300 text-sm bg-gray-50"
-                               readonly>
-                        <p class="text-xs text-gray-400 mt-1">Filled automatically with the current date and time</p>
-                      </div>
-                      <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 shrink-0 transition-colors cursor-pointer" data-turbo-submits-with="Applying...">
-                        Apply Date
-                      </button>
-                    <% end %>
-
-                  <% elsif field.field_type == "name" %>
-                    <!-- Name field - pre-filled with signer name -->
-                    <%= form_with url: capture_artifact_signature_path(@signature_request.signature_token), method: :post, class: "flex items-end space-x-3" do %>
-                      <input type="hidden" name="artifact_type" value="name">
-                      <input type="hidden" name="capture_method" value="typed">
-                      <input type="hidden" name="field_id" value="<%= field.id %>">
-                      <div class="flex-1">
-                        <input type="text" name="artifact_data" required
-                               value="<%= @signature_request.signer_name %>"
-                               class="block w-full rounded-lg border-gray-300 text-sm"
-                               placeholder="Enter your full name...">
-                        <% if @signature_request.signer_name.present? %>
-                          <p class="text-xs text-gray-400 mt-1">Pre-filled from your signing invitation</p>
-                        <% end %>
-                      </div>
-                      <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 shrink-0 transition-colors cursor-pointer" data-turbo-submits-with="Saving...">
-                        Save
-                      </button>
-                    <% end %>
-
-                  <% elsif field.field_type == "email" %>
-                    <!-- Email field - pre-filled and read-only -->
-                    <%= form_with url: capture_artifact_signature_path(@signature_request.signature_token), method: :post, class: "flex items-end space-x-3" do %>
-                      <input type="hidden" name="artifact_type" value="email">
-                      <input type="hidden" name="capture_method" value="typed">
-                      <input type="hidden" name="field_id" value="<%= field.id %>">
-                      <div class="flex-1">
-                        <input type="text" name="artifact_data" required
-                               value="<%= @signature_request.signer_email %>"
-                               class="block w-full rounded-lg border-gray-300 text-sm bg-gray-50"
-                               readonly>
-                        <p class="text-xs text-gray-400 mt-1">Pre-filled from your signing invitation</p>
-                      </div>
-                      <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 shrink-0 transition-colors cursor-pointer" data-turbo-submits-with="Saving...">
-                        Save
-                      </button>
-                    <% end %>
-
-                  <% elsif field.checkable? %>
-                    <!-- Checkbox field -->
-                    <%= form_with url: capture_artifact_signature_path(@signature_request.signature_token), method: :post, class: "flex items-center space-x-3" do %>
-                      <input type="hidden" name="artifact_type" value="checkbox">
-                      <input type="hidden" name="capture_method" value="typed">
-                      <input type="hidden" name="field_id" value="<%= field.id %>">
-                      <input type="hidden" name="artifact_data" value="\u2713">
-                      <label class="flex items-center space-x-2 cursor-pointer">
-                        <input type="checkbox" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500 h-5 w-5"
-                               onchange="this.form.querySelector('[type=submit]').disabled = !this.checked"
-                               required>
-                        <span class="text-sm text-gray-700">I confirm this checkbox</span>
-                      </label>
-                      <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 shrink-0 transition-colors cursor-pointer" disabled data-turbo-submits-with="Saving...">
-                        Save
-                      </button>
-                    <% end %>
-
-                  <% else %>
-                    <!-- Text/Company/Title fields -->
-                    <%= form_with url: capture_artifact_signature_path(@signature_request.signature_token), method: :post, class: "flex items-end space-x-3" do %>
-                      <input type="hidden" name="artifact_type" value="<%= field.field_type %>">
-                      <input type="hidden" name="capture_method" value="typed">
-                      <input type="hidden" name="field_id" value="<%= field.id %>">
-                      <div class="flex-1">
-                        <input type="text" name="artifact_data" required
-                               class="block w-full rounded-lg border-gray-300 text-sm"
-                               placeholder="Enter <%= field.field_type.humanize.downcase %>...">
-                      </div>
-                      <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 shrink-0 transition-colors cursor-pointer" data-turbo-submits-with="Saving...">
-                        Save
-                      </button>
-                    <% end %>
-                  <% end %>
-                </div>
-              <% end %>
+              </p>
             </div>
-          <% end %>
+            <div class="text-right">
+              <p data-signing-stepper-target="progressText" class="text-sm font-medium text-gray-700">Field 1 of X</p>
+              <div class="w-32 bg-gray-200 rounded-full h-1.5 mt-1">
+                <div data-signing-stepper-target="progressBar" class="bg-blue-600 h-1.5 rounded-full transition-all" style="width: 0%"></div>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
 
-      <!-- Submit button -->
-      <div class="bg-white rounded-xl shadow-sm p-6 mb-5">
-        <%= form_with url: finalize_signature_path(@signature_request.signature_token), method: :post do %>
-          <button type="submit"
-                  class="w-full px-6 py-4 text-base font-semibold text-white bg-green-600 rounded-xl hover:bg-green-700 transition-colors cursor-pointer
-                    <%= @signature_request.all_required_fields_completed? ? '' : 'opacity-50 cursor-not-allowed' %>"
-                  <%= @signature_request.all_required_fields_completed? ? '' : 'disabled' %>
-                  aria-disabled="<%= !@signature_request.all_required_fields_completed? %>"
-                  title="<%= @signature_request.all_required_fields_completed? ? 'Submit your signed document' : 'Please complete all required fields before submitting' %>"
-                  data-turbo-submits-with="Submitting...">
+        <!-- PDF Canvas -->
+        <div data-signing-stepper-target="loadingState" class="flex items-center justify-center py-32">
+          <div class="text-center">
+            <svg class="animate-spin h-8 w-8 text-blue-500 mx-auto mb-3" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+            </svg>
+            <p class="text-sm text-gray-500">Loading document...</p>
+          </div>
+        </div>
+
+        <div data-signing-stepper-target="canvasContainer" class="hidden">
+          <div class="px-4 py-3 bg-gray-50 border-b border-gray-100 flex items-center justify-center space-x-3">
+            <button type="button" data-action="signing-stepper#previousPage" aria-label="Previous page"
+                    class="p-1.5 text-gray-400 hover:text-gray-600 rounded-md hover:bg-gray-200 transition-colors">
+              <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+            </button>
+            <span data-signing-stepper-target="pageIndicator" class="text-xs text-gray-500 tabular-nums">Page 1 of 1</span>
+            <button type="button" data-action="signing-stepper#nextPage" aria-label="Next page"
+                    class="p-1.5 text-gray-400 hover:text-gray-600 rounded-md hover:bg-gray-200 transition-colors">
+              <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+            </button>
+          </div>
+          <div class="p-4 flex justify-center">
+            <canvas data-signing-stepper-target="canvas" class="border border-gray-200 rounded-lg shadow-sm max-w-full"></canvas>
+          </div>
+        </div>
+
+        <!-- Field Input Panel (changes based on current field type) -->
+        <div data-signing-stepper-target="fieldPanel" class="hidden px-6 py-6 border-t border-gray-100 bg-white">
+          <!-- Dynamically populated by Stimulus -->
+        </div>
+
+        <!-- Review Panel (shown when all fields complete) -->
+        <div data-signing-stepper-target="reviewPanel" class="hidden px-6 py-8 border-t border-gray-100 bg-white">
+          <div class="text-center mb-6">
+            <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-green-100 mb-3">
+              <svg class="h-6 w-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+              </svg>
+            </div>
+            <h3 class="text-lg font-semibold text-gray-900">All fields completed</h3>
+            <p class="text-sm text-gray-500 mt-1">Review your entries below, then submit to sign the document.</p>
+          </div>
+          <div data-signing-stepper-target="reviewList" class="space-y-2 mb-8">
+            <!-- Populated by JS -->
+          </div>
+          <button type="button" data-action="signing-stepper#finalize"
+                  data-signing-stepper-target="submitButton"
+                  class="w-full px-6 py-4 text-base font-semibold text-white bg-green-600 rounded-xl hover:bg-green-700 transition-colors cursor-pointer shadow-sm">
             Submit Signed Document
           </button>
           <p class="text-xs text-gray-500 text-center mt-3">
             By submitting, you agree that this electronic signature is the legal equivalent of your manual/handwritten signature.
           </p>
-        <% end %>
+        </div>
+
+        <!-- Decline section -->
+        <div class="px-6 py-4 border-t border-gray-100">
+          <details class="group">
+            <summary class="text-sm text-gray-500 cursor-pointer hover:text-gray-700 transition-colors flex items-center">
+              <span>Report an Issue</span>
+              <svg class="h-4 w-4 ml-1 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+              </svg>
+            </summary>
+            <div class="mt-3 space-y-3">
+              <p class="text-sm text-gray-600">If you have concerns about this document, you can decline to sign it.</p>
+              <form action="<%= decline_signature_path(@signature_request.signature_token) %>" method="post">
+                <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
+                <textarea name="reason" rows="2" placeholder="Describe the issue (optional)..." class="block w-full text-sm border border-gray-300 rounded-lg p-2"></textarea>
+                <button type="submit" class="mt-2 px-4 py-2 text-sm font-medium text-red-600 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 transition-colors cursor-pointer">
+                  Decline to Sign
+                </button>
+              </form>
+            </div>
+          </details>
+        </div>
       </div>
 
     <% else %>
@@ -340,31 +205,31 @@
           <% end %>
         </div>
       </div>
-    <% end %>
 
-    <!-- Report an Issue / Decline -->
-    <div class="bg-white rounded-xl shadow-sm p-6">
-      <details class="group">
-        <summary class="text-sm font-medium text-gray-500 cursor-pointer hover:text-gray-700 transition-colors list-none flex items-center">
-          <svg class="h-4 w-4 mr-2 text-gray-400 transition-transform group-open:rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-          </svg>
-          Report an Issue or Decline to Sign
-        </summary>
-        <div class="mt-4">
-          <%= form_with url: decline_signature_path(@signature_request.signature_token), method: :post, class: "space-y-3" do %>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Reason (optional)</label>
-              <textarea name="decline_reason" rows="2" class="block w-full rounded-lg border-gray-300 text-sm" placeholder="Explain why you're declining..."></textarea>
-            </div>
-            <button type="submit" class="px-4 py-2 text-sm font-medium text-red-600 bg-white border border-red-300 rounded-md hover:bg-red-50 transition-colors cursor-pointer"
-                    data-turbo-confirm="Are you sure you want to decline signing this document?"
-                    data-turbo-submits-with="Declining...">
-              Decline to Sign
-            </button>
-          <% end %>
-        </div>
-      </details>
-    </div>
+      <!-- Report an Issue / Decline -->
+      <div class="bg-white rounded-xl shadow-sm p-6">
+        <details class="group">
+          <summary class="text-sm font-medium text-gray-500 cursor-pointer hover:text-gray-700 transition-colors list-none flex items-center">
+            <svg class="h-4 w-4 mr-2 text-gray-400 transition-transform group-open:rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+            </svg>
+            Report an Issue or Decline to Sign
+          </summary>
+          <div class="mt-4">
+            <%= form_with url: decline_signature_path(@signature_request.signature_token), method: :post, class: "space-y-3" do %>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Reason (optional)</label>
+                <textarea name="decline_reason" rows="2" class="block w-full rounded-lg border-gray-300 text-sm" placeholder="Explain why you're declining..."></textarea>
+              </div>
+              <button type="submit" class="px-4 py-2 text-sm font-medium text-red-600 bg-white border border-red-300 rounded-md hover:bg-red-50 transition-colors cursor-pointer"
+                      data-turbo-confirm="Are you sure you want to decline signing this document?"
+                      data-turbo-submits-with="Declining...">
+                Decline to Sign
+              </button>
+            <% end %>
+          </div>
+        </details>
+      </div>
+    <% end %>
   <% end %>
 </div>

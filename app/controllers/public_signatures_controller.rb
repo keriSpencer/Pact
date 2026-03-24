@@ -64,29 +64,38 @@ class PublicSignaturesController < ApplicationController
           user_agent: request.user_agent
         ) unless field.completed?
       end
-      redirect_to signature_path(@signature_request.signature_token), notice: "Captured successfully."
+      respond_to do |format|
+        format.json { render json: { success: true, artifact_id: artifact.id } }
+        format.html { redirect_to signature_path(@signature_request.signature_token), notice: "Captured successfully." }
+      end
     else
-      redirect_to signature_path(@signature_request.signature_token), alert: "Failed to capture."
+      respond_to do |format|
+        format.json { render json: { success: false, error: "Failed to capture" }, status: :unprocessable_entity }
+        format.html { redirect_to signature_path(@signature_request.signature_token), alert: "Failed to capture." }
+      end
     end
   end
 
   def complete_field
     field = @signature_request.signature_fields.find(params[:field_id])
 
-    if params[:artifact_data].present? && field.text_input_type? || field.checkable?
-      # For text-like and checkbox fields, create artifact and complete in one step
-      artifact = SignatureArtifact.find_or_create_for(
-        signature_request: @signature_request,
-        signer_email: @signature_request.signer_email,
-        artifact_type: field.field_type,
-        artifact_data: params[:artifact_data],
-        capture_method: "typed",
-        ip_address: request.remote_ip,
-        user_agent: request.user_agent
-      )
-    else
-      artifact = @signature_request.signature_artifacts.find(params[:artifact_id])
+    if field.completed?
+      respond_to do |format|
+        format.json { render json: { success: true, already_completed: true } }
+        format.html { redirect_to signature_path(@signature_request.signature_token), notice: "Field already completed." }
+      end
+      return
     end
+
+    artifact = SignatureArtifact.find_or_create_for(
+      signature_request: @signature_request,
+      signer_email: @signature_request.signer_email,
+      artifact_type: params[:artifact_type] || field.field_type,
+      artifact_data: params[:artifact_data],
+      capture_method: params[:capture_method] || "typed",
+      ip_address: request.remote_ip,
+      user_agent: request.user_agent
+    )
 
     if field.complete!(
       artifact: artifact,
@@ -94,9 +103,15 @@ class PublicSignaturesController < ApplicationController
       ip_address: request.remote_ip,
       user_agent: request.user_agent
     )
-      redirect_to signature_path(@signature_request.signature_token), notice: "Field completed."
+      respond_to do |format|
+        format.json { render json: { success: true, field_id: field.id } }
+        format.html { redirect_to signature_path(@signature_request.signature_token), notice: "Field completed." }
+      end
     else
-      redirect_to signature_path(@signature_request.signature_token), alert: "Unable to complete this field."
+      respond_to do |format|
+        format.json { render json: { success: false, error: "Failed to complete field" }, status: :unprocessable_entity }
+        format.html { redirect_to signature_path(@signature_request.signature_token), alert: "Unable to complete this field." }
+      end
     end
   end
 
@@ -104,9 +119,15 @@ class PublicSignaturesController < ApplicationController
     field = @signature_request.signature_fields.find(params[:field_id])
 
     if field.reset!
-      redirect_to signature_path(@signature_request.signature_token), notice: "Field reset."
+      respond_to do |format|
+        format.json { render json: { success: true, field_id: field.id } }
+        format.html { redirect_to signature_path(@signature_request.signature_token), notice: "Field reset." }
+      end
     else
-      redirect_to signature_path(@signature_request.signature_token), alert: "Unable to reset this field."
+      respond_to do |format|
+        format.json { render json: { success: false, error: "Unable to reset field" }, status: :unprocessable_entity }
+        format.html { redirect_to signature_path(@signature_request.signature_token), alert: "Unable to reset this field." }
+      end
     end
   end
 
@@ -115,11 +136,19 @@ class PublicSignaturesController < ApplicationController
       ip_address: request.remote_ip,
       user_agent: request.user_agent
     )
-      redirect_to success_signature_path(@signature_request.signature_token)
+      respond_to do |format|
+        format.json { render json: { success: true, redirect_url: success_signature_path(@signature_request.signature_token) } }
+        format.html { redirect_to success_signature_path(@signature_request.signature_token) }
+      end
     else
-      flash.now[:alert] = "Please complete all required fields before submitting."
-      @fields = @signature_request.signature_fields.order(:position)
-      render :show, status: :unprocessable_entity
+      respond_to do |format|
+        format.json { render json: { success: false, error: "Not all required fields are completed" }, status: :unprocessable_entity }
+        format.html do
+          flash.now[:alert] = "Please complete all required fields before submitting."
+          @fields = @signature_request.signature_fields.order(:position)
+          render :show, status: :unprocessable_entity
+        end
+      end
     end
   end
 
