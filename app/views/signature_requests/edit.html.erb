@@ -99,6 +99,65 @@
           </div>
         </div>
 
+        <!-- Templates -->
+        <div class="bg-white rounded-xl shadow-sm">
+          <div class="px-5 py-4 border-b border-gray-100">
+            <h2 class="text-sm font-semibold text-gray-900">Templates</h2>
+          </div>
+          <div class="px-5 py-3 space-y-2">
+            <% templates = @document.signature_templates.by_recent %>
+            <% if templates.any? %>
+              <div class="space-y-1">
+                <% templates.each do |template| %>
+                  <div class="flex items-center justify-between py-1.5">
+                    <span class="text-sm text-gray-700 truncate"><%= template.name %></span>
+                    <div class="flex items-center space-x-2 shrink-0">
+                      <%= link_to "Apply", apply_document_signature_template_path(@document, template),
+                            data: { "turbo-method": "post" },
+                            class: "text-xs text-blue-600 hover:text-blue-800 font-medium" %>
+                      <%= link_to "Delete", document_signature_template_path(@document, template),
+                            data: { "turbo-method": "delete", turbo_confirm: "Delete this template?" },
+                            class: "text-xs text-red-500 hover:text-red-700" %>
+                    </div>
+                  </div>
+                <% end %>
+              </div>
+            <% else %>
+              <p class="text-xs text-gray-400 py-2 text-center">No templates saved yet</p>
+            <% end %>
+          </div>
+          <div class="px-5 py-3 border-t border-gray-100">
+            <details class="group">
+              <summary class="text-xs font-medium text-blue-600 cursor-pointer hover:text-blue-800">Save Current Fields as Template</summary>
+              <div class="mt-2 space-y-2">
+                <input type="text" id="template_name_input" placeholder="Template name..." class="block w-full text-sm rounded-lg border-gray-300">
+                <button type="button"
+                        onclick="saveTemplate()"
+                        class="w-full px-3 py-1.5 text-xs font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700">
+                  Save Template
+                </button>
+              </div>
+            </details>
+            <script>
+              function saveTemplate() {
+                const name = document.getElementById('template_name_input').value;
+                if (!name) { alert('Please enter a template name.'); return; }
+                const fieldsInput = document.querySelector('[data-pdf-signature-placement-target="fieldsInput"]');
+                const fields = fieldsInput ? fieldsInput.value : '[]';
+                const token = document.querySelector('meta[name="csrf-token"]').content;
+                fetch('<%= document_signature_templates_path(@document) %>', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': token, 'Accept': 'application/json' },
+                  body: JSON.stringify({ name: name, fields: fields })
+                }).then(r => r.json()).then(data => {
+                  if (data.id) { alert('Template saved!'); location.reload(); }
+                  else { alert(data.errors ? data.errors.join(', ') : 'Error saving template.'); }
+                }).catch(() => alert('Error saving template.'));
+              }
+            </script>
+          </div>
+        </div>
+
         <!-- Placed Fields -->
         <div class="bg-white rounded-xl shadow-sm">
           <div class="px-5 py-4 border-b border-gray-100 flex justify-between items-center">

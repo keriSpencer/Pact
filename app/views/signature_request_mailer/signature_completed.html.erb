@@ -1,9 +1,23 @@
-<h2>Document Signed</h2>
+<h2>Document Signed Successfully</h2>
 
 <p>Hello <%= @signature_request.requester.full_name %>,</p>
 
-<p><strong><%= @signature_request.signer_display_name %></strong> has signed the document "<strong><%= @document.name %></strong>".</p>
+<p>
+  Great news! <strong><%= @signature_request.signer_display_name %></strong> has signed your document.
+</p>
 
-<p>Signed on: <%= @signature_request.signed_at&.strftime("%B %d, %Y at %l:%M %p") %></p>
+<div class="highlight">
+  <p><strong>Document:</strong> <%= @document.name %></p>
+  <p><strong>Signed by:</strong> <%= @signature_request.signer_display_name %> (<%= @signature_request.signer_email %>)</p>
+  <p><strong>Signed on:</strong> <%= @signature_request.signed_at&.strftime("%B %d, %Y at %l:%M %p") %></p>
+</div>
 
-<p style="color: #666; font-size: 14px;">You can view the signed document in your Pact account.</p>
+<p>
+  You can view the signed document and download the audit certificate from your Pact account.
+</p>
+
+<p style="text-align: center; margin: 24px 0;">
+  <a href="<%= document_url(@document) %>" class="btn-primary">
+    View Document
+  </a>
+</p>

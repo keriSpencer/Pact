@@ -19,6 +19,9 @@ Rails.application.routes.draw do
   end
 
   resources :documents, only: [:index, :show, :new, :create, :edit, :update, :destroy] do
+    collection do
+      get :archive
+    end
     member do
       get :download
       get :preview
@@ -33,6 +36,11 @@ Rails.application.routes.draw do
         post :void
       end
     end
+    resources :signature_templates, only: [:index, :create, :destroy] do
+      member do
+        post :apply
+      end
+    end
   end
 
   # Public signature routes (no auth)
@@ -44,6 +52,7 @@ Rails.application.routes.draw do
       post :complete_field
       post :reset_field
       post :finalize
+      get :success
     end
   end
 

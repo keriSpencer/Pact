@@ -71,8 +71,19 @@ class DocumentsController < ApplicationController
       return
     end
 
-    @document.destroy
-    redirect_to documents_path, notice: "Document deleted."
+    was_deleted = @document.safe_destroy!
+
+    if was_deleted
+      redirect_to documents_path, notice: "Document deleted."
+    else
+      redirect_to documents_path, notice: "Document archived. Signed versions are preserved in the Signed Archive for legal compliance."
+    end
+  end
+
+  def archive
+    @documents = organization_documents.where(status: :archived)
+                                       .includes(:user, :signature_requests)
+                                       .order(updated_at: :desc)
   end
 
   def download

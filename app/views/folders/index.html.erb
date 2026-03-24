@@ -26,6 +26,17 @@
         <p class="text-xs text-gray-500"><%= @unfiled_count %> documents</p>
       </div>
     <% end %>
+    <%= link_to archive_documents_path, class: "bg-white rounded-lg shadow p-4 hover:shadow-md transition-shadow flex items-center" do %>
+      <div class="h-10 w-10 rounded-lg bg-amber-50 flex items-center justify-center mr-3">
+        <svg class="h-5 w-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/>
+        </svg>
+      </div>
+      <div>
+        <p class="text-sm font-medium text-gray-900">Signed Archive</p>
+        <p class="text-xs text-gray-500">Preserved signed documents</p>
+      </div>
+    <% end %>
   </div>
 
   <!-- User Folders -->

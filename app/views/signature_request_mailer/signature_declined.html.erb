@@ -2,13 +2,28 @@
 
 <p>Hello <%= @signature_request.requester.full_name %>,</p>
 
-<p><strong><%= @signature_request.signer_display_name %></strong> has declined to sign the document "<strong><%= @document.name %></strong>".</p>
+<p>
+  Unfortunately, <strong><%= @signature_request.signer_display_name %></strong> has declined to sign your document.
+</p>
+
+<div class="highlight">
+  <p><strong>Document:</strong> <%= @document.name %></p>
+  <p><strong>Declined by:</strong> <%= @signature_request.signer_display_name %> (<%= @signature_request.signer_email %>)</p>
+</div>
 
 <% if @signature_request.decline_reason.present? %>
-  <p>Reason provided:</p>
-  <blockquote style="border-left: 3px solid #ccc; padding-left: 12px; color: #555;">
-    <%= @signature_request.decline_reason %>
-  </blockquote>
+  <p><strong>Reason provided:</strong></p>
+  <div class="message-block">
+    <p>"<%= @signature_request.decline_reason %>"</p>
+  </div>
 <% end %>
 
-<p style="color: #666; font-size: 14px;">You can view this signature request in your Pact account.</p>
+<p>
+  You can view this signature request and take further action from your Pact account.
+</p>
+
+<p style="text-align: center; margin: 24px 0;">
+  <a href="<%= document_url(@document) %>" class="btn-primary">
+    View Document
+  </a>
+</p>

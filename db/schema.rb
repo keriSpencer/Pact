@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_03_23_200004) do
+ActiveRecord::Schema[8.0].define(version: 2026_03_23_210001) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -268,6 +268,38 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_23_200004) do
     t.index ["voided_by_id"], name: "index_signature_requests_on_voided_by_id"
   end
 
+  create_table "signature_template_fields", force: :cascade do |t|
+    t.integer "signature_template_id", null: false
+    t.integer "page_number", default: 1, null: false
+    t.decimal "x_percent", precision: 5, scale: 2, null: false
+    t.decimal "y_percent", precision: 5, scale: 2, null: false
+    t.decimal "width_percent", precision: 5, scale: 2, default: "25.0"
+    t.decimal "height_percent", precision: 5, scale: 2, default: "8.0"
+    t.string "field_type", default: "signature", null: false
+    t.string "label"
+    t.boolean "required", default: true, null: false
+    t.integer "position", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["signature_template_id"], name: "index_signature_template_fields_on_signature_template_id"
+  end
+
+  create_table "signature_templates", force: :cascade do |t|
+    t.string "name", null: false
+    t.text "description"
+    t.integer "document_id", null: false
+    t.integer "user_id", null: false
+    t.integer "organization_id", null: false
+    t.integer "use_count", default: 0, null: false
+    t.datetime "last_used_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["document_id", "name"], name: "index_signature_templates_on_document_id_and_name", unique: true
+    t.index ["document_id"], name: "index_signature_templates_on_document_id"
+    t.index ["organization_id"], name: "index_signature_templates_on_organization_id"
+    t.index ["user_id"], name: "index_signature_templates_on_user_id"
+  end
+
   create_table "tags", force: :cascade do |t|
     t.integer "organization_id", null: false
     t.string "name", null: false
@@ -346,6 +378,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_23_200004) do
   add_foreign_key "signature_requests", "users", column: "requester_id"
   add_foreign_key "signature_requests", "users", column: "signer_id"
   add_foreign_key "signature_requests", "users", column: "voided_by_id"
+  add_foreign_key "signature_template_fields", "signature_templates"
+  add_foreign_key "signature_templates", "documents"
+  add_foreign_key "signature_templates", "organizations"
+  add_foreign_key "signature_templates", "users"
   add_foreign_key "tags", "organizations"
   add_foreign_key "users", "organizations"
 end

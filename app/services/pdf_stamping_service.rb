@@ -16,6 +16,8 @@ class PdfStampingService
       stamp_single_field!(doc)
     end
 
+    add_audit_footer!(doc)
+
     output = StringIO.new
     doc.write(output)
     output.string
@@ -44,11 +46,16 @@ class PdfStampingService
     height = ((@signature_request.signature_height || 8) / 100.0) * page_height
 
     canvas = page.canvas(type: :overlay)
-    draw_text_in_box(canvas, @signature_request.signature_data, x, y, width, height)
+
+    if @signature_request.signature_data.start_with?("data:image/")
+      draw_image_in_box(doc, canvas, @signature_request.signature_data, x, y, width, height)
+    else
+      draw_text_in_box(canvas, @signature_request.signature_data, x, y, width, height)
+    end
   end
 
   def stamp_multi_field!(doc)
-    @signature_request.signature_fields.includes(:completion).each do |field|
+    @signature_request.signature_fields.includes(:completion => :signature_artifact).each do |field|
       next unless field.completed?
       stamp = field.stamp_data
       next unless stamp
@@ -67,24 +74,94 @@ class PdfStampingService
       height = ((stamp[:height] || 8).to_f / 100.0) * page_height
 
       canvas = page.canvas(type: :overlay)
-      draw_text_in_box(canvas, stamp[:data].to_s, x, y, width, height)
+      data = stamp[:data].to_s
+
+      if data.start_with?("data:image/")
+        draw_image_in_box(doc, canvas, data, x, y, width, height)
+      elsif field.field_type == "date"
+        # Include time in date stamp
+        completed_at = field.completion&.completed_at
+        display_text = completed_at ? completed_at.strftime("%B %d, %Y at %l:%M %p") : data
+        draw_text_in_box(canvas, display_text, x, y, width, height)
+      else
+        draw_text_in_box(canvas, data, x, y, width, height)
+      end
     end
   end
 
   def draw_text_in_box(canvas, text, x, y, width, height)
-    font_size = [height * 0.6, 14].min
+    font_size = [height * 0.5, 12].min
+    font_size = [font_size, 6].max
     canvas.font("Helvetica", size: font_size)
-    canvas.fill_color(0, 0, 0.6)
+    canvas.fill_color(0.1, 0.1, 0.4)
 
-    # Draw a subtle border
-    canvas.stroke_color(0.7, 0.7, 0.7)
+    # Subtle background
+    canvas.save_graphics_state
+    canvas.fill_color(0.97, 0.97, 1.0)
+    canvas.rectangle(x, y, width, height)
+    canvas.fill
+    canvas.restore_graphics_state
+
+    # Border
+    canvas.stroke_color(0.7, 0.7, 0.85)
     canvas.line_width(0.5)
     canvas.rectangle(x, y, width, height)
     canvas.stroke
 
-    # Draw text centered in box
+    # Text
+    canvas.fill_color(0.1, 0.1, 0.4)
+    canvas.font("Helvetica", size: font_size)
     text_x = x + 4
     text_y = y + (height - font_size) / 2.0 + 2
     canvas.text(text, at: [text_x, text_y])
+  end
+
+  def draw_image_in_box(doc, canvas, data_uri, x, y, width, height)
+    # Extract base64 image data
+    match = data_uri.match(/\Adata:image\/(\w+);base64,(.+)\z/m)
+    return draw_text_in_box(canvas, "[Signature]", x, y, width, height) unless match
+
+    image_data = Base64.decode64(match[2])
+
+    begin
+      image = doc.images.add(StringIO.new(image_data))
+
+      # Calculate aspect-fit dimensions with padding
+      padding = 2
+      available_width = width - (padding * 2)
+      available_height = height - (padding * 2)
+
+      img_width = image.width.to_f
+      img_height = image.height.to_f
+
+      scale = [available_width / img_width, available_height / img_height].min
+      draw_width = img_width * scale
+      draw_height = img_height * scale
+
+      # Center the image in the box
+      img_x = x + (width - draw_width) / 2.0
+      img_y = y + (height - draw_height) / 2.0
+
+      canvas.image(image, at: [img_x, img_y], width: draw_width, height: draw_height)
+    rescue => e
+      Rails.logger.error "Failed to embed signature image: #{e.message}"
+      draw_text_in_box(canvas, "[Signature]", x, y, width, height)
+    end
+  end
+
+  def add_audit_footer!(doc)
+    last_page = doc.pages[-1]
+    return unless last_page
+
+    canvas = last_page.canvas(type: :overlay)
+    box = last_page.box(:media)
+
+    footer_y = 15
+    canvas.font("Helvetica", size: 6)
+    canvas.fill_color(0.5, 0.5, 0.5)
+
+    signed_at = @signature_request.signed_at&.strftime("%B %d, %Y at %l:%M:%S %p %Z") || "N/A"
+    footer_text = "Signed via Pact | #{@document.name} | Request ##{@signature_request.id} | #{@signature_request.signer_display_name} | #{signed_at}"
+    canvas.text(footer_text, at: [30, footer_y])
   end
 end

@@ -7,6 +7,7 @@ class Document < ApplicationRecord
   has_many :versions, class_name: "DocumentVersion", dependent: :destroy
   has_many :document_shares, dependent: :destroy
   has_many :signature_requests, dependent: :destroy
+  has_many :signature_templates, dependent: :destroy
 
   has_one_attached :file
 
@@ -75,6 +76,22 @@ class Document < ApplicationRecord
     when "doc_public", "organization" then true
     when "doc_private" then false
     else false
+    end
+  end
+
+  def has_signed_requests?
+    signature_requests.where(status: :signed).exists?
+  end
+
+  # Safe deletion: archive documents with signed versions instead of destroying
+  def safe_destroy!
+    if has_signed_requests?
+      # Archive instead of delete — preserve signed versions for legal compliance
+      update!(status: :archived, folder_id: nil)
+      false # indicates it was archived, not deleted
+    else
+      destroy
+      true # indicates it was actually deleted
     end
   end
 

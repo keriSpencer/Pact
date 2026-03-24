@@ -80,6 +80,7 @@ class SignatureRequest < ApplicationRecord
     )
 
     GenerateSignedPdfJob.perform_later(id) if document.pdf?
+    GenerateAuditCertificateJob.perform_later(id)
     SignatureRequestMailer.signature_completed(self).deliver_later
     true
   end
@@ -184,7 +185,7 @@ class SignatureRequest < ApplicationRecord
         signature_request: self,
         signer_email: signer_email,
         artifact_type: "date",
-        artifact_data: Date.current.to_s,
+        artifact_data: Time.current.strftime("%B %d, %Y at %l:%M %p"),
         capture_method: "auto"
       )
       field.complete!(artifact: artifact, signer_email: signer_email)

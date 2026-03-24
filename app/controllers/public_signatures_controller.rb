@@ -8,7 +8,7 @@ class PublicSignaturesController < ApplicationController
 
   def show
     @signature_request.mark_as_viewed!
-    @fields = @signature_request.signature_fields.order(:position)
+    @fields = @signature_request.signature_fields.includes(:completion).order(:position)
   end
 
   def sign
@@ -17,7 +17,7 @@ class PublicSignaturesController < ApplicationController
       ip_address: request.remote_ip,
       user_agent: request.user_agent
     )
-      redirect_to signature_path(@signature_request.signature_token), notice: "Document signed successfully. Thank you!"
+      redirect_to success_signature_path(@signature_request.signature_token)
     else
       flash.now[:alert] = "Unable to sign this document."
       @fields = @signature_request.signature_fields.order(:position)
@@ -52,6 +52,15 @@ class PublicSignaturesController < ApplicationController
     )
 
     if artifact.persisted?
+      if params[:field_id].present?
+        field = @signature_request.signature_fields.find(params[:field_id])
+        field.complete!(
+          artifact: artifact,
+          signer_email: @signature_request.signer_email,
+          ip_address: request.remote_ip,
+          user_agent: request.user_agent
+        ) unless field.completed?
+      end
       redirect_to signature_path(@signature_request.signature_token), notice: "Captured successfully."
     else
       redirect_to signature_path(@signature_request.signature_token), alert: "Failed to capture."
@@ -89,11 +98,17 @@ class PublicSignaturesController < ApplicationController
       ip_address: request.remote_ip,
       user_agent: request.user_agent
     )
-      redirect_to signature_path(@signature_request.signature_token), notice: "Document signed successfully. Thank you!"
+      redirect_to success_signature_path(@signature_request.signature_token)
     else
       flash.now[:alert] = "Please complete all required fields before submitting."
       @fields = @signature_request.signature_fields.order(:position)
       render :show, status: :unprocessable_entity
+    end
+  end
+
+  def success
+    unless @signature_request.signed?
+      redirect_to signature_path(@signature_request.signature_token)
     end
   end
 

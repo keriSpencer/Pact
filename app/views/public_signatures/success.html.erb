@@ -1,0 +1,39 @@
+<% content_for(:title) { "Signed Successfully - Pact" } %>
+
+<div class="max-w-xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+  <div class="bg-white rounded-xl shadow-sm p-8 sm:p-12">
+    <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-green-100 mb-6">
+      <svg class="h-10 w-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+      </svg>
+    </div>
+
+    <h1 class="text-2xl font-bold text-gray-900">Document Signed Successfully</h1>
+
+    <p class="mt-3 text-gray-600">
+      You have successfully signed
+      "<strong><%= @signature_request.document.name %></strong>".
+    </p>
+
+    <div class="mt-6 bg-gray-50 rounded-lg p-4 text-left space-y-2">
+      <div class="flex justify-between">
+        <span class="text-sm text-gray-500">Signed by</span>
+        <span class="text-sm font-medium text-gray-900"><%= @signature_request.signer_display_name %></span>
+      </div>
+      <div class="flex justify-between">
+        <span class="text-sm text-gray-500">Date</span>
+        <span class="text-sm font-medium text-gray-900"><%= @signature_request.signed_at&.strftime("%B %d, %Y at %l:%M %p") %></span>
+      </div>
+      <div class="flex justify-between">
+        <span class="text-sm text-gray-500">Requested by</span>
+        <span class="text-sm font-medium text-gray-900"><%= @signature_request.requester.full_name %></span>
+      </div>
+    </div>
+
+    <p class="mt-6 text-sm text-gray-500">
+      A copy of the signed document will be sent to
+      <strong><%= @signature_request.requester.full_name %></strong>.
+      You may safely close this window.
+    </p>
+  </div>
+</div>
