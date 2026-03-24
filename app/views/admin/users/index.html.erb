@@ -4,17 +4,17 @@
       <h1 class="text-2xl font-bold text-gray-900">Team Members</h1>
       <p class="mt-1 text-sm text-gray-500"><%= current_organization.name %></p>
     </div>
-    <%= link_to "Invite Member", new_admin_invitation_path, class: "px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700" %>
+    <%= link_to "Invite Member", new_admin_invitation_path, class: "px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors" %>
   </div>
 
   <!-- Active Users -->
-  <div class="bg-white rounded-lg shadow mb-8">
+  <div class="bg-white rounded-lg shadow-sm mb-8">
     <div class="px-6 py-4 border-b border-gray-200">
       <h2 class="text-lg font-semibold text-gray-900">Active (<%= @users.count %>)</h2>
     </div>
     <ul class="divide-y divide-gray-200">
       <% @users.each do |user| %>
-        <li class="px-6 py-4 flex items-center justify-between">
+        <li class="px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors">
           <div class="flex items-center">
             <div class="h-10 w-10 rounded-full bg-blue-600 flex items-center justify-center">
               <span class="text-sm font-medium text-white"><%= user.initials %></span>
@@ -29,7 +29,7 @@
               <%= user.role.humanize %>
             </span>
             <% if current_user.can_delete_user?(user) %>
-              <%= link_to admin_user_path(user), data: { "turbo-method": "delete", turbo_confirm: "Are you sure you want to remove #{user.full_name}?" }, class: "text-sm text-red-600 hover:text-red-800" do %>
+              <%= link_to admin_user_path(user), data: { "turbo-method": "delete", turbo_confirm: "Are you sure you want to remove #{user.full_name}?" }, class: "text-sm text-red-600 hover:text-red-800 transition-colors" do %>
                 Remove
               <% end %>
             <% end %>
@@ -41,7 +41,7 @@
 
   <!-- Deleted Users -->
   <% if @deleted_users.any? %>
-    <div class="bg-white rounded-lg shadow">
+    <div class="bg-white rounded-lg shadow-sm">
       <div class="px-6 py-4 border-b border-gray-200">
         <h2 class="text-lg font-semibold text-gray-500">Deleted (<%= @deleted_users.count %>)</h2>
       </div>
@@ -57,7 +57,7 @@
                 <p class="text-sm text-gray-500"><%= user.email %></p>
               </div>
             </div>
-            <%= link_to "Restore", restore_admin_user_path(user), data: { "turbo-method": "patch" }, class: "text-sm text-blue-600 hover:text-blue-800" %>
+            <%= link_to "Restore", restore_admin_user_path(user), data: { "turbo-method": "patch" }, class: "text-sm text-blue-600 hover:text-blue-800 transition-colors" %>
           </li>
         <% end %>
       </ul>

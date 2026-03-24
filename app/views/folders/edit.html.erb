@@ -1,11 +1,11 @@
 <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-  <div class="bg-white rounded-lg shadow">
+  <div class="bg-white rounded-lg shadow-sm">
     <div class="px-6 py-5 border-b border-gray-200">
       <h1 class="text-xl font-bold text-gray-900">Edit Folder</h1>
     </div>
     <%= form_with(model: @folder, url: folder_path(@folder), method: :patch, class: "px-6 py-5 space-y-6") do |form| %>
       <% if @folder.errors.any? %>
-        <div class="bg-red-50 border border-red-200 rounded-md p-4">
+        <div class="bg-red-50 border border-red-200 rounded-md p-4" role="alert" aria-live="polite">
           <ul class="list-disc list-inside text-sm text-red-700">
             <% @folder.errors.full_messages.each do |message| %>
               <li><%= message %></li>
@@ -30,8 +30,8 @@
       </div>
 
       <div class="flex justify-end space-x-3 pt-4">
-        <%= link_to "Cancel", folder_path(@folder), class: "px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50" %>
-        <%= form.submit "Save Changes", class: "px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 cursor-pointer" %>
+        <%= link_to "Cancel", folder_path(@folder), class: "px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors" %>
+        <%= form.submit "Save Changes", class: "px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 transition-colors cursor-pointer", data: { turbo_submits_with: "Saving..." } %>
       </div>
     <% end %>
   </div>

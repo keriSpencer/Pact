@@ -6,41 +6,48 @@
 
   <!-- Stats -->
   <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
-    <div class="bg-white rounded-lg shadow p-6">
+    <div class="bg-white rounded-lg shadow-sm p-6">
       <div class="text-sm font-medium text-gray-500">Total Contacts</div>
       <div class="mt-1 text-3xl font-bold text-gray-900"><%= @contacts_count %></div>
     </div>
-    <div class="bg-white rounded-lg shadow p-6">
+    <div class="bg-white rounded-lg shadow-sm p-6">
       <div class="text-sm font-medium text-gray-500">Organization</div>
       <div class="mt-1 text-lg font-semibold text-gray-900"><%= current_organization.name %></div>
     </div>
-    <div class="bg-white rounded-lg shadow p-6">
+    <div class="bg-white rounded-lg shadow-sm p-6">
       <div class="text-sm font-medium text-gray-500">Team Members</div>
       <div class="mt-1 text-3xl font-bold text-gray-900"><%= current_organization.member_count %></div>
     </div>
   </div>
 
   <!-- Recent Contacts -->
-  <div class="bg-white rounded-lg shadow">
+  <div class="bg-white rounded-lg shadow-sm">
     <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
       <h2 class="text-lg font-semibold text-gray-900">Recent Contacts</h2>
-      <%= link_to "View all", contacts_path, class: "text-sm text-blue-600 hover:text-blue-800" %>
+      <%= link_to "View all", contacts_path, class: "text-sm text-blue-600 hover:text-blue-800 transition-colors" %>
     </div>
     <% if @recent_contacts.any? %>
       <ul class="divide-y divide-gray-200">
         <% @recent_contacts.each do |contact| %>
-          <li class="px-6 py-4 flex items-center justify-between">
+          <li class="px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors">
             <div>
               <p class="text-sm font-medium text-gray-900"><%= contact.full_name %></p>
               <p class="text-sm text-gray-500"><%= contact.company %></p>
             </div>
-            <p class="text-xs text-gray-400"><%= time_ago_in_words(contact.created_at) %> ago</p>
+            <p class="text-xs text-gray-500"><%= time_ago_in_words(contact.created_at) %> ago</p>
           </li>
         <% end %>
       </ul>
     <% else %>
       <div class="px-6 py-12 text-center">
-        <p class="text-sm text-gray-500">No contacts yet. Add your first contact to get started.</p>
+        <svg class="mx-auto h-12 w-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+        </svg>
+        <h3 class="mt-2 text-sm font-medium text-gray-900">No contacts yet</h3>
+        <p class="mt-1 text-sm text-gray-500">Add your first contact to get started.</p>
+        <div class="mt-6">
+          <%= link_to "New Contact", new_contact_path, class: "px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors" %>
+        </div>
       </div>
     <% end %>
   </div>

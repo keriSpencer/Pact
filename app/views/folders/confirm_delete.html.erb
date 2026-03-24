@@ -1,5 +1,5 @@
 <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-  <div class="bg-white rounded-lg shadow">
+  <div class="bg-white rounded-lg shadow-sm">
     <div class="px-6 py-5 border-b border-gray-200">
       <h1 class="text-xl font-bold text-red-600">Delete Folder</h1>
     </div>
@@ -11,7 +11,7 @@
       <% if @folder.has_contents? %>
         <div class="bg-amber-50 border border-amber-200 rounded-md p-4">
           <div class="flex">
-            <svg class="h-5 w-5 text-amber-400 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="h-5 w-5 text-amber-400 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/>
             </svg>
             <div class="ml-3">
@@ -42,8 +42,8 @@
       <% end %>
 
       <div class="flex justify-end space-x-3 pt-4">
-        <%= link_to "Cancel", folder_path(@folder), class: "px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50" %>
-        <%= link_to "Delete Folder", folder_path(@folder), data: { "turbo-method": "delete" }, class: "px-4 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-md hover:bg-red-700" %>
+        <%= link_to "Cancel", folder_path(@folder), class: "px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors" %>
+        <%= link_to "Delete Folder", folder_path(@folder), data: { "turbo-method": "delete" }, class: "px-4 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-md hover:bg-red-700 transition-colors" %>
       </div>
     </div>
   </div>

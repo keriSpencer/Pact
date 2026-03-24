@@ -1,6 +1,6 @@
 <%= form_with(model: contact, url: form_url, method: form_method, class: "px-6 py-5 space-y-6") do |form| %>
   <% if contact.errors.any? %>
-    <div class="bg-red-50 border border-red-200 rounded-md p-4">
+    <div class="bg-red-50 border border-red-200 rounded-md p-4" role="alert" aria-live="polite">
       <ul class="list-disc list-inside text-sm text-red-700">
         <% contact.errors.full_messages.each do |message| %>
           <li><%= message %></li>
@@ -52,7 +52,7 @@
       <label class="block text-sm font-medium text-gray-700 mb-2">Assign to</label>
       <div class="space-y-2">
         <% @available_users.each do |user| %>
-          <label class="flex items-center">
+          <label class="flex items-center cursor-pointer">
             <input type="checkbox" name="assigned_user_ids[]" value="<%= user.id %>" class="mr-2"
                    <%= "checked" if user == current_user %>>
             <span class="text-sm text-gray-700"><%= user.full_name %></span>
@@ -63,7 +63,7 @@
   <% end %>
 
   <div class="flex justify-end space-x-3 pt-4">
-    <%= link_to "Cancel", (contact.persisted? ? contact_path(contact) : contacts_path), class: "px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50" %>
-    <%= form.submit contact.persisted? ? "Save Changes" : "Create Contact", class: "px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 cursor-pointer" %>
+    <%= link_to "Cancel", (contact.persisted? ? contact_path(contact) : contacts_path), class: "px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors" %>
+    <%= form.submit contact.persisted? ? "Save Changes" : "Create Contact", class: "px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 transition-colors cursor-pointer", data: { turbo_submits_with: contact.persisted? ? "Saving..." : "Creating..." } %>
   </div>
 <% end %>

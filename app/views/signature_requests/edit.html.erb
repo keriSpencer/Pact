@@ -5,7 +5,7 @@
      data-action="keydown->pdf-signature-placement#handleKeyDown">
 
   <% if flash.now[:alert] %>
-    <div class="bg-red-50 border border-red-200 rounded-md p-4 mb-6">
+    <div class="bg-red-50 border border-red-200 rounded-md p-4 mb-6" role="alert" aria-live="polite">
       <p class="text-sm text-red-700"><%= flash.now[:alert] %></p>
     </div>
   <% end %>
@@ -17,21 +17,21 @@
     </div>
     <div class="flex space-x-3">
       <% if @signature_request.draft? %>
-        <%= link_to "Discard Draft", discard_draft_document_signature_request_path(@document, @signature_request), data: { "turbo-method": "delete", turbo_confirm: "Discard this draft?" }, class: "px-3 py-1.5 text-sm text-red-600 border border-red-300 rounded-md hover:bg-red-50" %>
+        <%= link_to "Discard Draft", discard_draft_document_signature_request_path(@document, @signature_request), data: { "turbo-method": "delete", turbo_confirm: "Discard this draft?" }, class: "px-3 py-1.5 text-sm text-red-600 border border-red-300 rounded-md hover:bg-red-50 transition-colors" %>
       <% end %>
-      <%= link_to "Back to Document", document_path(@document), class: "px-3 py-1.5 text-sm text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50" %>
+      <%= link_to "Back to Document", document_path(@document), class: "px-3 py-1.5 text-sm text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors" %>
     </div>
   </div>
 
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
     <!-- PDF Canvas -->
     <div class="lg:col-span-2">
-      <div class="bg-white rounded-xl shadow-sm">
+      <div class="bg-white rounded-lg shadow-sm">
         <!-- Toolbar -->
-        <div class="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
+        <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
           <div class="flex items-center space-x-2">
             <span class="text-xs font-medium text-gray-500 uppercase mr-2">Place:</span>
-            <select data-pdf-signature-placement-target="addFieldType" class="text-sm border-gray-300 rounded-lg pr-8 py-1.5">
+            <select data-pdf-signature-placement-target="addFieldType" class="text-sm border-gray-300 rounded-md pr-8 py-1.5">
               <option value="signature">Signature</option>
               <option value="initials">Initials</option>
               <option value="date">Date</option>
@@ -39,12 +39,12 @@
             </select>
           </div>
           <div class="flex items-center space-x-3">
-            <button type="button" data-action="pdf-signature-placement#previousPage" class="p-1.5 text-gray-400 hover:text-gray-600 rounded-md hover:bg-gray-100">
-              <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+            <button type="button" data-action="pdf-signature-placement#previousPage" aria-label="Previous page" class="p-1.5 text-gray-500 hover:text-gray-600 rounded-md hover:bg-gray-100 transition-colors">
+              <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
             </button>
             <span data-pdf-signature-placement-target="pageIndicator" class="text-xs text-gray-500 tabular-nums">Page 1 of 1</span>
-            <button type="button" data-action="pdf-signature-placement#nextPage" class="p-1.5 text-gray-400 hover:text-gray-600 rounded-md hover:bg-gray-100">
-              <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+            <button type="button" data-action="pdf-signature-placement#nextPage" aria-label="Next page" class="p-1.5 text-gray-500 hover:text-gray-600 rounded-md hover:bg-gray-100 transition-colors">
+              <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
             </button>
           </div>
         </div>
@@ -52,7 +52,7 @@
         <!-- Loading -->
         <div data-pdf-signature-placement-target="loadingState" class="flex items-center justify-center py-32">
           <div class="text-center">
-            <svg class="animate-spin h-8 w-8 text-blue-500 mx-auto mb-3" fill="none" viewBox="0 0 24 24">
+            <svg class="animate-spin h-8 w-8 text-blue-500 mx-auto mb-3" fill="none" viewBox="0 0 24 24" aria-hidden="true">
               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
               <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
             </svg>
@@ -61,12 +61,12 @@
         </div>
 
         <!-- Canvas -->
-        <div data-pdf-signature-placement-target="canvasContainer" class="hidden p-4">
+        <div data-pdf-signature-placement-target="canvasContainer" class="hidden p-4 overflow-hidden">
           <canvas data-pdf-signature-placement-target="canvas"
                   data-action="mousedown->pdf-signature-placement#handleCanvasMouseDown mousemove->pdf-signature-placement#handleCanvasHover"
-                  class="mx-auto border border-gray-200 rounded-lg shadow-sm cursor-crosshair">
+                  class="mx-auto border border-gray-200 rounded-lg shadow-sm cursor-crosshair max-w-full">
           </canvas>
-          <p class="text-center text-xs text-gray-400 mt-3">Click to place a field, or drag to draw. Select and press Delete to remove.</p>
+          <p class="text-center text-xs text-gray-500 mt-3">Click to place a field, or drag to draw. Select and press Delete to remove.</p>
         </div>
       </div>
     </div>
@@ -79,11 +79,11 @@
                value="<%= @signature_request.signature_fields.map { |sf| { page_number: sf.page_number, x_percent: sf.x_percent, y_percent: sf.y_percent, width_percent: sf.width_percent, height_percent: sf.height_percent, field_type: sf.field_type, required: sf.required, position: sf.position, label: sf.read_attribute(:label) } }.to_json %>">
 
         <!-- Signer Details -->
-        <div class="bg-white rounded-xl shadow-sm">
-          <div class="px-5 py-4 border-b border-gray-100">
+        <div class="bg-white rounded-lg shadow-sm">
+          <div class="px-6 py-4 border-b border-gray-200">
             <h2 class="text-sm font-semibold text-gray-900">Signer Details</h2>
           </div>
-          <div class="px-5 py-4 space-y-4">
+          <div class="px-6 py-4 space-y-4">
             <div>
               <%= f.label :signer_email, "Email", class: "block text-sm font-medium text-gray-700" %>
               <%= f.email_field :signer_email, class: "mt-1 block w-full", required: true, placeholder: "signer@example.com" %>
@@ -100,11 +100,11 @@
         </div>
 
         <!-- Templates -->
-        <div class="bg-white rounded-xl shadow-sm">
-          <div class="px-5 py-4 border-b border-gray-100">
+        <div class="bg-white rounded-lg shadow-sm">
+          <div class="px-6 py-4 border-b border-gray-200">
             <h2 class="text-sm font-semibold text-gray-900">Templates</h2>
           </div>
-          <div class="px-5 py-3 space-y-2">
+          <div class="px-6 py-4 space-y-2">
             <% templates = @document.signature_templates.by_recent %>
             <% if templates.any? %>
               <div class="space-y-1">
@@ -114,26 +114,31 @@
                     <div class="flex items-center space-x-2 shrink-0">
                       <%= link_to "Apply", apply_document_signature_template_path(@document, template),
                             data: { "turbo-method": "post" },
-                            class: "text-xs text-blue-600 hover:text-blue-800 font-medium" %>
+                            class: "text-xs text-blue-600 hover:text-blue-800 font-medium transition-colors" %>
                       <%= link_to "Delete", document_signature_template_path(@document, template),
                             data: { "turbo-method": "delete", turbo_confirm: "Delete this template?" },
-                            class: "text-xs text-red-500 hover:text-red-700" %>
+                            class: "text-xs text-red-500 hover:text-red-700 transition-colors" %>
                     </div>
                   </div>
                 <% end %>
               </div>
             <% else %>
-              <p class="text-xs text-gray-400 py-2 text-center">No templates saved yet</p>
+              <p class="text-xs text-gray-500 py-2 text-center">No templates saved yet</p>
             <% end %>
           </div>
-          <div class="px-5 py-3 border-t border-gray-100">
+          <div class="px-6 py-4 border-t border-gray-200">
             <details class="group">
-              <summary class="text-xs font-medium text-blue-600 cursor-pointer hover:text-blue-800">Save Current Fields as Template</summary>
+              <summary class="text-xs font-medium text-blue-600 cursor-pointer hover:text-blue-800 transition-colors flex items-center">
+                <svg class="h-3 w-3 mr-1 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                </svg>
+                Save Current Fields as Template
+              </summary>
               <div class="mt-2 space-y-2">
-                <input type="text" id="template_name_input" placeholder="Template name..." class="block w-full text-sm rounded-lg border-gray-300">
+                <input type="text" id="template_name_input" placeholder="Template name..." class="block w-full text-sm rounded-md border-gray-300">
                 <button type="button"
                         onclick="saveTemplate()"
-                        class="w-full px-3 py-1.5 text-xs font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700">
+                        class="w-full px-3 py-1.5 text-xs font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors cursor-pointer">
                   Save Template
                 </button>
               </div>
@@ -159,10 +164,10 @@
         </div>
 
         <!-- Placed Fields -->
-        <div class="bg-white rounded-xl shadow-sm">
-          <div class="px-5 py-4 border-b border-gray-100 flex justify-between items-center">
+        <div class="bg-white rounded-lg shadow-sm">
+          <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
             <h2 class="text-sm font-semibold text-gray-900">Fields</h2>
-            <span data-pdf-signature-placement-target="fieldCount" class="text-xs text-gray-400">0 fields placed</span>
+            <span data-pdf-signature-placement-target="fieldCount" class="text-xs text-gray-500">0 fields placed</span>
           </div>
           <div class="px-4 py-3 space-y-2" data-pdf-signature-placement-target="fieldsList">
             <p class="text-sm text-gray-500 py-4 text-center">Click or drag on the document to place fields</p>
@@ -171,10 +176,10 @@
 
         <!-- Actions -->
         <div class="space-y-3">
-          <button type="submit" name="send_request" value="1" class="w-full px-4 py-3 text-sm font-semibold text-white bg-blue-600 rounded-xl hover:bg-blue-700 transition-colors cursor-pointer shadow-sm">
+          <button type="submit" name="send_request" value="1" class="w-full px-4 py-3 text-sm font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors cursor-pointer shadow-sm" data-turbo-submits-with="Sending...">
             Send for Signature
           </button>
-          <%= f.submit "Save Draft", class: "w-full px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 cursor-pointer" %>
+          <%= f.submit "Save Draft", class: "w-full px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer", data: { turbo_submits_with: "Saving..." } %>
         </div>
       <% end %>
     </div>

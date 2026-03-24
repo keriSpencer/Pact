@@ -4,10 +4,10 @@
       <h1 class="text-2xl font-bold text-gray-900">Documents</h1>
     </div>
     <div class="flex space-x-3">
-      <%= link_to new_folder_path, class: "px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50" do %>
+      <%= link_to new_folder_path, class: "px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors" do %>
         New Folder
       <% end %>
-      <%= link_to new_document_path, class: "px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700" do %>
+      <%= link_to new_document_path, class: "px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors" do %>
         Upload Document
       <% end %>
     </div>
@@ -15,9 +15,9 @@
 
   <!-- System Folders -->
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-    <%= link_to documents_path, class: "bg-white rounded-lg shadow p-4 hover:shadow-md transition-shadow flex items-center" do %>
+    <%= link_to documents_path, class: "bg-white rounded-lg shadow-sm p-4 hover:shadow-md transition-shadow flex items-center" do %>
       <div class="h-10 w-10 rounded-lg bg-gray-100 flex items-center justify-center mr-3">
-        <svg class="h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg class="h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
         </svg>
       </div>
@@ -26,9 +26,9 @@
         <p class="text-xs text-gray-500"><%= @unfiled_count %> documents</p>
       </div>
     <% end %>
-    <%= link_to archive_documents_path, class: "bg-white rounded-lg shadow p-4 hover:shadow-md transition-shadow flex items-center" do %>
+    <%= link_to archive_documents_path, class: "bg-white rounded-lg shadow-sm p-4 hover:shadow-md transition-shadow flex items-center" do %>
       <div class="h-10 w-10 rounded-lg bg-amber-50 flex items-center justify-center mr-3">
-        <svg class="h-5 w-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg class="h-5 w-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/>
         </svg>
       </div>
@@ -44,9 +44,9 @@
     <h2 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">Folders</h2>
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
       <% @folders.each do |folder| %>
-        <%= link_to folder_path(folder), class: "bg-white rounded-lg shadow p-4 hover:shadow-md transition-shadow flex items-center" do %>
+        <%= link_to folder_path(folder), class: "bg-white rounded-lg shadow-sm p-4 hover:shadow-md transition-shadow flex items-center" do %>
           <div class="h-10 w-10 rounded-lg bg-blue-50 flex items-center justify-center mr-3">
-            <svg class="h-5 w-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="h-5 w-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/>
             </svg>
           </div>

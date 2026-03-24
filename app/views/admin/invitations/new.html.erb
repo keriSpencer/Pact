@@ -1,12 +1,12 @@
 <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-  <div class="bg-white rounded-lg shadow">
+  <div class="bg-white rounded-lg shadow-sm">
     <div class="px-6 py-5 border-b border-gray-200">
       <h1 class="text-xl font-bold text-gray-900">Invite Team Member</h1>
       <p class="mt-1 text-sm text-gray-500">Send an invitation to join <%= current_organization.name %></p>
     </div>
     <%= form_with(model: @user, url: admin_invitations_path, method: :post, class: "px-6 py-5 space-y-6") do |form| %>
       <% if @user.errors.any? %>
-        <div class="bg-red-50 border border-red-200 rounded-md p-4">
+        <div class="bg-red-50 border border-red-200 rounded-md p-4" role="alert" aria-live="polite">
           <ul class="list-disc list-inside text-sm text-red-700">
             <% @user.errors.full_messages.each do |message| %>
               <li><%= message %></li>
@@ -17,28 +17,28 @@
 
       <div>
         <%= form.label :email, class: "block text-sm font-medium text-gray-700" %>
-        <%= form.email_field :email, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm", required: true %>
+        <%= form.email_field :email, class: "mt-1 block w-full", required: true %>
       </div>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
         <div>
           <%= form.label :first_name, class: "block text-sm font-medium text-gray-700" %>
-          <%= form.text_field :first_name, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" %>
+          <%= form.text_field :first_name, class: "mt-1 block w-full" %>
         </div>
         <div>
           <%= form.label :last_name, class: "block text-sm font-medium text-gray-700" %>
-          <%= form.text_field :last_name, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" %>
+          <%= form.text_field :last_name, class: "mt-1 block w-full" %>
         </div>
       </div>
 
       <div>
         <%= form.label :role, class: "block text-sm font-medium text-gray-700" %>
-        <%= form.select :role, [["Member", "member"], ["Admin", "admin"]], {}, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" %>
+        <%= form.select :role, [["Member", "member"], ["Admin", "admin"]], {}, class: "mt-1 block w-full" %>
       </div>
 
       <div class="flex justify-end space-x-3 pt-4">
-        <%= link_to "Cancel", admin_users_path, class: "px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50" %>
-        <%= form.submit "Send Invitation", class: "px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 cursor-pointer" %>
+        <%= link_to "Cancel", admin_users_path, class: "px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors" %>
+        <%= form.submit "Send Invitation", class: "px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 transition-colors cursor-pointer", data: { turbo_submits_with: "Sending..." } %>
       </div>
     <% end %>
   </div>
