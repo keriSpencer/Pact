@@ -55,7 +55,7 @@
                   data-action="mousedown->pdf-signature-placement#handleCanvasMouseDown mousemove->pdf-signature-placement#handleCanvasHover"
                   class="mx-auto border border-gray-200 rounded-lg shadow-sm cursor-crosshair max-w-full">
           </canvas>
-          <p class="text-center text-xs text-gray-500 mt-3">Click to place a field, or drag to draw. Select and press Delete to remove.</p>
+          <p class="text-center text-xs text-gray-500 mt-3">Click to place. Click a field to select, then <kbd class="px-1 py-0.5 bg-gray-100 border border-gray-300 rounded text-xs">Delete</kbd> to remove.</p>
         </div>
       </div>
     </div>
@@ -182,6 +182,11 @@
               <button type="button" data-action="pdf-signature-placement#selectFieldType" data-field-type="email" data-pdf-signature-placement-target="fieldTypePill" class="px-3 py-1.5 text-xs font-medium rounded-full border transition-colors cursor-pointer bg-white text-gray-600 border-gray-200 hover:bg-gray-50">Email</button>
               <button type="button" data-action="pdf-signature-placement#selectFieldType" data-field-type="company" data-pdf-signature-placement-target="fieldTypePill" class="px-3 py-1.5 text-xs font-medium rounded-full border transition-colors cursor-pointer bg-white text-gray-600 border-gray-200 hover:bg-gray-50">Company</button>
               <button type="button" data-action="pdf-signature-placement#selectFieldType" data-field-type="title" data-pdf-signature-placement-target="fieldTypePill" class="px-3 py-1.5 text-xs font-medium rounded-full border transition-colors cursor-pointer bg-white text-gray-600 border-gray-200 hover:bg-gray-50">Title</button>
+              <button type="button" data-action="pdf-signature-placement#selectCustomFieldType" data-pdf-signature-placement-target="fieldTypePill" class="px-3 py-1.5 text-xs font-medium rounded-full border border-dashed transition-colors cursor-pointer bg-white text-gray-500 border-gray-300 hover:bg-gray-50">+ Custom</button>
+            </div>
+            <!-- Custom label input (shown when Custom is selected) -->
+            <div data-pdf-signature-placement-target="customLabelInput" class="hidden mt-3">
+              <input type="text" data-pdf-signature-placement-target="customLabelField" placeholder="Field label (e.g., Address, SSN last 4)..." class="block w-full text-sm rounded-md border-gray-300">
             </div>
           </div>
           <div class="px-6 py-3 border-b border-gray-200 flex justify-between items-center">

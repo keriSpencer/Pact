@@ -4,7 +4,8 @@ export default class extends Controller {
   static targets = [
     "canvas", "pageIndicator", "fieldsInput", "loadingState",
     "canvasContainer", "fieldsList", "fieldCount", "addFieldType",
-    "labelInput", "fieldLabel", "fieldTypePill"
+    "labelInput", "fieldLabel", "fieldTypePill",
+    "customLabelInput", "customLabelField"
   ]
   static values = {
     pdfUrl: String,
@@ -41,6 +42,7 @@ export default class extends Controller {
     this.pdfCanvasImage = null
     this.dragState = null
     this.dragStarted = false
+    this.customFieldMode = false
     this.mouseDownPos = null
 
     this._onMouseMove = this.onDocumentMouseMove.bind(this)
@@ -349,10 +351,13 @@ export default class extends Controller {
     let cx = Math.max(wPct/2, Math.min(100 - wPct/2, Math.min(startXPct, endXPct) + wPct/2))
     let cy = Math.max(hPct/2, Math.min(100 - hPct/2, Math.min(startYPct, endYPct) + hPct/2))
     const fieldType = this.hasAddFieldTypeTarget ? this.addFieldTypeTarget.value : 'signature'
+    const customLabel = this.customFieldMode && this.hasCustomLabelFieldTarget
+      ? this.customLabelFieldTarget.value.trim() || 'Custom'
+      : null
     const newField = {
       id: this.nextFieldId++, x: parseFloat(cx.toFixed(2)), y: parseFloat(cy.toFixed(2)),
       page: this.currentPageValue, width: parseFloat(wPct.toFixed(2)), height: parseFloat(hPct.toFixed(2)),
-      type: fieldType, label: null, required: true, position: this.signatureFields.length + 1
+      type: fieldType, label: customLabel, required: true, position: this.signatureFields.length + 1
     }
     this.signatureFields.push(newField)
     this.selectedFieldId = newField.id
@@ -363,10 +368,13 @@ export default class extends Controller {
   placeNewField(xPct, yPct) {
     const fieldType = this.hasAddFieldTypeTarget ? this.addFieldTypeTarget.value : 'signature'
     const defaults = this.fieldDefaults[fieldType] || this.fieldDefaults.signature
+    const customLabel = this.customFieldMode && this.hasCustomLabelFieldTarget
+      ? this.customLabelFieldTarget.value.trim() || 'Custom'
+      : null
     const newField = {
       id: this.nextFieldId++, x: Math.max(5, Math.min(95, xPct)), y: Math.max(5, Math.min(95, yPct)),
       page: this.currentPageValue, width: defaults.width, height: defaults.height,
-      type: fieldType, label: null, required: true, position: this.signatureFields.length + 1
+      type: fieldType, label: customLabel, required: true, position: this.signatureFields.length + 1
     }
     this.signatureFields.push(newField)
     this.selectedFieldId = newField.id
@@ -483,18 +491,23 @@ export default class extends Controller {
         title: { label: 'Title', color: 'bg-pink-100 text-pink-800', badge: 'bg-pink-600' },
         checkbox: { label: 'Checkbox', color: 'bg-gray-100 text-gray-800', badge: 'bg-gray-600' }
       }
+      const selectedHint = this.selectedFieldId !== null
+        ? `<p class="text-xs text-gray-400 text-center mt-2 pb-1">Press <kbd class="px-1 py-0.5 bg-gray-100 border border-gray-300 rounded text-xs">Delete</kbd> to remove selected field</p>`
+        : ''
+
       this.fieldsListTarget.innerHTML = this.signatureFields.map((field, index) => {
         const cfg = typeConfig[field.type] || typeConfig.signature
-        const sel = field.id === this.selectedFieldId ? 'ring-2 ring-purple-400 bg-purple-50' : 'bg-gray-50'
-        return `<div class="flex items-center justify-between py-2 px-3 ${sel} rounded-lg cursor-pointer" data-action="click->pdf-signature-placement#selectField" data-field-id="${field.id}">
+        const isSelected = field.id === this.selectedFieldId
+        const sel = isSelected ? 'ring-2 ring-purple-400 bg-purple-50' : 'bg-gray-50 hover:bg-gray-100'
+        return `<div class="flex items-center justify-between py-2 px-3 ${sel} rounded-lg cursor-pointer transition-colors" data-action="click->pdf-signature-placement#selectField" data-field-id="${field.id}">
           <div class="flex items-center space-x-3">
             <span class="flex items-center justify-center h-6 w-6 rounded-full ${cfg.badge} text-white text-xs font-bold">${index + 1}</span>
             <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${cfg.color}">${cfg.label}</span>
             <span class="text-xs text-gray-500">Page ${field.page}</span>
           </div>
-          <button type="button" data-action="click->pdf-signature-placement#removeField" data-field-id="${field.id}" class="text-xs text-red-600 hover:text-red-800">Remove</button>
+          <button type="button" data-action="click->pdf-signature-placement#removeField" data-field-id="${field.id}" class="text-xs text-red-600 hover:text-red-800 transition-colors">Remove</button>
         </div>`
-      }).join('')
+      }).join('') + selectedHint
     }
     if (this.hasFieldCountTarget) {
       const c = this.signatureFields.length
@@ -520,6 +533,10 @@ export default class extends Controller {
   selectFieldType(event) {
     const type = event.currentTarget.dataset.fieldType
     if (!type) return
+
+    // Exit custom mode
+    this.customFieldMode = false
+    if (this.hasCustomLabelInputTarget) this.customLabelInputTarget.classList.add('hidden')
 
     // Update hidden select
     if (this.hasAddFieldTypeTarget) this.addFieldTypeTarget.value = type
@@ -547,6 +564,31 @@ export default class extends Controller {
     // Activate the clicked pill
     const activeColors = colors[type] || colors.text
     event.currentTarget.className = `px-3 py-1.5 text-xs font-medium rounded-full border transition-colors cursor-pointer ${activeColors}`
+  }
+
+  // Custom field type selection
+  selectCustomFieldType(event) {
+    // Set to 'text' type with custom label
+    if (this.hasAddFieldTypeTarget) this.addFieldTypeTarget.value = 'text'
+    this.customFieldMode = true
+
+    // Show the custom label input
+    if (this.hasCustomLabelInputTarget) this.customLabelInputTarget.classList.remove('hidden')
+    if (this.hasCustomLabelFieldTarget) {
+      this.customLabelFieldTarget.focus()
+      this.customLabelFieldTarget.value = ''
+    }
+
+    // Update pill styling
+    const inactive = 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
+    this.fieldTypePillTargets.forEach(pill => {
+      if (pill.dataset.fieldType) {
+        pill.className = `px-3 py-1.5 text-xs font-medium rounded-full border transition-colors cursor-pointer ${inactive}`
+      } else {
+        // This is the custom pill
+        pill.className = 'px-3 py-1.5 text-xs font-medium rounded-full border border-dashed transition-colors cursor-pointer bg-orange-100 text-orange-800 border-orange-300'
+      }
+    })
   }
 
   // Loading states
