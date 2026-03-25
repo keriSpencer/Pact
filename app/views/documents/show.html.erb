@@ -253,9 +253,15 @@
         <!-- Original panel -->
         <div class="p-6" data-version-toggle-target="panel" data-tab="original">
           <% if @document.pdf? && @document.file.attached? %>
-            <iframe src="<%= rails_blob_path(@document.file, disposition: 'inline') %>" class="w-full h-96 border border-gray-200 rounded" title="Original document preview"></iframe>
+            <iframe src="<%= rails_blob_path(@document.file, disposition: 'inline') %>" class="w-full border border-gray-200 rounded" style="height: 70vh; min-height: 500px;" title="Original document preview"></iframe>
+            <div class="mt-3 flex justify-end">
+              <%= link_to rails_blob_path(@document.file, disposition: "inline"), target: "_blank", class: "inline-flex items-center text-xs text-gray-500 hover:text-gray-700 transition-colors" do %>
+                <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5v-4m0 4h-4m4 0l-5-5"/></svg>
+                Open full screen
+              <% end %>
+            </div>
           <% elsif @document.image? && @document.file.attached? %>
-            <%= image_tag rails_blob_path(@document.file), class: "max-w-full rounded", alt: @document.name %>
+            <%= image_tag rails_blob_path(@document.file), class: "max-w-full rounded cursor-pointer", alt: @document.name, onclick: "window.open(this.src, '_blank')", title: "Click to open full size" %>
           <% else %>
             <div class="text-center py-12">
               <svg class="mx-auto h-16 w-16 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -272,10 +278,16 @@
           <% latest_signed = @document.latest_signed_version %>
           <div class="p-6 hidden" data-version-toggle-target="panel" data-tab="signed">
             <% if latest_signed&.file&.attached? %>
-              <iframe src="<%= rails_blob_path(latest_signed.file, disposition: 'inline') %>" class="w-full h-96 border border-gray-200 rounded" title="Signed document preview"></iframe>
+              <iframe src="<%= rails_blob_path(latest_signed.file, disposition: 'inline') %>" class="w-full border border-gray-200 rounded" style="height: 70vh; min-height: 500px;" title="Signed document preview"></iframe>
               <div class="mt-3 flex items-center justify-between">
-                <p class="text-xs text-gray-500"><%= latest_signed.display_label %> -- <%= latest_signed.formatted_date %></p>
-                <%= link_to "Download Signed PDF", rails_blob_path(latest_signed.file, disposition: "attachment"), class: "text-xs text-blue-600 hover:text-blue-800 font-medium transition-colors" %>
+                <p class="text-xs text-gray-500"><%= latest_signed.display_label %> — <%= latest_signed.formatted_date %></p>
+                <div class="flex items-center space-x-4">
+                  <%= link_to rails_blob_path(latest_signed.file, disposition: "inline"), target: "_blank", class: "inline-flex items-center text-xs text-gray-500 hover:text-gray-700 transition-colors" do %>
+                    <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5v-4m0 4h-4m4 0l-5-5"/></svg>
+                    Full screen
+                  <% end %>
+                  <%= link_to "Download", rails_blob_path(latest_signed.file, disposition: "attachment"), class: "text-xs text-blue-600 hover:text-blue-800 font-medium transition-colors" %>
+                </div>
               </div>
             <% else %>
               <p class="text-sm text-gray-500 text-center py-8">Signed version is being generated...</p>

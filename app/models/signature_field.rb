@@ -61,6 +61,7 @@ class SignatureField < ApplicationRecord
       width: width_percent,
       height: height_percent,
       type: field_type,
+      label: self[:label],
       data: completion.signature_artifact.artifact_data
     }
   end

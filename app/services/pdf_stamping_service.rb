@@ -86,7 +86,8 @@ class PdfStampingService
         display_text = completed_at ? completed_at.strftime("%B %d, %Y at %l:%M %p") : data
         draw_text_in_box(canvas, display_text, x, y, width, height)
       elsif field.field_type == "checkbox"
-        draw_text_in_box(canvas, "X", x, y, width, height)
+        checkbox_text = stamp[:label].present? ? "X  #{stamp[:label]}" : "X"
+        draw_text_in_box(canvas, checkbox_text, x, y, width, height)
       elsif field.text_input_type?
         # name, email, company, title, text - render as plain text
         draw_text_in_box(canvas, data, x, y, width, height)
