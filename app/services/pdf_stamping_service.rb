@@ -68,10 +68,12 @@ class PdfStampingService
       page_width = box.width
       page_height = box.height
 
-      x = (stamp[:x].to_f / 100.0) * page_width
-      y = (stamp[:y].to_f / 100.0) * page_height
       width = ((stamp[:width] || 25).to_f / 100.0) * page_width
       height = ((stamp[:height] || 8).to_f / 100.0) * page_height
+      # Convert from top-left percentage to PDF bottom-left coordinates
+      # x/y are center-point percentages from our JS placement
+      x = (stamp[:x].to_f / 100.0) * page_width - width / 2.0
+      y = page_height - (stamp[:y].to_f / 100.0) * page_height - height / 2.0
 
       canvas = page.canvas(type: :overlay)
       data = stamp[:data].to_s
@@ -84,7 +86,7 @@ class PdfStampingService
         display_text = completed_at ? completed_at.strftime("%B %d, %Y at %l:%M %p") : data
         draw_text_in_box(canvas, display_text, x, y, width, height)
       elsif field.field_type == "checkbox"
-        draw_text_in_box(canvas, "\u2713", x, y, width, height)
+        draw_text_in_box(canvas, "X", x, y, width, height)
       elsif field.text_input_type?
         # name, email, company, title, text - render as plain text
         draw_text_in_box(canvas, data, x, y, width, height)
