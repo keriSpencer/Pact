@@ -128,19 +128,48 @@ export default class extends Controller {
     const top = y - h / 2
 
     if (field.completed) {
-      // Green border + checkmark
+      // Show actual content instead of a checkmark
       ctx.strokeStyle = "#16a34a"
-      ctx.lineWidth = 2
+      ctx.lineWidth = 1.5
       ctx.setLineDash([])
       ctx.strokeRect(left, top, w, h)
-      ctx.fillStyle = "rgba(22, 163, 74, 0.08)"
+      ctx.fillStyle = "rgba(255, 255, 255, 0.85)"
       ctx.fillRect(left, top, w, h)
-      // Checkmark
-      ctx.fillStyle = "#16a34a"
-      ctx.font = "bold 14px sans-serif"
-      ctx.textAlign = "center"
-      ctx.textBaseline = "middle"
-      ctx.fillText("\u2713", x, y)
+
+      const value = field.artifact_value
+      if (value && value.startsWith && value.startsWith("data:image/")) {
+        // Drawn signature/initials — render the image
+        this.drawImageInField(ctx, value, left, top, w, h)
+      } else if (field.type === "checkbox") {
+        // Checkmark for checkbox
+        ctx.fillStyle = "#16a34a"
+        ctx.font = `bold ${Math.min(h * 0.7, 18)}px sans-serif`
+        ctx.textAlign = "center"
+        ctx.textBaseline = "middle"
+        ctx.fillText("\u2713", x, y)
+      } else if (value) {
+        // Text content (name, date, email, typed signature, etc.)
+        ctx.fillStyle = "#1a1a1a"
+        const fontSize = Math.min(h * 0.55, 14)
+        const isSignatureType = field.type === "signature" || field.type === "initials"
+        ctx.font = isSignatureType ? `italic ${fontSize}px 'Georgia', serif` : `${fontSize}px sans-serif`
+        ctx.textAlign = "center"
+        ctx.textBaseline = "middle"
+        // Truncate if too long
+        let displayText = value
+        const maxWidth = w - 8
+        while (ctx.measureText(displayText).width > maxWidth && displayText.length > 3) {
+          displayText = displayText.slice(0, -4) + "..."
+        }
+        ctx.fillText(displayText, x, y)
+      } else {
+        // Fallback checkmark if no artifact value
+        ctx.fillStyle = "#16a34a"
+        ctx.font = "bold 14px sans-serif"
+        ctx.textAlign = "center"
+        ctx.textBaseline = "middle"
+        ctx.fillText("\u2713", x, y)
+      }
     } else if (isCurrent) {
       // Pulsing blue border
       const alpha = 0.4 + 0.4 * Math.sin(this.pulsePhase)
@@ -402,6 +431,28 @@ export default class extends Controller {
 
   endDraw() {
     this.isDrawing = false
+  }
+
+  // Draw a base64 image inside a field box (for drawn signatures/initials)
+  drawImageInField(ctx, dataUrl, left, top, w, h) {
+    const img = new Image()
+    img.onload = () => {
+      // Fit image within the field maintaining aspect ratio
+      const imgAspect = img.width / img.height
+      const boxAspect = w / h
+      let drawW, drawH
+      if (imgAspect > boxAspect) {
+        drawW = w - 4
+        drawH = drawW / imgAspect
+      } else {
+        drawH = h - 4
+        drawW = drawH * imgAspect
+      }
+      const drawX = left + (w - drawW) / 2
+      const drawY = top + (h - drawH) / 2
+      ctx.drawImage(img, drawX, drawY, drawW, drawH)
+    }
+    img.src = dataUrl
   }
 
   clearPad() {
