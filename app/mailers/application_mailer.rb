@@ -1,4 +1,4 @@
 class ApplicationMailer < ActionMailer::Base
-  default from: "Pact <notifications@pactapp.com>"
+  default from: ENV.fetch("MAILER_FROM", "Pact <notifications@pactapp.com>")
   layout "mailer"
 end
