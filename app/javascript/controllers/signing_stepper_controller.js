@@ -141,12 +141,14 @@ export default class extends Controller {
         // Drawn signature/initials — render the image
         this.drawImageInField(ctx, value, left, top, w, h)
       } else if (field.type === "checkbox") {
-        // Checkmark for checkbox
+        // Checked checkbox with label
         ctx.fillStyle = "#16a34a"
-        ctx.font = `bold ${Math.min(h * 0.7, 18)}px sans-serif`
+        const cbFontSize = Math.min(h * 0.55, 14)
+        ctx.font = `${cbFontSize}px sans-serif`
         ctx.textAlign = "center"
         ctx.textBaseline = "middle"
-        ctx.fillText("\u2713", x, y)
+        const cbLabel = field.label ? `\u2611 ${field.label}` : "\u2611"
+        ctx.fillText(cbLabel, x, y)
       } else if (value) {
         // Text content (name, date, email, typed signature, etc.)
         ctx.fillStyle = "#1a1a1a"
@@ -181,10 +183,14 @@ export default class extends Controller {
       ctx.fillRect(left, top, w, h)
       // Label
       ctx.fillStyle = "#2563eb"
-      ctx.font = "bold 12px sans-serif"
+      const labelFontSize = Math.min(h * 0.5, 12)
+      ctx.font = `bold ${labelFontSize}px sans-serif`
       ctx.textAlign = "center"
       ctx.textBaseline = "middle"
-      ctx.fillText(field.label || field.type, x, y)
+      const displayLabel = field.type === "checkbox" && field.label
+        ? `\u2610 ${field.label}`
+        : (field.label || field.type)
+      ctx.fillText(displayLabel, x, y)
     } else {
       // Gray dashed border
       ctx.strokeStyle = "#9ca3af"
@@ -591,8 +597,10 @@ export default class extends Controller {
   isCanvasBlank(canvas) {
     const ctx = canvas.getContext("2d")
     const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data
-    for (let i = 3; i < data.length; i += 4) {
-      if (data[i] !== 0) return false
+    // Check for any non-white pixel (canvas is pre-filled with white for dark mode)
+    for (let i = 0; i < data.length; i += 4) {
+      const r = data[i], g = data[i + 1], b = data[i + 2]
+      if (r < 250 || g < 250 || b < 250) return false // Found a non-white pixel (ink)
     }
     return true
   }
