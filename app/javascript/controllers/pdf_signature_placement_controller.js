@@ -647,7 +647,38 @@ export default class extends Controller {
     field.label = newLabel || null
     this.updateFormData()
     this.redrawFields()
-    // Don't call updateFieldsList here — it would destroy the input we're typing in
+    // Update the field list but NOT the inspector (would destroy the input we're typing in)
+    this.updateFieldsListOnly()
+  }
+
+  // Update just the field list HTML without touching the inspector
+  updateFieldsListOnly() {
+    if (!this.hasFieldsListTarget) return
+    const typeConfig = {
+      signature: { label: 'Signature', color: 'bg-purple-100 text-purple-800', badge: 'bg-purple-600' },
+      initials: { label: 'Initials', color: 'bg-cyan-100 text-cyan-800', badge: 'bg-cyan-600' },
+      date: { label: 'Date', color: 'bg-amber-100 text-amber-800', badge: 'bg-amber-600' },
+      text: { label: 'Text', color: 'bg-blue-100 text-blue-800', badge: 'bg-blue-600' },
+      name: { label: 'Name', color: 'bg-green-100 text-green-800', badge: 'bg-green-600' },
+      email: { label: 'Email', color: 'bg-indigo-100 text-indigo-800', badge: 'bg-indigo-600' },
+      company: { label: 'Company', color: 'bg-teal-100 text-teal-800', badge: 'bg-teal-600' },
+      title: { label: 'Title', color: 'bg-pink-100 text-pink-800', badge: 'bg-pink-600' },
+      checkbox: { label: 'Checkbox', color: 'bg-gray-100 text-gray-800', badge: 'bg-gray-600' }
+    }
+    this.fieldsListTarget.innerHTML = this.signatureFields.map((field, index) => {
+      const cfg = typeConfig[field.type] || typeConfig.signature
+      const isSelected = field.id === this.selectedFieldId
+      const sel = isSelected ? 'ring-2 ring-purple-400 bg-purple-50' : 'bg-gray-50 hover:bg-gray-100'
+      const displayLabel = field.label ? `"${field.label}"` : ''
+      return `<div class="flex items-center justify-between py-2 px-3 ${sel} rounded-lg cursor-pointer transition-colors" data-action="click->pdf-signature-placement#selectField" data-field-id="${field.id}">
+        <div class="flex items-center space-x-2 min-w-0">
+          <span class="flex items-center justify-center h-6 w-6 rounded-full ${cfg.badge} text-white text-xs font-bold shrink-0">${index + 1}</span>
+          <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${cfg.color} shrink-0">${cfg.label}</span>
+          ${displayLabel ? `<span class="text-xs text-gray-500 truncate">${displayLabel}</span>` : ''}
+        </div>
+        <button type="button" data-action="click->pdf-signature-placement#removeField" data-field-id="${field.id}" class="text-xs text-red-600 hover:text-red-800 transition-colors shrink-0 ml-2">Remove</button>
+      </div>`
+    }).join('')
   }
 
   // Custom field type selection
