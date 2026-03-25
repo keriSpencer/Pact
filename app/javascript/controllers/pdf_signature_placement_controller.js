@@ -4,7 +4,7 @@ export default class extends Controller {
   static targets = [
     "canvas", "pageIndicator", "fieldsInput", "loadingState",
     "canvasContainer", "fieldsList", "fieldCount", "addFieldType",
-    "labelInput", "fieldLabel"
+    "labelInput", "fieldLabel", "fieldTypePill"
   ]
   static values = {
     pdfUrl: String,
@@ -515,6 +515,39 @@ export default class extends Controller {
   nextPage() { if (this.currentPageValue < this.totalPagesValue) this.renderPage(this.currentPageValue + 1) }
   previousPage() { if (this.currentPageValue > 1) this.renderPage(this.currentPageValue - 1) }
   updatePageIndicator() { if (this.hasPageIndicatorTarget) this.pageIndicatorTarget.textContent = `Page ${this.currentPageValue} of ${this.totalPagesValue}` }
+
+  // Field type selection via pills
+  selectFieldType(event) {
+    const type = event.currentTarget.dataset.fieldType
+    if (!type) return
+
+    // Update hidden select
+    if (this.hasAddFieldTypeTarget) this.addFieldTypeTarget.value = type
+
+    // Color map for each type
+    const colors = {
+      signature: 'bg-purple-100 text-purple-800 border-purple-300',
+      initials: 'bg-cyan-100 text-cyan-800 border-cyan-300',
+      name: 'bg-green-100 text-green-800 border-green-300',
+      date: 'bg-amber-100 text-amber-800 border-amber-300',
+      text: 'bg-blue-100 text-blue-800 border-blue-300',
+      checkbox: 'bg-gray-100 text-gray-800 border-gray-300',
+      email: 'bg-indigo-100 text-indigo-800 border-indigo-300',
+      company: 'bg-teal-100 text-teal-800 border-teal-300',
+      title: 'bg-pink-100 text-pink-800 border-pink-300'
+    }
+
+    const inactive = 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
+
+    // Reset all pills to inactive
+    this.fieldTypePillTargets.forEach(pill => {
+      pill.className = `px-3 py-1.5 text-xs font-medium rounded-full border transition-colors cursor-pointer ${inactive}`
+    })
+
+    // Activate the clicked pill
+    const activeColors = colors[type] || colors.text
+    event.currentTarget.className = `px-3 py-1.5 text-xs font-medium rounded-full border transition-colors cursor-pointer ${activeColors}`
+  }
 
   // Loading states
   showLoading() {
