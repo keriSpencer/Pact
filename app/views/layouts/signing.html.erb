@@ -4,6 +4,7 @@
     <title><%= content_for(:title) || "Pact" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="color-scheme" content="light">
     <meta name="mobile-web-app-capable" content="yes">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
@@ -16,7 +17,7 @@
     <%= javascript_importmap_tags %>
   </head>
 
-  <body class="bg-gray-100 min-h-screen flex flex-col">
+  <body class="bg-gray-100 min-h-screen flex flex-col" style="color-scheme: light;">
     <!-- Header -->
     <header class="bg-white border-b border-gray-200 shadow-sm">
       <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">

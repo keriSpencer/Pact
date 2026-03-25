@@ -245,8 +245,8 @@ export default class extends Controller {
             </div>
           </div>
           <div class="stepper-draw-mode">
-            <canvas class="stepper-signing-canvas w-full border-2 border-dashed border-gray-300 rounded-lg cursor-crosshair bg-white touch-none"
-                    style="height: min(180px, 25vh);"></canvas>
+            <canvas class="stepper-signing-canvas w-full border-2 border-dashed border-gray-300 rounded-lg cursor-crosshair touch-none"
+                    style="height: min(180px, 25vh); background-color: #ffffff; color-scheme: light;"></canvas>
           </div>
           <div class="stepper-type-mode hidden">
             <input type="text" class="stepper-typed-input block w-full rounded-lg border-gray-300 text-xl py-3 px-4"
@@ -361,6 +361,9 @@ export default class extends Controller {
     canvas.height = rect.height
 
     const ctx = canvas.getContext("2d")
+    // Fill with white first so drawing is visible in dark mode
+    ctx.fillStyle = "#ffffff"
+    ctx.fillRect(0, 0, canvas.width, canvas.height)
     ctx.strokeStyle = "#1a1a1a"
     ctx.lineWidth = 2.5
     ctx.lineCap = "round"
@@ -404,7 +407,9 @@ export default class extends Controller {
   clearPad() {
     if (!this.drawingCanvas) return
     const ctx = this.drawingCanvas.getContext("2d")
-    ctx.clearRect(0, 0, this.drawingCanvas.width, this.drawingCanvas.height)
+    // Fill with white (not just clear) so drawing is visible in dark mode
+    ctx.fillStyle = "#ffffff"
+    ctx.fillRect(0, 0, this.drawingCanvas.width, this.drawingCanvas.height)
   }
 
   switchToDraw() {
