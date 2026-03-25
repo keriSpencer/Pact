@@ -75,7 +75,7 @@
           <div class="px-6 py-4 space-y-4">
             <div class="relative">
               <%= f.label :signer_email, "Email", class: "block text-sm font-medium text-gray-700" %>
-              <%= f.email_field :signer_email, class: "mt-1 block w-full", required: true, placeholder: "signer@example.com", data: { contact_picker_target: "email", action: "input->contact-picker#onEmailInput" } %>
+              <%= f.email_field :signer_email, class: "mt-1 block w-full", placeholder: "signer@example.com", data: { contact_picker_target: "email", action: "input->contact-picker#onEmailInput" } %>
               <div data-contact-picker-target="suggestions" class="hidden absolute z-10 mt-1 w-full bg-white border border-gray-200 rounded-md shadow-lg max-h-48 overflow-y-auto"></div>
               <div data-contact-picker-target="linkedBadge" class="hidden mt-1.5"></div>
             </div>
