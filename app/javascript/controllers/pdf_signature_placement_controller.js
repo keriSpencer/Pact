@@ -491,23 +491,37 @@ export default class extends Controller {
         title: { label: 'Title', color: 'bg-pink-100 text-pink-800', badge: 'bg-pink-600' },
         checkbox: { label: 'Checkbox', color: 'bg-gray-100 text-gray-800', badge: 'bg-gray-600' }
       }
-      const selectedHint = this.selectedFieldId !== null
-        ? `<p class="text-xs text-gray-400 text-center mt-2 pb-1">Press <kbd class="px-1 py-0.5 bg-gray-100 border border-gray-300 rounded text-xs">Delete</kbd> to remove selected field</p>`
+      const selectedField = this.selectedFieldId !== null
+        ? this.signatureFields.find(f => f.id === this.selectedFieldId)
+        : null
+
+      // Editable label for selected field
+      const editableLabel = selectedField
+        ? `<div class="mt-3 px-1 pb-1">
+            <label class="text-xs font-medium text-gray-500">Label</label>
+            <input type="text" value="${(selectedField.label || '').replace(/"/g, '&quot;')}"
+                   placeholder="${this.fieldDefaultLabel(selectedField)}"
+                   data-action="input->pdf-signature-placement#onFieldLabelEdit change->pdf-signature-placement#onFieldLabelEdit"
+                   data-field-id="${selectedField.id}"
+                   class="mt-1 block w-full text-sm rounded-md border-gray-300 py-1.5 px-2.5">
+            <p class="text-xs text-gray-400 mt-1">Press <kbd class="px-1 py-0.5 bg-gray-100 border border-gray-300 rounded text-xs">Delete</kbd> to remove field</p>
+          </div>`
         : ''
 
       this.fieldsListTarget.innerHTML = this.signatureFields.map((field, index) => {
         const cfg = typeConfig[field.type] || typeConfig.signature
         const isSelected = field.id === this.selectedFieldId
         const sel = isSelected ? 'ring-2 ring-purple-400 bg-purple-50' : 'bg-gray-50 hover:bg-gray-100'
+        const customLabel = field.label ? `<span class="text-xs text-gray-500 truncate max-w-[100px]">"${field.label}"</span>` : ''
         return `<div class="flex items-center justify-between py-2 px-3 ${sel} rounded-lg cursor-pointer transition-colors" data-action="click->pdf-signature-placement#selectField" data-field-id="${field.id}">
-          <div class="flex items-center space-x-3">
-            <span class="flex items-center justify-center h-6 w-6 rounded-full ${cfg.badge} text-white text-xs font-bold">${index + 1}</span>
-            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${cfg.color}">${cfg.label}</span>
-            <span class="text-xs text-gray-500">Page ${field.page}</span>
+          <div class="flex items-center space-x-2">
+            <span class="flex items-center justify-center h-6 w-6 rounded-full ${cfg.badge} text-white text-xs font-bold shrink-0">${index + 1}</span>
+            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${cfg.color} shrink-0">${cfg.label}</span>
+            ${customLabel}
           </div>
-          <button type="button" data-action="click->pdf-signature-placement#removeField" data-field-id="${field.id}" class="text-xs text-red-600 hover:text-red-800 transition-colors">Remove</button>
+          <button type="button" data-action="click->pdf-signature-placement#removeField" data-field-id="${field.id}" class="text-xs text-red-600 hover:text-red-800 transition-colors shrink-0">Remove</button>
         </div>`
-      }).join('') + selectedHint
+      }).join('') + editableLabel
     }
     if (this.hasFieldCountTarget) {
       const c = this.signatureFields.length
@@ -564,6 +578,19 @@ export default class extends Controller {
     // Activate the clicked pill
     const activeColors = colors[type] || colors.text
     event.currentTarget.className = `px-3 py-1.5 text-xs font-medium rounded-full border transition-colors cursor-pointer ${activeColors}`
+  }
+
+  // Edit label of selected field inline
+  onFieldLabelEdit(event) {
+    const fieldId = parseInt(event.currentTarget.dataset.fieldId)
+    const field = this.signatureFields.find(f => f.id === fieldId)
+    if (!field) return
+
+    const newLabel = event.currentTarget.value.trim()
+    field.label = newLabel || null
+    this.updateFormData()
+    this.redrawFields()
+    // Don't call updateFieldsList here — it would destroy the input we're typing in
   }
 
   // Custom field type selection
