@@ -1,0 +1,27 @@
+<h2>Your Signed Document</h2>
+
+<p>Hello <%= @signature_request.signer_display_name %>,</p>
+
+<p>
+  Thank you for signing <strong><%= @document.name %></strong>. Here is your confirmation.
+</p>
+
+<div class="highlight">
+  <p><strong>Document:</strong> <%= @document.name %></p>
+  <p><strong>Requested by:</strong> <%= @signature_request.requester.full_name %></p>
+  <p><strong>Signed on:</strong> <%= @signature_request.signed_at&.strftime("%B %d, %Y at %l:%M %p") %></p>
+</div>
+
+<p>
+  You can view your signed document using the link below.
+</p>
+
+<p style="text-align: center; margin: 24px 0;">
+  <a href="<%= @view_url %>" class="btn-primary">
+    View Signed Document
+  </a>
+</p>
+
+<p style="font-size: 12px; color: #999;">
+  This link will show your signed document confirmation. Keep this email for your records.
+</p>

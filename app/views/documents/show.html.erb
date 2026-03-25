@@ -49,14 +49,26 @@
               </dd>
             </div>
           <% end %>
-          <% if @document.contact %>
-            <div>
-              <dt class="text-xs font-medium text-gray-500 uppercase">Contact</dt>
-              <dd class="mt-1 text-sm">
+          <div>
+            <dt class="text-xs font-medium text-gray-500 uppercase">Contact</dt>
+            <dd class="mt-1 text-sm">
+              <% if @document.contact %>
                 <%= link_to @document.contact.full_name, contact_path(@document.contact), class: "text-blue-600 hover:text-blue-800 transition-colors" %>
-              </dd>
-            </div>
-          <% end %>
+                <%= link_to "(change)", edit_document_path(@document), class: "text-xs text-gray-400 hover:text-gray-600 ml-1 transition-colors" %>
+              <% else %>
+                <details class="group">
+                  <summary class="text-blue-600 hover:text-blue-800 cursor-pointer text-sm transition-colors">Link to contact</summary>
+                  <%= form_with model: @document, url: document_path(@document), method: :patch, class: "mt-2" do |f| %>
+                    <%= f.select :contact_id,
+                        current_organization.contacts.order(:first_name).map { |c| [c.full_name, c.id] },
+                        { include_blank: "Select a contact..." },
+                        class: "block w-full text-sm" %>
+                    <button type="submit" class="mt-2 px-3 py-1.5 text-xs font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors cursor-pointer">Link</button>
+                  <% end %>
+                </details>
+              <% end %>
+            </dd>
+          </div>
           <div>
             <dt class="text-xs font-medium text-gray-500 uppercase">Uploaded by</dt>
             <dd class="mt-1 text-sm text-gray-900"><%= @document.user.full_name %></dd>

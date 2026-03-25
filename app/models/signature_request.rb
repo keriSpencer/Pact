@@ -82,8 +82,17 @@ class SignatureRequest < ApplicationRecord
 
     GenerateSignedPdfJob.perform_later(id) if document.pdf?
     GenerateAuditCertificateJob.perform_later(id)
+
+    # Notify requester that it's been signed
     SignatureRequestMailer.signature_completed(self).deliver_later
+    # Send the signer a copy — they can view via their signing token
+    SignatureRequestMailer.signer_copy(self).deliver_later
     true
+  end
+
+  def signed_view_url
+    # Signer can view their signed document via the signing token
+    Rails.application.routes.url_helpers.signature_url(signature_token, host: default_host)
   end
 
   def void!(user)

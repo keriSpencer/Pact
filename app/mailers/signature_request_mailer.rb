@@ -20,6 +20,17 @@ class SignatureRequestMailer < ApplicationMailer
     )
   end
 
+  def signer_copy(signature_request)
+    @signature_request = signature_request
+    @document = signature_request.document
+    @view_url = signature_request.signed_view_url
+
+    mail(
+      to: signature_request.signer_email,
+      subject: "Your signed copy: #{@document.name}"
+    )
+  end
+
   def signature_declined(signature_request)
     @signature_request = signature_request
     @document = signature_request.document
