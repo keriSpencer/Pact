@@ -132,6 +132,9 @@ class PublicSignaturesController < ApplicationController
   end
 
   def finalize
+    # Complete date fields NOW with the actual signing timestamp
+    complete_date_fields_at_signing_time
+
     if @signature_request.finalize_signing!(
       ip_address: request.remote_ip,
       user_agent: request.user_agent
@@ -164,6 +167,31 @@ class PublicSignaturesController < ApplicationController
     @signature_request = SignatureRequest.find_by!(signature_token: params[:signature_token])
   end
 
+  def complete_date_fields_at_signing_time
+    signing_timestamp = Time.current.strftime("%B %d, %Y at %l:%M %p")
+
+    @signature_request.signature_fields.where(field_type: "date").each do |field|
+      next if field.completed?
+
+      artifact = SignatureArtifact.find_or_create_for(
+        signature_request: @signature_request,
+        signer_email: @signature_request.signer_email,
+        artifact_type: "date",
+        artifact_data: signing_timestamp,
+        capture_method: "auto",
+        ip_address: request.remote_ip,
+        user_agent: request.user_agent
+      )
+
+      field.complete!(
+        artifact: artifact,
+        signer_email: @signature_request.signer_email,
+        ip_address: request.remote_ip,
+        user_agent: request.user_agent
+      ) if artifact.persisted?
+    end
+  end
+
   def auto_complete_pre_fillable_fields
     return unless @signature_request.can_sign?
 
@@ -171,13 +199,15 @@ class PublicSignaturesController < ApplicationController
       next if field.completed?
       next unless field.pre_fillable?
 
+      # Don't auto-complete date fields — they get filled at submit time
+      # so the timestamp reflects when the signer actually signs
+      next if field.field_type == "date"
+
       data = case field.field_type
       when "name"
         @signature_request.signer_name.presence
       when "email"
         @signature_request.signer_email.presence
-      when "date"
-        Time.current.strftime("%B %d, %Y at %l:%M %p")
       end
 
       next unless data

@@ -43,7 +43,8 @@ class SignatureRequest < ApplicationRecord
 
   def all_required_fields_completed?
     return true unless uses_multi_field?
-    signature_fields.where(required: true).all? { |f| f.completed? }
+    # Date fields are completed at finalize time, so exclude them from the check
+    signature_fields.where(required: true).where.not(field_type: "date").all? { |f| f.completed? }
   end
 
   def completion_progress

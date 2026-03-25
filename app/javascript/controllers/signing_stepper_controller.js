@@ -54,7 +54,7 @@ export default class extends Controller {
   }
 
   get completedCount() {
-    return this.sigFields.filter(f => f.completed).length
+    return this.sigFields.filter(f => f.completed || f.dateDeferred).length
   }
 
   get totalCount() {
@@ -127,7 +127,21 @@ export default class extends Controller {
     const left = x - w / 2
     const top = y - h / 2
 
-    if (field.completed) {
+    if (field.dateDeferred) {
+      // Date field — will be filled at submit time
+      ctx.strokeStyle = "#16a34a"
+      ctx.lineWidth = 1.5
+      ctx.setLineDash([])
+      ctx.strokeRect(left, top, w, h)
+      ctx.fillStyle = "rgba(255, 255, 255, 0.85)"
+      ctx.fillRect(left, top, w, h)
+      ctx.fillStyle = "#6b7280"
+      const dfSize = Math.min(h * 0.45, 11)
+      ctx.font = `italic ${dfSize}px sans-serif`
+      ctx.textAlign = "center"
+      ctx.textBaseline = "middle"
+      ctx.fillText("Date applied at signing", x, y)
+    } else if (field.completed) {
       // Show actual content instead of a checkmark
       ctx.strokeStyle = "#16a34a"
       ctx.lineWidth = 1.5
@@ -327,16 +341,16 @@ export default class extends Controller {
         </div>
       `
     } else if (type === "date") {
-      const dateStr = new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric", hour: "numeric", minute: "2-digit" })
       html = `
         <div class="space-y-4">
           <h3 class="text-sm font-semibold text-gray-900">${field.label || "Date"}</h3>
-          <input type="text" class="stepper-text-input block w-full rounded-lg border border-gray-300 text-sm py-2.5 px-3 bg-gray-50"
-                 value="${dateStr}" readonly>
-          <p class="text-xs text-gray-400">Today's date will be applied automatically</p>
+          <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 text-center">
+            <p class="text-sm text-gray-700">The exact date and time will be recorded when you submit the document.</p>
+            <p class="text-xs text-gray-400 mt-1">This ensures the timestamp reflects when you actually sign.</p>
+          </div>
           <div class="flex justify-end">
-            <button type="button" data-action="signing-stepper#completeCurrentField"
-                    class="px-6 py-2 bg-blue-600 text-white rounded-lg font-medium text-sm hover:bg-blue-700 transition-colors cursor-pointer">Apply Date</button>
+            <button type="button" data-action="signing-stepper#skipDateField"
+                    class="px-6 py-2 bg-blue-600 text-white rounded-lg font-medium text-sm hover:bg-blue-700 transition-colors cursor-pointer">Continue</button>
           </div>
         </div>
       `
@@ -440,6 +454,17 @@ export default class extends Controller {
   }
 
   // Draw a base64 image inside a field box (for drawn signatures/initials)
+  // Skip date field — it gets filled at submit time
+  skipDateField() {
+    const field = this.currentField
+    if (!field) return
+    // Mark as "will be filled" locally without server call
+    field.dateDeferred = true
+    field.artifact_value = "Date will be applied at signing"
+    this.updateProgress()
+    this.advanceToNextField()
+  }
+
   drawImageInField(ctx, dataUrl, left, top, w, h) {
     const img = new Image()
     img.onload = () => {
@@ -606,7 +631,7 @@ export default class extends Controller {
   }
 
   advanceToNextField() {
-    const nextIdx = this.sigFields.findIndex(f => !f.completed)
+    const nextIdx = this.sigFields.findIndex(f => !f.completed && !f.dateDeferred)
     if (nextIdx >= 0) {
       this.currentFieldIndex = nextIdx
       const field = this.sigFields[nextIdx]
@@ -696,6 +721,16 @@ export default class extends Controller {
   }
 
   async finalize() {
+    // Confirmation dialog with timestamp
+    const now = new Date().toLocaleString("en-US", {
+      year: "numeric", month: "long", day: "numeric",
+      hour: "numeric", minute: "2-digit", timeZoneName: "short"
+    })
+    const confirmed = confirm(
+      `Confirm Signing\n\nBy clicking OK, you are signing this document.\n\nTimestamp: ${now}\n\nThis action cannot be undone.`
+    )
+    if (!confirmed) return
+
     if (this.hasSubmitButtonTarget) {
       this.submitButtonTarget.disabled = true
       this.submitButtonTarget.textContent = "Submitting..."
