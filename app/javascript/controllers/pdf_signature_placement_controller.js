@@ -406,18 +406,35 @@ export default class extends Controller {
     }
   }
 
+  // What to display ON the PDF canvas for the requester
   fieldDefaultLabel(field) {
-    if (field.label) return field.label
     switch (field.type) {
-      case 'signature': return 'Sign Here'
-      case 'initials': return 'Initial Here'
+      case 'signature': return 'Sign Here'  // Always — label is internal only
+      case 'initials': return 'Initial Here'  // Always — label is internal only
+      case 'checkbox': return field.label ? `\u2610 ${field.label}` : '\u2610'  // Label appears next to checkbox
+      default: return field.label || this.fieldTypeDefaultText(field.type)
+    }
+  }
+
+  // Default text for a field type (used when no custom label)
+  fieldTypeDefaultText(type) {
+    switch (type) {
       case 'date': return 'Date'
       case 'name': return 'Print Name'
       case 'email': return 'Email'
       case 'company': return 'Company'
       case 'title': return 'Title'
-      case 'checkbox': return '\u2610'
       default: return 'Text'
+    }
+  }
+
+  // Internal label for the requester (shown in field list)
+  fieldDisplayLabel(field) {
+    if (field.label) return field.label
+    switch (field.type) {
+      case 'signature': return ''
+      case 'initials': return ''
+      default: return ''
     }
   }
 
@@ -542,6 +559,21 @@ export default class extends Controller {
       }
       const cfg = typeConfig[selectedField.type] || typeConfig.text
 
+      const isDrawable = selectedField.type === 'signature' || selectedField.type === 'initials'
+      const isCheckbox = selectedField.type === 'checkbox'
+
+      let labelHelp, labelPlaceholder
+      if (isDrawable) {
+        labelHelp = 'For your reference only — signer always sees "' + (selectedField.type === 'signature' ? 'Sign Here' : 'Initial Here') + '"'
+        labelPlaceholder = 'e.g., Buyer Signature, Witness'
+      } else if (isCheckbox) {
+        labelHelp = 'Shown next to the checkbox on the document'
+        labelPlaceholder = 'e.g., I agree to the terms'
+      } else {
+        labelHelp = 'Replaces the default text on the document'
+        labelPlaceholder = 'e.g., Mailing Address, Witness Name'
+      }
+
       this.fieldInspectorTarget.innerHTML = `
         <div class="px-6 py-4 border-b border-gray-200">
           <div class="flex items-center justify-between mb-4">
@@ -556,10 +588,11 @@ export default class extends Controller {
             <div>
               <label class="block text-xs font-medium text-gray-500 mb-1">Label</label>
               <input type="text" value="${(selectedField.label || '').replace(/"/g, '&quot;')}"
-                     placeholder="${this.fieldDefaultLabel(selectedField)}"
+                     placeholder="${labelPlaceholder}"
                      data-action="input->pdf-signature-placement#onFieldLabelEdit"
                      data-field-id="${selectedField.id}"
                      class="block w-full text-sm rounded-md border-gray-300 py-1.5 px-2.5">
+              <p class="text-xs text-gray-400 mt-1">${labelHelp}</p>
             </div>
             <div class="flex justify-between items-center pt-1">
               <button type="button" data-action="click->pdf-signature-placement#deleteSelectedField"
