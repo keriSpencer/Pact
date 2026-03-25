@@ -154,47 +154,50 @@
           </div>
         </div>
 
-        <!-- Field Type + Placed Fields -->
+        <!-- Fields Panel — contextual: type picker when nothing selected, inspector when field selected -->
         <div class="bg-white rounded-lg shadow-sm">
-          <div class="px-6 py-4 border-b border-gray-200">
-            <h2 class="text-sm font-semibold text-gray-900 mb-3">Add Field</h2>
-            <p class="text-xs text-gray-500 mb-3">Select a type, then click on the document to place it.</p>
-            <!-- Hidden select that Stimulus reads -->
-            <select data-pdf-signature-placement-target="addFieldType" class="hidden">
-              <option value="signature">Signature</option>
-              <option value="initials">Initials</option>
-              <option value="name">Printed Name</option>
-              <option value="date">Date Signed</option>
-              <option value="text">Text</option>
-              <option value="email">Email</option>
-              <option value="company">Company</option>
-              <option value="title">Title/Role</option>
-              <option value="checkbox">Checkbox</option>
-            </select>
-            <!-- Visual pill buttons wired through Stimulus -->
-            <div class="flex flex-wrap gap-2">
-              <button type="button" data-action="pdf-signature-placement#selectFieldType" data-field-type="signature" data-pdf-signature-placement-target="fieldTypePill" class="px-3 py-1.5 text-xs font-medium rounded-full border transition-colors cursor-pointer bg-purple-100 text-purple-800 border-purple-300">Signature</button>
-              <button type="button" data-action="pdf-signature-placement#selectFieldType" data-field-type="initials" data-pdf-signature-placement-target="fieldTypePill" class="px-3 py-1.5 text-xs font-medium rounded-full border transition-colors cursor-pointer bg-white text-gray-600 border-gray-200 hover:bg-gray-50">Initials</button>
-              <button type="button" data-action="pdf-signature-placement#selectFieldType" data-field-type="name" data-pdf-signature-placement-target="fieldTypePill" class="px-3 py-1.5 text-xs font-medium rounded-full border transition-colors cursor-pointer bg-white text-gray-600 border-gray-200 hover:bg-gray-50">Printed Name</button>
-              <button type="button" data-action="pdf-signature-placement#selectFieldType" data-field-type="date" data-pdf-signature-placement-target="fieldTypePill" class="px-3 py-1.5 text-xs font-medium rounded-full border transition-colors cursor-pointer bg-white text-gray-600 border-gray-200 hover:bg-gray-50">Date</button>
-              <button type="button" data-action="pdf-signature-placement#selectFieldType" data-field-type="text" data-pdf-signature-placement-target="fieldTypePill" class="px-3 py-1.5 text-xs font-medium rounded-full border transition-colors cursor-pointer bg-white text-gray-600 border-gray-200 hover:bg-gray-50">Text</button>
-              <button type="button" data-action="pdf-signature-placement#selectFieldType" data-field-type="checkbox" data-pdf-signature-placement-target="fieldTypePill" class="px-3 py-1.5 text-xs font-medium rounded-full border transition-colors cursor-pointer bg-white text-gray-600 border-gray-200 hover:bg-gray-50">Checkbox</button>
-              <button type="button" data-action="pdf-signature-placement#selectFieldType" data-field-type="email" data-pdf-signature-placement-target="fieldTypePill" class="px-3 py-1.5 text-xs font-medium rounded-full border transition-colors cursor-pointer bg-white text-gray-600 border-gray-200 hover:bg-gray-50">Email</button>
-              <button type="button" data-action="pdf-signature-placement#selectFieldType" data-field-type="company" data-pdf-signature-placement-target="fieldTypePill" class="px-3 py-1.5 text-xs font-medium rounded-full border transition-colors cursor-pointer bg-white text-gray-600 border-gray-200 hover:bg-gray-50">Company</button>
-              <button type="button" data-action="pdf-signature-placement#selectFieldType" data-field-type="title" data-pdf-signature-placement-target="fieldTypePill" class="px-3 py-1.5 text-xs font-medium rounded-full border transition-colors cursor-pointer bg-white text-gray-600 border-gray-200 hover:bg-gray-50">Title</button>
-              <button type="button" data-action="pdf-signature-placement#selectCustomFieldType" data-pdf-signature-placement-target="fieldTypePill" class="px-3 py-1.5 text-xs font-medium rounded-full border border-dashed transition-colors cursor-pointer bg-white text-gray-500 border-gray-300 hover:bg-gray-50">+ Custom</button>
-            </div>
-            <!-- Custom label input (shown when Custom is selected) -->
-            <div data-pdf-signature-placement-target="customLabelInput" class="hidden mt-3">
-              <input type="text" data-pdf-signature-placement-target="customLabelField" placeholder="Field label (e.g., Address, SSN last 4)..." class="block w-full text-sm rounded-md border-gray-300">
+          <!-- Hidden select that Stimulus reads -->
+          <select data-pdf-signature-placement-target="addFieldType" class="hidden">
+            <option value="signature">Signature</option>
+            <option value="initials">Initials</option>
+            <option value="name">Printed Name</option>
+            <option value="date">Date Signed</option>
+            <option value="text">Text</option>
+            <option value="email">Email</option>
+            <option value="company">Company</option>
+            <option value="title">Title/Role</option>
+            <option value="checkbox">Checkbox</option>
+          </select>
+
+          <!-- Type Picker (shown when no field is selected) -->
+          <div data-pdf-signature-placement-target="typePicker">
+            <div class="px-6 py-4 border-b border-gray-200">
+              <p class="text-xs text-gray-500 mb-3">Select a type, then click on the document to place it.</p>
+              <div class="flex flex-wrap gap-2">
+                <button type="button" data-action="pdf-signature-placement#selectFieldType" data-field-type="signature" data-pdf-signature-placement-target="fieldTypePill" class="px-3 py-1.5 text-xs font-medium rounded-full border transition-colors cursor-pointer bg-purple-100 text-purple-800 border-purple-300">Signature</button>
+                <button type="button" data-action="pdf-signature-placement#selectFieldType" data-field-type="initials" data-pdf-signature-placement-target="fieldTypePill" class="px-3 py-1.5 text-xs font-medium rounded-full border transition-colors cursor-pointer bg-white text-gray-600 border-gray-200 hover:bg-gray-50">Initials</button>
+                <button type="button" data-action="pdf-signature-placement#selectFieldType" data-field-type="name" data-pdf-signature-placement-target="fieldTypePill" class="px-3 py-1.5 text-xs font-medium rounded-full border transition-colors cursor-pointer bg-white text-gray-600 border-gray-200 hover:bg-gray-50">Name</button>
+                <button type="button" data-action="pdf-signature-placement#selectFieldType" data-field-type="date" data-pdf-signature-placement-target="fieldTypePill" class="px-3 py-1.5 text-xs font-medium rounded-full border transition-colors cursor-pointer bg-white text-gray-600 border-gray-200 hover:bg-gray-50">Date</button>
+                <button type="button" data-action="pdf-signature-placement#selectFieldType" data-field-type="text" data-pdf-signature-placement-target="fieldTypePill" class="px-3 py-1.5 text-xs font-medium rounded-full border transition-colors cursor-pointer bg-white text-gray-600 border-gray-200 hover:bg-gray-50">Text</button>
+                <button type="button" data-action="pdf-signature-placement#selectFieldType" data-field-type="checkbox" data-pdf-signature-placement-target="fieldTypePill" class="px-3 py-1.5 text-xs font-medium rounded-full border transition-colors cursor-pointer bg-white text-gray-600 border-gray-200 hover:bg-gray-50">Checkbox</button>
+                <button type="button" data-action="pdf-signature-placement#selectCustomFieldType" data-pdf-signature-placement-target="fieldTypePill" class="px-3 py-1.5 text-xs font-medium rounded-full border border-dashed transition-colors cursor-pointer bg-white text-gray-500 border-gray-300 hover:bg-gray-50">+ Custom</button>
+              </div>
+              <div data-pdf-signature-placement-target="customLabelInput" class="hidden mt-3">
+                <input type="text" data-pdf-signature-placement-target="customLabelField" placeholder="Custom label (e.g., Address, Witness)..." class="block w-full text-sm rounded-md border-gray-300">
+              </div>
             </div>
           </div>
+
+          <!-- Field Inspector (shown when a field is selected — populated by Stimulus) -->
+          <div data-pdf-signature-placement-target="fieldInspector" class="hidden"></div>
+
+          <!-- Placed Fields List -->
           <div class="px-6 py-3 border-b border-gray-200 flex justify-between items-center">
-            <h2 class="text-sm font-semibold text-gray-900">Placed Fields</h2>
-            <span data-pdf-signature-placement-target="fieldCount" class="text-xs text-gray-500">0 fields placed</span>
+            <h2 class="text-sm font-semibold text-gray-900">Fields</h2>
+            <span data-pdf-signature-placement-target="fieldCount" class="text-xs text-gray-500">0 fields</span>
           </div>
           <div class="px-4 py-3 space-y-2" data-pdf-signature-placement-target="fieldsList">
-            <p class="text-sm text-gray-500 py-4 text-center">Click or drag on the document to place fields</p>
+            <p class="text-sm text-gray-500 py-4 text-center">Click on the document to place fields</p>
           </div>
         </div>
 

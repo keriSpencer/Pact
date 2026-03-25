@@ -5,7 +5,8 @@ export default class extends Controller {
     "canvas", "pageIndicator", "fieldsInput", "loadingState",
     "canvasContainer", "fieldsList", "fieldCount", "addFieldType",
     "labelInput", "fieldLabel", "fieldTypePill",
-    "customLabelInput", "customLabelField"
+    "customLabelInput", "customLabelField",
+    "typePicker", "fieldInspector"
   ]
   static values = {
     pdfUrl: String,
@@ -491,41 +492,90 @@ export default class extends Controller {
         title: { label: 'Title', color: 'bg-pink-100 text-pink-800', badge: 'bg-pink-600' },
         checkbox: { label: 'Checkbox', color: 'bg-gray-100 text-gray-800', badge: 'bg-gray-600' }
       }
-      const selectedField = this.selectedFieldId !== null
-        ? this.signatureFields.find(f => f.id === this.selectedFieldId)
-        : null
-
-      // Editable label for selected field
-      const editableLabel = selectedField
-        ? `<div class="mt-3 px-1 pb-1">
-            <label class="text-xs font-medium text-gray-500">Label</label>
-            <input type="text" value="${(selectedField.label || '').replace(/"/g, '&quot;')}"
-                   placeholder="${this.fieldDefaultLabel(selectedField)}"
-                   data-action="input->pdf-signature-placement#onFieldLabelEdit change->pdf-signature-placement#onFieldLabelEdit"
-                   data-field-id="${selectedField.id}"
-                   class="mt-1 block w-full text-sm rounded-md border-gray-300 py-1.5 px-2.5">
-            <p class="text-xs text-gray-400 mt-1">Press <kbd class="px-1 py-0.5 bg-gray-100 border border-gray-300 rounded text-xs">Delete</kbd> to remove field</p>
-          </div>`
-        : ''
-
+      // Field list (compact, no inline editing)
       this.fieldsListTarget.innerHTML = this.signatureFields.map((field, index) => {
         const cfg = typeConfig[field.type] || typeConfig.signature
         const isSelected = field.id === this.selectedFieldId
         const sel = isSelected ? 'ring-2 ring-purple-400 bg-purple-50' : 'bg-gray-50 hover:bg-gray-100'
-        const customLabel = field.label ? `<span class="text-xs text-gray-500 truncate max-w-[100px]">"${field.label}"</span>` : ''
+        const displayLabel = field.label ? `"${field.label}"` : ''
         return `<div class="flex items-center justify-between py-2 px-3 ${sel} rounded-lg cursor-pointer transition-colors" data-action="click->pdf-signature-placement#selectField" data-field-id="${field.id}">
-          <div class="flex items-center space-x-2">
+          <div class="flex items-center space-x-2 min-w-0">
             <span class="flex items-center justify-center h-6 w-6 rounded-full ${cfg.badge} text-white text-xs font-bold shrink-0">${index + 1}</span>
             <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${cfg.color} shrink-0">${cfg.label}</span>
-            ${customLabel}
+            ${displayLabel ? `<span class="text-xs text-gray-500 truncate">${displayLabel}</span>` : ''}
           </div>
-          <button type="button" data-action="click->pdf-signature-placement#removeField" data-field-id="${field.id}" class="text-xs text-red-600 hover:text-red-800 transition-colors shrink-0">Remove</button>
+          <button type="button" data-action="click->pdf-signature-placement#removeField" data-field-id="${field.id}" class="text-xs text-red-600 hover:text-red-800 transition-colors shrink-0 ml-2">Remove</button>
         </div>`
-      }).join('') + editableLabel
+      }).join('')
+
+      // Contextual inspector: show type picker or field inspector
+      this.updateInspector()
     }
     if (this.hasFieldCountTarget) {
       const c = this.signatureFields.length
-      this.fieldCountTarget.textContent = `${c} field${c !== 1 ? 's' : ''} placed`
+      this.fieldCountTarget.textContent = `${c} field${c !== 1 ? 's' : ''}`
+    }
+  }
+
+  updateInspector() {
+    if (!this.hasTypePickerTarget || !this.hasFieldInspectorTarget) return
+
+    const selectedField = this.selectedFieldId !== null
+      ? this.signatureFields.find(f => f.id === this.selectedFieldId)
+      : null
+
+    if (selectedField) {
+      // Hide type picker, show field inspector
+      this.typePickerTarget.classList.add('hidden')
+      this.fieldInspectorTarget.classList.remove('hidden')
+
+      const typeConfig = {
+        signature: { label: 'Signature', color: 'bg-purple-100 text-purple-800' },
+        initials: { label: 'Initials', color: 'bg-cyan-100 text-cyan-800' },
+        date: { label: 'Date', color: 'bg-amber-100 text-amber-800' },
+        text: { label: 'Text', color: 'bg-blue-100 text-blue-800' },
+        name: { label: 'Name', color: 'bg-green-100 text-green-800' },
+        email: { label: 'Email', color: 'bg-indigo-100 text-indigo-800' },
+        company: { label: 'Company', color: 'bg-teal-100 text-teal-800' },
+        title: { label: 'Title', color: 'bg-pink-100 text-pink-800' },
+        checkbox: { label: 'Checkbox', color: 'bg-gray-100 text-gray-800' }
+      }
+      const cfg = typeConfig[selectedField.type] || typeConfig.text
+
+      this.fieldInspectorTarget.innerHTML = `
+        <div class="px-6 py-4 border-b border-gray-200">
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center space-x-2">
+              <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${cfg.color}">${cfg.label}</span>
+              <span class="text-xs text-gray-500">Page ${selectedField.page}</span>
+            </div>
+            <button type="button" data-action="click->pdf-signature-placement#deselectField"
+                    class="text-xs text-gray-400 hover:text-gray-600 transition-colors">Done</button>
+          </div>
+          <div class="space-y-3">
+            <div>
+              <label class="block text-xs font-medium text-gray-500 mb-1">Label</label>
+              <input type="text" value="${(selectedField.label || '').replace(/"/g, '&quot;')}"
+                     placeholder="${this.fieldDefaultLabel(selectedField)}"
+                     data-action="input->pdf-signature-placement#onFieldLabelEdit"
+                     data-field-id="${selectedField.id}"
+                     class="block w-full text-sm rounded-md border-gray-300 py-1.5 px-2.5">
+            </div>
+            <div class="flex justify-between items-center pt-1">
+              <button type="button" data-action="click->pdf-signature-placement#deleteSelectedField"
+                      class="text-xs text-red-600 hover:text-red-800 transition-colors">
+                Delete Field
+              </button>
+              <span class="text-xs text-gray-400">or press <kbd class="px-1 py-0.5 bg-gray-100 border border-gray-200 rounded text-xs">Delete</kbd></span>
+            </div>
+          </div>
+        </div>
+      `
+    } else {
+      // Show type picker, hide field inspector
+      this.typePickerTarget.classList.remove('hidden')
+      this.fieldInspectorTarget.classList.add('hidden')
+      this.fieldInspectorTarget.innerHTML = ''
     }
   }
 
@@ -578,6 +628,13 @@ export default class extends Controller {
     // Activate the clicked pill
     const activeColors = colors[type] || colors.text
     event.currentTarget.className = `px-3 py-1.5 text-xs font-medium rounded-full border transition-colors cursor-pointer ${activeColors}`
+  }
+
+  deselectField() {
+    this.selectedFieldId = null
+    this.redrawFields()
+    this.updateFieldsList()
+    this.element.focus()
   }
 
   // Edit label of selected field inline
