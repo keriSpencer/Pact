@@ -466,24 +466,39 @@ export default class extends Controller {
   }
 
   drawImageInField(ctx, dataUrl, left, top, w, h) {
+    // Use cached image if available for synchronous drawing
+    if (!this._imageCache) this._imageCache = {}
+
+    const cached = this._imageCache[dataUrl]
+    if (cached && cached.complete) {
+      this._drawImageFit(ctx, cached, left, top, w, h)
+      return
+    }
+
+    // Load and cache, then trigger a redraw
     const img = new Image()
     img.onload = () => {
-      // Fit image within the field maintaining aspect ratio
-      const imgAspect = img.width / img.height
-      const boxAspect = w / h
-      let drawW, drawH
-      if (imgAspect > boxAspect) {
-        drawW = w - 4
-        drawH = drawW / imgAspect
-      } else {
-        drawH = h - 4
-        drawW = drawH * imgAspect
-      }
-      const drawX = left + (w - drawW) / 2
-      const drawY = top + (h - drawH) / 2
-      ctx.drawImage(img, drawX, drawY, drawW, drawH)
+      this._imageCache[dataUrl] = img
+      // Redraw the page to show the image (now cached, will draw synchronously)
+      this.drawFieldOverlays()
     }
     img.src = dataUrl
+  }
+
+  _drawImageFit(ctx, img, left, top, w, h) {
+    const imgAspect = img.width / img.height
+    const boxAspect = w / h
+    let drawW, drawH
+    if (imgAspect > boxAspect) {
+      drawW = w - 4
+      drawH = drawW / imgAspect
+    } else {
+      drawH = h - 4
+      drawW = drawH * imgAspect
+    }
+    const drawX = left + (w - drawW) / 2
+    const drawY = top + (h - drawH) / 2
+    ctx.drawImage(img, drawX, drawY, drawW, drawH)
   }
 
   clearPad() {
