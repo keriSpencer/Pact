@@ -126,31 +126,15 @@
                 Save Current Fields as Template
               </summary>
               <div class="mt-2 space-y-2">
-                <input type="text" id="template_name_input" placeholder="Template name..." class="block w-full text-sm rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200">
+                <input type="text" data-pdf-signature-placement-target="templateNameInput" placeholder="Template name..." class="block w-full text-sm rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200">
                 <button type="button"
-                        onclick="saveTemplate()"
+                        data-action="pdf-signature-placement#saveTemplate"
+                        data-template-url="<%= document_signature_templates_path(@document) %>"
                         class="w-full px-3 py-1.5 text-xs font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors cursor-pointer">
                   Save Template
                 </button>
               </div>
             </details>
-            <script>
-              function saveTemplate() {
-                const name = document.getElementById('template_name_input').value;
-                if (!name) { alert('Please enter a template name.'); return; }
-                const fieldsInput = document.querySelector('[data-pdf-signature-placement-target="fieldsInput"]');
-                const fields = fieldsInput ? fieldsInput.value : '[]';
-                const token = document.querySelector('meta[name="csrf-token"]').content;
-                fetch('<%= document_signature_templates_path(@document) %>', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': token, 'Accept': 'application/json' },
-                  body: JSON.stringify({ name: name, fields: fields })
-                }).then(r => r.json()).then(data => {
-                  if (data.id) { alert('Template saved!'); location.reload(); }
-                  else { alert(data.errors ? data.errors.join(', ') : 'Error saving template.'); }
-                }).catch(() => alert('Error saving template.'));
-              }
-            </script>
           </div>
         </div>
 

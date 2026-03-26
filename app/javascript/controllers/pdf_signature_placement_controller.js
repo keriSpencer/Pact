@@ -5,7 +5,7 @@ export default class extends Controller {
     "canvas", "pageIndicator", "fieldsInput", "loadingState",
     "canvasContainer", "fieldsList", "fieldCount", "addFieldType",
     "labelInput", "fieldLabel", "fieldTypePill",
-    "customLabelInput", "customLabelField",
+    "customLabelInput", "customLabelField", "templateNameInput",
     "typePicker", "fieldInspector"
   ]
   static values = {
@@ -663,6 +663,33 @@ export default class extends Controller {
     // Activate the clicked pill
     const activeColors = colors[type] || colors.text
     event.currentTarget.className = `px-3 py-1.5 text-xs font-medium rounded-full border transition-colors cursor-pointer ${activeColors}`
+  }
+
+  async saveTemplate(event) {
+    if (!this.hasTemplateNameInputTarget) return
+    const name = this.templateNameInputTarget.value.trim()
+    if (!name) { alert("Please enter a template name."); return }
+
+    const fieldsInput = this.hasFieldsInputTarget ? this.fieldsInputTarget.value : "[]"
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content
+    const url = event.currentTarget.dataset.templateUrl
+
+    try {
+      const resp = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-CSRF-Token": csrfToken, "Accept": "application/json" },
+        body: JSON.stringify({ name: name, fields: fieldsInput })
+      })
+      const data = await resp.json()
+      if (data.id) {
+        alert("Template saved!")
+        location.reload()
+      } else {
+        alert(data.errors ? data.errors.join(", ") : "Error saving template.")
+      }
+    } catch {
+      alert("Error saving template.")
+    }
   }
 
   deselectField() {
