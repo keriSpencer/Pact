@@ -53,6 +53,10 @@ class ContactsController < ApplicationController
   end
 
   def show
+    @signature_requests = @contact.signature_requests
+                                  .includes(:document)
+                                  .order(created_at: :desc)
+    @contact_documents = organization_documents.where(contact: @contact).active
   end
 
   def new

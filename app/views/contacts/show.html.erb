@@ -144,6 +144,68 @@
 
     <!-- Main content -->
     <div class="lg:col-span-2 space-y-6">
+      <!-- Documents & Signatures -->
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+          <h2 class="text-sm font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-wider">Documents & Signatures</h2>
+          <details class="group relative">
+            <summary class="px-3 py-1.5 text-xs font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors cursor-pointer list-none flex items-center">
+              Send for Signature
+              <svg class="h-3 w-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+            </summary>
+            <div class="absolute right-0 mt-2 w-72 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg z-10 p-4">
+              <p class="text-xs text-gray-500 dark:text-gray-400 mb-3">Select a document to send to <strong><%= @contact.full_name %></strong>:</p>
+              <% pdf_docs = organization_documents.active.where(content_type: "application/pdf").order(:name) %>
+              <% if pdf_docs.any? %>
+                <div class="space-y-1 max-h-48 overflow-y-auto">
+                  <% pdf_docs.each do |doc| %>
+                    <%= link_to new_document_signature_request_path(doc, signer_email: @contact.email, signer_name: @contact.full_name),
+                        class: "block px-3 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600 rounded-md transition-colors" do %>
+                      <span class="font-medium"><%= doc.name %></span>
+                      <span class="text-xs text-gray-400 block"><%= doc.formatted_file_size %></span>
+                    <% end %>
+                  <% end %>
+                </div>
+              <% else %>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mb-2">No PDF documents uploaded yet.</p>
+                <%= link_to "Upload a document", new_document_path, class: "text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 transition-colors" %>
+              <% end %>
+            </div>
+          </details>
+        </div>
+
+        <% if @signature_requests.any? %>
+          <div class="divide-y divide-gray-200 dark:divide-gray-700">
+            <% @signature_requests.each do |sr| %>
+              <div class="px-6 py-3 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                <div>
+                  <% if sr.document %>
+                    <%= link_to sr.document.name, document_path(sr.document), class: "text-sm font-medium text-gray-900 dark:text-gray-100 hover:text-blue-600 dark:hover:text-blue-400 transition-colors" %>
+                  <% end %>
+                  <p class="text-xs text-gray-500 dark:text-gray-400">
+                    <% if sr.signed? %>
+                      Signed <%= time_ago_in_words(sr.signed_at) %> ago
+                    <% elsif sr.sent? || sr.viewed? || sr.pending? %>
+                      Sent <%= time_ago_in_words(sr.sent_at || sr.created_at) %> ago
+                    <% else %>
+                      <%= sr.status.humanize %> — <%= time_ago_in_words(sr.created_at) %> ago
+                    <% end %>
+                  </p>
+                </div>
+                <span class="text-xs px-2 py-1 rounded-full <%= sr.status_color_class %>"><%= sr.status.humanize %></span>
+              </div>
+            <% end %>
+          </div>
+        <% else %>
+          <div class="px-6 py-8 text-center">
+            <svg class="mx-auto h-10 w-10 text-gray-300 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+            </svg>
+            <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">No signature requests yet</p>
+          </div>
+        <% end %>
+      </div>
+
       <!-- Add Note Form -->
       <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
         <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">

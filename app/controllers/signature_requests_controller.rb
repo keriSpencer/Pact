@@ -8,7 +8,8 @@ class SignatureRequestsController < ApplicationController
     @signature_request = @document.signature_requests.create!(
       requester: current_user,
       status: :draft,
-      signer_email: params[:signer_email] || ""
+      signer_email: params[:signer_email] || "",
+      signer_name: params[:signer_name] || ""
     )
     redirect_to edit_document_signature_request_path(@document, @signature_request)
   end
