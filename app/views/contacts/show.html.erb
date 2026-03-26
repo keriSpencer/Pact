@@ -155,7 +155,7 @@
             </summary>
             <div class="absolute right-0 mt-2 w-72 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg z-10 p-4">
               <p class="text-xs text-gray-500 dark:text-gray-400 mb-3">Select a document to send to <strong><%= @contact.full_name %></strong>:</p>
-              <% pdf_docs = organization_documents.active.where(content_type: "application/pdf").order(:name) %>
+              <% pdf_docs = current_organization.documents.active.where(content_type: "application/pdf").order(:name) %>
               <% if pdf_docs.any? %>
                 <div class="space-y-1 max-h-48 overflow-y-auto">
                   <% pdf_docs.each do |doc| %>
