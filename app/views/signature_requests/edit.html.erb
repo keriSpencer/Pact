@@ -5,26 +5,26 @@
      data-action="keydown->pdf-signature-placement#handleKeyDown">
 
   <% if flash.now[:alert] %>
-    <div class="bg-red-50 border border-red-200 rounded-md p-4 mb-6" role="alert" aria-live="polite">
-      <p class="text-sm text-red-700"><%= flash.now[:alert] %></p>
+    <div class="bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-md p-4 mb-6" role="alert" aria-live="polite">
+      <p class="text-sm text-red-700 dark:text-red-300"><%= flash.now[:alert] %></p>
     </div>
   <% end %>
 
   <div class="flex justify-between items-start mb-6">
     <div>
-      <h1 class="text-2xl font-bold text-gray-900">Place Signature Fields</h1>
-      <p class="mt-1 text-sm text-gray-500">Document: <strong><%= @document.name %></strong></p>
+      <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100">Place Signature Fields</h1>
+      <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Document: <strong><%= @document.name %></strong></p>
     </div>
     <div class="flex space-x-3">
       <% if @signature_request.draft? %>
-        <%= link_to "Discard Draft", discard_draft_document_signature_request_path(@document, @signature_request), data: { "turbo-method": "delete", turbo_confirm: "Discard this draft?" }, class: "px-3 py-1.5 text-sm text-red-600 border border-red-300 rounded-md hover:bg-red-50 transition-colors" %>
+        <%= link_to "Discard Draft", discard_draft_document_signature_request_path(@document, @signature_request), data: { "turbo-method": "delete", turbo_confirm: "Discard this draft?" }, class: "px-3 py-1.5 text-sm text-red-600 border border-red-300 dark:border-red-500/50 rounded-md hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors" %>
       <% end %>
-      <%= link_to "Back to Document", document_path(@document), class: "px-3 py-1.5 text-sm text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors" %>
+      <%= link_to "Back to Document", document_path(@document), class: "px-3 py-1.5 text-sm text-gray-600 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors" %>
     </div>
   </div>
 
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-    <!-- PDF Canvas -->
+    <!-- PDF Canvas — stays light -->
     <div class="lg:col-span-2">
       <div class="bg-white rounded-lg shadow-sm">
         <!-- Page Navigation Only -->
@@ -68,32 +68,32 @@
                value="<%= @signature_request.signature_fields.map { |sf| { page_number: sf.page_number, x_percent: sf.x_percent, y_percent: sf.y_percent, width_percent: sf.width_percent, height_percent: sf.height_percent, field_type: sf.field_type, required: sf.required, position: sf.position, label: sf.read_attribute(:label) } }.to_json %>">
 
         <!-- Signer Details -->
-        <div class="bg-white rounded-lg shadow-sm" data-controller="contact-picker" data-contact-picker-url-value="<%= search_contacts_path %>">
-          <div class="px-6 py-4 border-b border-gray-200">
-            <h2 class="text-sm font-semibold text-gray-900">Signer Details</h2>
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm" data-controller="contact-picker" data-contact-picker-url-value="<%= search_contacts_path %>">
+          <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+            <h2 class="text-sm font-semibold text-gray-900 dark:text-gray-100">Signer Details</h2>
           </div>
           <div class="px-6 py-4 space-y-4">
             <div class="relative">
-              <%= f.label :signer_email, "Email", class: "block text-sm font-medium text-gray-700" %>
+              <%= f.label :signer_email, "Email", class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
               <%= f.email_field :signer_email, class: "mt-1 block w-full", placeholder: "signer@example.com", data: { contact_picker_target: "email", action: "input->contact-picker#onEmailInput" } %>
-              <div data-contact-picker-target="suggestions" class="hidden absolute z-10 mt-1 w-full bg-white border border-gray-200 rounded-md shadow-lg max-h-48 overflow-y-auto"></div>
+              <div data-contact-picker-target="suggestions" class="hidden absolute z-10 mt-1 w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg max-h-48 overflow-y-auto"></div>
               <div data-contact-picker-target="linkedBadge" class="hidden mt-1.5"></div>
             </div>
             <div>
-              <%= f.label :signer_name, "Name", class: "block text-sm font-medium text-gray-700" %>
+              <%= f.label :signer_name, "Name", class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
               <%= f.text_field :signer_name, class: "mt-1 block w-full", placeholder: "Full name", data: { contact_picker_target: "name" } %>
             </div>
             <div>
-              <%= f.label :message, "Message (optional)", class: "block text-sm font-medium text-gray-700" %>
+              <%= f.label :message, "Message (optional)", class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
               <%= f.text_area :message, rows: 2, class: "mt-1 block w-full text-sm", placeholder: "Please sign this document..." %>
             </div>
           </div>
         </div>
 
         <!-- Templates -->
-        <div class="bg-white rounded-lg shadow-sm">
-          <div class="px-6 py-4 border-b border-gray-200">
-            <h2 class="text-sm font-semibold text-gray-900">Templates</h2>
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+          <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+            <h2 class="text-sm font-semibold text-gray-900 dark:text-gray-100">Templates</h2>
           </div>
           <div class="px-6 py-4 space-y-2">
             <% templates = @document.signature_templates.by_recent %>
@@ -101,11 +101,11 @@
               <div class="space-y-1">
                 <% templates.each do |template| %>
                   <div class="flex items-center justify-between py-1.5">
-                    <span class="text-sm text-gray-700 truncate"><%= template.name %></span>
+                    <span class="text-sm text-gray-700 dark:text-gray-300 truncate"><%= template.name %></span>
                     <div class="flex items-center space-x-2 shrink-0">
                       <%= link_to "Apply", apply_document_signature_template_path(@document, template),
                             data: { "turbo-method": "post" },
-                            class: "text-xs text-blue-600 hover:text-blue-800 font-medium transition-colors" %>
+                            class: "text-xs text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium transition-colors" %>
                       <%= link_to "Delete", document_signature_template_path(@document, template),
                             data: { "turbo-method": "delete", turbo_confirm: "Delete this template?" },
                             class: "text-xs text-red-500 hover:text-red-700 transition-colors" %>
@@ -114,19 +114,19 @@
                 <% end %>
               </div>
             <% else %>
-              <p class="text-xs text-gray-500 py-2 text-center">No templates saved yet</p>
+              <p class="text-xs text-gray-500 dark:text-gray-400 py-2 text-center">No templates saved yet</p>
             <% end %>
           </div>
-          <div class="px-6 py-4 border-t border-gray-200">
+          <div class="px-6 py-4 border-t border-gray-200 dark:border-gray-700">
             <details class="group">
-              <summary class="text-xs font-medium text-blue-600 cursor-pointer hover:text-blue-800 transition-colors flex items-center">
+              <summary class="text-xs font-medium text-blue-600 dark:text-blue-400 cursor-pointer hover:text-blue-800 dark:hover:text-blue-300 transition-colors flex items-center">
                 <svg class="h-3 w-3 mr-1 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                 </svg>
                 Save Current Fields as Template
               </summary>
               <div class="mt-2 space-y-2">
-                <input type="text" id="template_name_input" placeholder="Template name..." class="block w-full text-sm rounded-md border-gray-300">
+                <input type="text" id="template_name_input" placeholder="Template name..." class="block w-full text-sm rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200">
                 <button type="button"
                         onclick="saveTemplate()"
                         class="w-full px-3 py-1.5 text-xs font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors cursor-pointer">
@@ -155,7 +155,7 @@
         </div>
 
         <!-- Fields Panel — contextual: type picker when nothing selected, inspector when field selected -->
-        <div class="bg-white rounded-lg shadow-sm">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
           <!-- Hidden select that Stimulus reads -->
           <select data-pdf-signature-placement-target="addFieldType" class="hidden">
             <option value="signature">Signature</option>
@@ -171,19 +171,19 @@
 
           <!-- Type Picker (shown when no field is selected) -->
           <div data-pdf-signature-placement-target="typePicker">
-            <div class="px-6 py-4 border-b border-gray-200">
-              <p class="text-xs text-gray-500 mb-3">Select a type, then click on the document to place it.</p>
+            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+              <p class="text-xs text-gray-500 dark:text-gray-400 mb-3">Select a type, then click on the document to place it.</p>
               <div class="flex flex-wrap gap-2">
                 <button type="button" data-action="pdf-signature-placement#selectFieldType" data-field-type="signature" data-pdf-signature-placement-target="fieldTypePill" class="px-3 py-1.5 text-xs font-medium rounded-full border transition-colors cursor-pointer bg-purple-100 text-purple-800 border-purple-300">Signature</button>
-                <button type="button" data-action="pdf-signature-placement#selectFieldType" data-field-type="initials" data-pdf-signature-placement-target="fieldTypePill" class="px-3 py-1.5 text-xs font-medium rounded-full border transition-colors cursor-pointer bg-white text-gray-600 border-gray-200 hover:bg-gray-50">Initials</button>
-                <button type="button" data-action="pdf-signature-placement#selectFieldType" data-field-type="name" data-pdf-signature-placement-target="fieldTypePill" class="px-3 py-1.5 text-xs font-medium rounded-full border transition-colors cursor-pointer bg-white text-gray-600 border-gray-200 hover:bg-gray-50">Name</button>
-                <button type="button" data-action="pdf-signature-placement#selectFieldType" data-field-type="date" data-pdf-signature-placement-target="fieldTypePill" class="px-3 py-1.5 text-xs font-medium rounded-full border transition-colors cursor-pointer bg-white text-gray-600 border-gray-200 hover:bg-gray-50">Date</button>
-                <button type="button" data-action="pdf-signature-placement#selectFieldType" data-field-type="text" data-pdf-signature-placement-target="fieldTypePill" class="px-3 py-1.5 text-xs font-medium rounded-full border transition-colors cursor-pointer bg-white text-gray-600 border-gray-200 hover:bg-gray-50">Text</button>
-                <button type="button" data-action="pdf-signature-placement#selectFieldType" data-field-type="checkbox" data-pdf-signature-placement-target="fieldTypePill" class="px-3 py-1.5 text-xs font-medium rounded-full border transition-colors cursor-pointer bg-white text-gray-600 border-gray-200 hover:bg-gray-50">Checkbox</button>
-                <button type="button" data-action="pdf-signature-placement#selectCustomFieldType" data-pdf-signature-placement-target="fieldTypePill" class="px-3 py-1.5 text-xs font-medium rounded-full border border-dashed transition-colors cursor-pointer bg-white text-gray-500 border-gray-300 hover:bg-gray-50">+ Custom</button>
+                <button type="button" data-action="pdf-signature-placement#selectFieldType" data-field-type="initials" data-pdf-signature-placement-target="fieldTypePill" class="px-3 py-1.5 text-xs font-medium rounded-full border transition-colors cursor-pointer bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600">Initials</button>
+                <button type="button" data-action="pdf-signature-placement#selectFieldType" data-field-type="name" data-pdf-signature-placement-target="fieldTypePill" class="px-3 py-1.5 text-xs font-medium rounded-full border transition-colors cursor-pointer bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600">Name</button>
+                <button type="button" data-action="pdf-signature-placement#selectFieldType" data-field-type="date" data-pdf-signature-placement-target="fieldTypePill" class="px-3 py-1.5 text-xs font-medium rounded-full border transition-colors cursor-pointer bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600">Date</button>
+                <button type="button" data-action="pdf-signature-placement#selectFieldType" data-field-type="text" data-pdf-signature-placement-target="fieldTypePill" class="px-3 py-1.5 text-xs font-medium rounded-full border transition-colors cursor-pointer bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600">Text</button>
+                <button type="button" data-action="pdf-signature-placement#selectFieldType" data-field-type="checkbox" data-pdf-signature-placement-target="fieldTypePill" class="px-3 py-1.5 text-xs font-medium rounded-full border transition-colors cursor-pointer bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600">Checkbox</button>
+                <button type="button" data-action="pdf-signature-placement#selectCustomFieldType" data-pdf-signature-placement-target="fieldTypePill" class="px-3 py-1.5 text-xs font-medium rounded-full border border-dashed transition-colors cursor-pointer bg-white dark:bg-gray-700 text-gray-500 dark:text-gray-400 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600">+ Custom</button>
               </div>
               <div data-pdf-signature-placement-target="customLabelInput" class="hidden mt-3">
-                <input type="text" data-pdf-signature-placement-target="customLabelField" placeholder="Custom label (e.g., Address, Witness)..." class="block w-full text-sm rounded-md border-gray-300">
+                <input type="text" data-pdf-signature-placement-target="customLabelField" placeholder="Custom label (e.g., Address, Witness)..." class="block w-full text-sm rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200">
               </div>
             </div>
           </div>
@@ -192,12 +192,12 @@
           <div data-pdf-signature-placement-target="fieldInspector" class="hidden"></div>
 
           <!-- Placed Fields List -->
-          <div class="px-6 py-3 border-b border-gray-200 flex justify-between items-center">
-            <h2 class="text-sm font-semibold text-gray-900">Fields</h2>
-            <span data-pdf-signature-placement-target="fieldCount" class="text-xs text-gray-500">0 fields</span>
+          <div class="px-6 py-3 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+            <h2 class="text-sm font-semibold text-gray-900 dark:text-gray-100">Fields</h2>
+            <span data-pdf-signature-placement-target="fieldCount" class="text-xs text-gray-500 dark:text-gray-400">0 fields</span>
           </div>
           <div class="px-4 py-3 space-y-2" data-pdf-signature-placement-target="fieldsList">
-            <p class="text-sm text-gray-500 py-4 text-center">Click on the document to place fields</p>
+            <p class="text-sm text-gray-500 dark:text-gray-400 py-4 text-center">Click on the document to place fields</p>
           </div>
         </div>
 
@@ -206,7 +206,7 @@
           <button type="submit" name="send_request" value="1" class="w-full px-4 py-3 text-sm font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors cursor-pointer shadow-sm" data-turbo-submits-with="Sending...">
             Send for Signature
           </button>
-          <%= f.submit "Save Draft", class: "w-full px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer", data: { turbo_submits_with: "Saving..." } %>
+          <%= f.submit "Save Draft", class: "w-full px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors cursor-pointer", data: { turbo_submits_with: "Saving..." } %>
         </div>
       <% end %>
     </div>

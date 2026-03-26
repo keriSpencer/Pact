@@ -1,31 +1,31 @@
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
   <div class="flex justify-between items-center mb-8">
     <div>
-      <h1 class="text-2xl font-bold text-gray-900">Team Members</h1>
-      <p class="mt-1 text-sm text-gray-500"><%= current_organization.name %></p>
+      <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100">Team Members</h1>
+      <p class="mt-1 text-sm text-gray-500 dark:text-gray-400"><%= current_organization.name %></p>
     </div>
     <%= link_to "Invite Member", new_admin_invitation_path, class: "px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors" %>
   </div>
 
   <!-- Active Users -->
-  <div class="bg-white rounded-lg shadow-sm mb-8">
-    <div class="px-6 py-4 border-b border-gray-200">
-      <h2 class="text-lg font-semibold text-gray-900">Active (<%= @users.count %>)</h2>
+  <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm mb-8">
+    <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+      <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Active (<%= @users.count %>)</h2>
     </div>
-    <ul class="divide-y divide-gray-200">
+    <ul class="divide-y divide-gray-200 dark:divide-gray-700">
       <% @users.each do |user| %>
-        <li class="px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors">
+        <li class="px-6 py-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
           <div class="flex items-center">
             <div class="h-10 w-10 rounded-full bg-blue-600 flex items-center justify-center">
               <span class="text-sm font-medium text-white"><%= user.initials %></span>
             </div>
             <div class="ml-4">
-              <p class="text-sm font-medium text-gray-900"><%= user.full_name %></p>
-              <p class="text-sm text-gray-500"><%= user.email %></p>
+              <p class="text-sm font-medium text-gray-900 dark:text-gray-100"><%= user.full_name %></p>
+              <p class="text-sm text-gray-500 dark:text-gray-400"><%= user.email %></p>
             </div>
           </div>
           <div class="flex items-center space-x-4">
-            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium <%= user.admin? ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-800' %>">
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium <%= user.admin? ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300' %>">
               <%= user.role.humanize %>
             </span>
             <% if current_user.can_delete_user?(user) %>
@@ -41,11 +41,11 @@
 
   <!-- Deleted Users -->
   <% if @deleted_users.any? %>
-    <div class="bg-white rounded-lg shadow-sm">
-      <div class="px-6 py-4 border-b border-gray-200">
-        <h2 class="text-lg font-semibold text-gray-500">Deleted (<%= @deleted_users.count %>)</h2>
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+      <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+        <h2 class="text-lg font-semibold text-gray-500 dark:text-gray-400">Deleted (<%= @deleted_users.count %>)</h2>
       </div>
-      <ul class="divide-y divide-gray-200">
+      <ul class="divide-y divide-gray-200 dark:divide-gray-700">
         <% @deleted_users.each do |user| %>
           <li class="px-6 py-4 flex items-center justify-between opacity-60">
             <div class="flex items-center">
@@ -53,11 +53,11 @@
                 <span class="text-sm font-medium text-white"><%= user.initials %></span>
               </div>
               <div class="ml-4">
-                <p class="text-sm font-medium text-gray-900"><%= user.full_name %></p>
-                <p class="text-sm text-gray-500"><%= user.email %></p>
+                <p class="text-sm font-medium text-gray-900 dark:text-gray-100"><%= user.full_name %></p>
+                <p class="text-sm text-gray-500 dark:text-gray-400"><%= user.email %></p>
               </div>
             </div>
-            <%= link_to "Restore", restore_admin_user_path(user), data: { "turbo-method": "patch" }, class: "text-sm text-blue-600 hover:text-blue-800 transition-colors" %>
+            <%= link_to "Restore", restore_admin_user_path(user), data: { "turbo-method": "patch" }, class: "text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-colors" %>
           </li>
         <% end %>
       </ul>

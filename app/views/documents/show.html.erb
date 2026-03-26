@@ -1,25 +1,25 @@
 <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
   <div class="flex justify-between items-start mb-6">
     <div>
-      <h1 class="text-2xl font-bold text-gray-900"><%= @document.name %></h1>
+      <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100"><%= @document.name %></h1>
       <% if @document.description.present? %>
-        <p class="mt-1 text-sm text-gray-500"><%= @document.description %></p>
+        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400"><%= @document.description %></p>
       <% end %>
     </div>
     <div class="flex space-x-3">
       <%= link_to "Download", download_document_path(@document), class: "px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors" %>
       <% if @document.pdf? %>
-        <%= link_to "Preview", preview_document_path(@document), target: "_blank", class: "px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors" %>
+        <%= link_to "Preview", preview_document_path(@document), target: "_blank", class: "px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors" %>
       <% end %>
       <% if @document.pdf? %>
         <%= link_to "Request Signature", new_document_signature_request_path(@document), class: "px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700 transition-colors" %>
       <% end %>
       <% if @document.user == current_user || current_user.admin? %>
-        <%= link_to "Edit", edit_document_path(@document), class: "px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors" %>
+        <%= link_to "Edit", edit_document_path(@document), class: "px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors" %>
         <% if @document.has_signed_requests? %>
-          <%= link_to "Delete", document_path(@document), data: { "turbo-method": "delete", turbo_confirm: "This document has signed versions. It will be archived (not permanently deleted) to preserve the signing history for legal compliance. Continue?" }, class: "px-4 py-2 text-sm font-medium text-red-600 bg-white border border-red-300 rounded-md hover:bg-red-50 transition-colors" %>
+          <%= link_to "Delete", document_path(@document), data: { "turbo-method": "delete", turbo_confirm: "This document has signed versions. It will be archived (not permanently deleted) to preserve the signing history for legal compliance. Continue?" }, class: "px-4 py-2 text-sm font-medium text-red-600 bg-white dark:bg-gray-700 border border-red-300 dark:border-red-500/50 rounded-md hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors" %>
         <% else %>
-          <%= link_to "Delete", document_path(@document), data: { "turbo-method": "delete", turbo_confirm: "Delete '#{@document.name}'?" }, class: "px-4 py-2 text-sm font-medium text-red-600 bg-white border border-red-300 rounded-md hover:bg-red-50 transition-colors" %>
+          <%= link_to "Delete", document_path(@document), data: { "turbo-method": "delete", turbo_confirm: "Delete '#{@document.name}'?" }, class: "px-4 py-2 text-sm font-medium text-red-600 bg-white dark:bg-gray-700 border border-red-300 dark:border-red-500/50 rounded-md hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors" %>
         <% end %>
       <% end %>
     </div>
@@ -28,36 +28,36 @@
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
     <!-- Sidebar -->
     <div class="lg:col-span-1 space-y-6">
-      <div class="bg-white rounded-lg shadow-sm">
-        <div class="px-6 py-4 border-b border-gray-200">
-          <h2 class="text-sm font-semibold text-gray-900 uppercase tracking-wider">Details</h2>
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+          <h2 class="text-sm font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-wider">Details</h2>
         </div>
         <div class="px-6 py-4 space-y-4">
           <div>
-            <dt class="text-xs font-medium text-gray-500 uppercase">File type</dt>
-            <dd class="mt-1 text-sm text-gray-900"><%= @document.file_type_category.capitalize %></dd>
+            <dt class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">File type</dt>
+            <dd class="mt-1 text-sm text-gray-900 dark:text-gray-100"><%= @document.file_type_category.capitalize %></dd>
           </div>
           <div>
-            <dt class="text-xs font-medium text-gray-500 uppercase">Size</dt>
-            <dd class="mt-1 text-sm text-gray-900"><%= @document.formatted_file_size %></dd>
+            <dt class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Size</dt>
+            <dd class="mt-1 text-sm text-gray-900 dark:text-gray-100"><%= @document.formatted_file_size %></dd>
           </div>
           <% if @document.folder %>
             <div>
-              <dt class="text-xs font-medium text-gray-500 uppercase">Folder</dt>
+              <dt class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Folder</dt>
               <dd class="mt-1 text-sm">
-                <%= link_to @document.folder.name, folder_path(@document.folder), class: "text-blue-600 hover:text-blue-800 transition-colors" %>
+                <%= link_to @document.folder.name, folder_path(@document.folder), class: "text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-colors" %>
               </dd>
             </div>
           <% end %>
           <div>
-            <dt class="text-xs font-medium text-gray-500 uppercase">Contact</dt>
+            <dt class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Contact</dt>
             <dd class="mt-1 text-sm">
               <% if @document.contact %>
-                <%= link_to @document.contact.full_name, contact_path(@document.contact), class: "text-blue-600 hover:text-blue-800 transition-colors" %>
-                <%= link_to "(change)", edit_document_path(@document), class: "text-xs text-gray-400 hover:text-gray-600 ml-1 transition-colors" %>
+                <%= link_to @document.contact.full_name, contact_path(@document.contact), class: "text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-colors" %>
+                <%= link_to "(change)", edit_document_path(@document), class: "text-xs text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 ml-1 transition-colors" %>
               <% else %>
                 <details class="group">
-                  <summary class="text-blue-600 hover:text-blue-800 cursor-pointer text-sm transition-colors">Link to contact</summary>
+                  <summary class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 cursor-pointer text-sm transition-colors">Link to contact</summary>
                   <%= form_with model: @document, url: document_path(@document), method: :patch, class: "mt-2" do |f| %>
                     <%= f.select :contact_id,
                         current_organization.contacts.order(:first_name).map { |c| [c.full_name, c.id] },
@@ -70,16 +70,16 @@
             </dd>
           </div>
           <div>
-            <dt class="text-xs font-medium text-gray-500 uppercase">Uploaded by</dt>
-            <dd class="mt-1 text-sm text-gray-900"><%= @document.user.full_name %></dd>
+            <dt class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Uploaded by</dt>
+            <dd class="mt-1 text-sm text-gray-900 dark:text-gray-100"><%= @document.user.full_name %></dd>
           </div>
           <div>
-            <dt class="text-xs font-medium text-gray-500 uppercase">Uploaded</dt>
-            <dd class="mt-1 text-sm text-gray-900"><%= @document.created_at.strftime("%B %d, %Y at %l:%M %p") %></dd>
+            <dt class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Uploaded</dt>
+            <dd class="mt-1 text-sm text-gray-900 dark:text-gray-100"><%= @document.created_at.strftime("%B %d, %Y at %l:%M %p") %></dd>
           </div>
           <div>
-            <dt class="text-xs font-medium text-gray-500 uppercase">Visibility</dt>
-            <dd class="mt-1 text-sm text-gray-900"><%= @document.visibility.humanize %></dd>
+            <dt class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Visibility</dt>
+            <dd class="mt-1 text-sm text-gray-900 dark:text-gray-100"><%= @document.visibility.humanize %></dd>
           </div>
         </div>
       </div>
@@ -88,36 +88,36 @@
       <% signed_versions = @document.versions.signed_versions.includes(:signature_request).in_order %>
       <% audit_versions = @document.versions.audit_certificates.in_order %>
       <% if signed_versions.any? || audit_versions.any? %>
-        <div class="bg-white rounded-lg shadow-sm">
-          <div class="px-6 py-4 border-b border-gray-200">
-            <h2 class="text-sm font-semibold text-gray-900 uppercase tracking-wider">Versions & Downloads</h2>
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+          <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+            <h2 class="text-sm font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-wider">Versions & Downloads</h2>
           </div>
           <div class="px-6 py-4 space-y-3">
             <% if @document.file.attached? %>
               <div class="flex items-center justify-between">
-                <span class="text-sm text-gray-700">Original</span>
-                <%= link_to "Download", rails_blob_path(@document.file, disposition: "attachment"), class: "text-xs text-blue-600 hover:text-blue-800 font-medium transition-colors" %>
+                <span class="text-sm text-gray-700 dark:text-gray-300">Original</span>
+                <%= link_to "Download", rails_blob_path(@document.file, disposition: "attachment"), class: "text-xs text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium transition-colors" %>
               </div>
             <% end %>
             <% signed_versions.each do |sv| %>
               <div class="flex items-center justify-between">
                 <div>
-                  <span class="text-sm text-gray-700"><%= sv.display_label %></span>
-                  <span class="text-xs text-gray-500 block"><%= sv.formatted_date %></span>
+                  <span class="text-sm text-gray-700 dark:text-gray-300"><%= sv.display_label %></span>
+                  <span class="text-xs text-gray-500 dark:text-gray-400 block"><%= sv.formatted_date %></span>
                 </div>
                 <% if sv.file.attached? %>
-                  <%= link_to "Download", rails_blob_path(sv.file, disposition: "attachment"), class: "text-xs text-blue-600 hover:text-blue-800 font-medium transition-colors" %>
+                  <%= link_to "Download", rails_blob_path(sv.file, disposition: "attachment"), class: "text-xs text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium transition-colors" %>
                 <% end %>
               </div>
             <% end %>
             <% audit_versions.each do |av| %>
               <div class="flex items-center justify-between">
                 <div>
-                  <span class="text-sm text-gray-700"><%= av.display_label %></span>
-                  <span class="text-xs text-gray-500 block"><%= av.formatted_date %></span>
+                  <span class="text-sm text-gray-700 dark:text-gray-300"><%= av.display_label %></span>
+                  <span class="text-xs text-gray-500 dark:text-gray-400 block"><%= av.formatted_date %></span>
                 </div>
                 <% if av.file.attached? %>
-                  <%= link_to "Download", rails_blob_path(av.file, disposition: "attachment"), class: "text-xs text-blue-600 hover:text-blue-800 font-medium transition-colors" %>
+                  <%= link_to "Download", rails_blob_path(av.file, disposition: "attachment"), class: "text-xs text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium transition-colors" %>
                 <% end %>
               </div>
             <% end %>
@@ -128,21 +128,21 @@
       <!-- Signature Metadata -->
       <% signed_requests = @document.signature_requests.where(status: :signed).order(signed_at: :desc) %>
       <% if signed_requests.any? %>
-        <div class="bg-white rounded-lg shadow-sm">
-          <div class="px-6 py-4 border-b border-gray-200">
-            <h2 class="text-sm font-semibold text-gray-900 uppercase tracking-wider">Signature Details</h2>
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+          <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+            <h2 class="text-sm font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-wider">Signature Details</h2>
           </div>
-          <div class="divide-y divide-gray-200">
+          <div class="divide-y divide-gray-200 dark:divide-gray-700">
             <% signed_requests.each do |sr| %>
               <div class="px-6 py-3">
-                <p class="text-sm font-medium text-gray-900"><%= sr.signer_display_name %></p>
-                <p class="text-xs text-gray-500"><%= sr.signer_email %></p>
+                <p class="text-sm font-medium text-gray-900 dark:text-gray-100"><%= sr.signer_display_name %></p>
+                <p class="text-xs text-gray-500 dark:text-gray-400"><%= sr.signer_email %></p>
                 <div class="mt-1 space-y-0.5">
-                  <p class="text-xs text-gray-500" title="<%= sr.signed_at&.strftime('%B %d, %Y at %l:%M:%S %p %Z') %>">
+                  <p class="text-xs text-gray-500 dark:text-gray-400" title="<%= sr.signed_at&.strftime('%B %d, %Y at %l:%M:%S %p %Z') %>">
                     Signed: <%= sr.signed_at&.strftime("%b %d, %Y at %l:%M %p") %>
                   </p>
                   <% if sr.ip_address.present? %>
-                    <p class="text-xs text-gray-500">IP: <%= sr.ip_address %></p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">IP: <%= sr.ip_address %></p>
                   <% end %>
                 </div>
               </div>
@@ -153,17 +153,17 @@
       <!-- Signature Templates -->
       <% if @document.pdf? %>
         <% templates = @document.signature_templates.by_recent %>
-        <div class="bg-white rounded-lg shadow-sm">
-          <div class="px-6 py-4 border-b border-gray-200">
-            <h2 class="text-sm font-semibold text-gray-900 uppercase tracking-wider">Signature Templates</h2>
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+          <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+            <h2 class="text-sm font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-wider">Signature Templates</h2>
           </div>
           <% if templates.any? %>
-            <div class="divide-y divide-gray-200">
+            <div class="divide-y divide-gray-200 dark:divide-gray-700">
               <% templates.each do |template| %>
                 <div class="px-6 py-3 flex items-center justify-between">
                   <div>
-                    <p class="text-sm font-medium text-gray-900"><%= template.name %></p>
-                    <p class="text-xs text-gray-500">
+                    <p class="text-sm font-medium text-gray-900 dark:text-gray-100"><%= template.name %></p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">
                       <%= template.template_fields.count %> fields
                       <% if template.use_count > 0 %>
                         &middot; Used <%= template.use_count %> <%= "time".pluralize(template.use_count) %>
@@ -171,7 +171,7 @@
                     </p>
                   </div>
                   <div class="flex items-center space-x-2">
-                    <%= link_to "Use", new_document_signature_request_path(@document), class: "text-xs text-blue-600 hover:text-blue-800 font-medium transition-colors" %>
+                    <%= link_to "Use", new_document_signature_request_path(@document), class: "text-xs text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium transition-colors" %>
                     <%= link_to "Delete", document_signature_template_path(@document, template), data: { "turbo-method": "delete", turbo_confirm: "Delete template '#{template.name}'?" }, class: "text-xs text-red-500 hover:text-red-700 transition-colors" %>
                   </div>
                 </div>
@@ -179,7 +179,7 @@
             </div>
           <% else %>
             <div class="px-6 py-4">
-              <p class="text-sm text-gray-500">No templates yet. Create one when setting up a signature request.</p>
+              <p class="text-sm text-gray-500 dark:text-gray-400">No templates yet. Create one when setting up a signature request.</p>
             </div>
           <% end %>
         </div>
@@ -190,24 +190,24 @@
     <div class="lg:col-span-2 space-y-6">
       <!-- Signature Requests -->
       <% if @document.signature_requests.any? %>
-        <div class="bg-white rounded-lg shadow-sm">
-          <div class="px-6 py-4 border-b border-gray-200">
-            <h2 class="text-sm font-semibold text-gray-900 uppercase tracking-wider">Signature Requests</h2>
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+          <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+            <h2 class="text-sm font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-wider">Signature Requests</h2>
           </div>
-          <div class="divide-y divide-gray-200">
+          <div class="divide-y divide-gray-200 dark:divide-gray-700">
             <% @document.signature_requests.order(created_at: :desc).each do |sr| %>
               <div class="px-6 py-3 flex items-center justify-between">
                 <div>
-                  <p class="text-sm font-medium text-gray-900"><%= sr.signer_display_name %></p>
-                  <p class="text-xs text-gray-500"><%= sr.signer_email %></p>
+                  <p class="text-sm font-medium text-gray-900 dark:text-gray-100"><%= sr.signer_display_name %></p>
+                  <p class="text-xs text-gray-500 dark:text-gray-400"><%= sr.signer_email %></p>
                 </div>
                 <div class="flex items-center space-x-2">
                   <span class="text-xs px-2 py-1 rounded-full <%= sr.status_color_class %>"><%= sr.status.humanize %></span>
                   <% if sr.can_sign? %>
                     <div class="flex space-x-1">
-                      <%= link_to "Edit", edit_document_signature_request_path(@document, sr), class: "text-xs text-blue-600 hover:text-blue-800 transition-colors" %>
+                      <%= link_to "Edit", edit_document_signature_request_path(@document, sr), class: "text-xs text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-colors" %>
                       <%= link_to "Cancel", cancel_document_signature_request_path(@document, sr), data: { "turbo-method": "post", turbo_confirm: "Cancel this signature request?" }, class: "text-xs text-red-600 hover:text-red-800 transition-colors" %>
-                      <%= link_to "Resend", resend_document_signature_request_path(@document, sr), data: { "turbo-method": "post" }, class: "text-xs text-gray-600 hover:text-gray-800 transition-colors" %>
+                      <%= link_to "Resend", resend_document_signature_request_path(@document, sr), data: { "turbo-method": "post" }, class: "text-xs text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors" %>
                     </div>
                   <% end %>
                 </div>
@@ -219,16 +219,16 @@
 
       <!-- Document Shares -->
       <% if @document.document_shares.any? %>
-        <div class="bg-white rounded-lg shadow-sm">
-          <div class="px-6 py-4 border-b border-gray-200">
-            <h2 class="text-sm font-semibold text-gray-900 uppercase tracking-wider">Shares</h2>
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+          <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+            <h2 class="text-sm font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-wider">Shares</h2>
           </div>
-          <div class="divide-y divide-gray-200">
+          <div class="divide-y divide-gray-200 dark:divide-gray-700">
             <% @document.document_shares.order(created_at: :desc).each do |share| %>
               <div class="px-6 py-3 flex items-center justify-between">
                 <div>
-                  <p class="text-sm font-medium text-gray-900"><%= share.recipient_name %></p>
-                  <p class="text-xs text-gray-500"><%= share.recipient_email %></p>
+                  <p class="text-sm font-medium text-gray-900 dark:text-gray-100"><%= share.recipient_name %></p>
+                  <p class="text-xs text-gray-500 dark:text-gray-400"><%= share.recipient_email %></p>
                 </div>
                 <div class="flex items-center space-x-2">
                   <span class="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-800"><%= share.permission_level.humanize %></span>
@@ -245,17 +245,17 @@
       <% end %>
 
       <!-- Document Preview with Version Toggle -->
-      <div class="bg-white rounded-lg shadow-sm" data-controller="version-toggle">
-        <div class="px-6 py-4 border-b border-gray-200">
-          <h2 class="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-3">Preview</h2>
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm" data-controller="version-toggle">
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+          <h2 class="text-sm font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-wider mb-3">Preview</h2>
           <% if @document.has_signed_version? %>
-            <div class="flex border-b border-gray-200 -mb-4">
+            <div class="flex border-b border-gray-200 dark:border-gray-700 -mb-4">
               <button data-version-toggle-target="tab" data-tab="original" data-action="click->version-toggle#switch"
-                      class="px-4 py-2 text-sm font-medium border-b-2 cursor-pointer border-blue-500 text-blue-600 transition-colors">
+                      class="px-4 py-2 text-sm font-medium border-b-2 cursor-pointer border-blue-500 text-blue-600 dark:text-blue-400 transition-colors">
                 Original
               </button>
               <button data-version-toggle-target="tab" data-tab="signed" data-action="click->version-toggle#switch"
-                      class="px-4 py-2 text-sm font-medium border-b-2 cursor-pointer border-transparent text-gray-500 hover:text-gray-700 transition-colors">
+                      class="px-4 py-2 text-sm font-medium border-b-2 cursor-pointer border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors">
                 Signed
               </button>
             </div>
@@ -265,9 +265,9 @@
         <!-- Original panel -->
         <div class="p-6" data-version-toggle-target="panel" data-tab="original">
           <% if @document.pdf? && @document.file.attached? %>
-            <iframe src="<%= rails_blob_path(@document.file, disposition: 'inline') %>" class="w-full border border-gray-200 rounded" style="height: 70vh; min-height: 500px;" title="Original document preview"></iframe>
+            <iframe src="<%= rails_blob_path(@document.file, disposition: 'inline') %>" class="w-full border border-gray-200 dark:border-gray-700 rounded bg-white" style="height: 70vh; min-height: 500px;" title="Original document preview"></iframe>
             <div class="mt-3 flex justify-end">
-              <%= link_to rails_blob_path(@document.file, disposition: "inline"), target: "_blank", class: "inline-flex items-center text-xs text-gray-500 hover:text-gray-700 transition-colors" do %>
+              <%= link_to rails_blob_path(@document.file, disposition: "inline"), target: "_blank", class: "inline-flex items-center text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors" do %>
                 <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5v-4m0 4h-4m4 0l-5-5"/></svg>
                 Open full screen
               <% end %>
@@ -276,11 +276,11 @@
             <%= image_tag rails_blob_path(@document.file), class: "max-w-full rounded cursor-pointer", alt: @document.name, onclick: "window.open(this.src, '_blank')", title: "Click to open full size" %>
           <% else %>
             <div class="text-center py-12">
-              <svg class="mx-auto h-16 w-16 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <svg class="mx-auto h-16 w-16 text-gray-300 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
               </svg>
-              <p class="mt-4 text-sm text-gray-500">Preview not available for this file type.</p>
-              <%= link_to "Download to view", download_document_path(@document), class: "mt-2 inline-block text-sm text-blue-600 hover:text-blue-800 transition-colors" %>
+              <p class="mt-4 text-sm text-gray-500 dark:text-gray-400">Preview not available for this file type.</p>
+              <%= link_to "Download to view", download_document_path(@document), class: "mt-2 inline-block text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-colors" %>
             </div>
           <% end %>
         </div>
@@ -290,19 +290,19 @@
           <% latest_signed = @document.latest_signed_version %>
           <div class="p-6 hidden" data-version-toggle-target="panel" data-tab="signed">
             <% if latest_signed&.file&.attached? %>
-              <iframe src="<%= rails_blob_path(latest_signed.file, disposition: 'inline') %>" class="w-full border border-gray-200 rounded" style="height: 70vh; min-height: 500px;" title="Signed document preview"></iframe>
+              <iframe src="<%= rails_blob_path(latest_signed.file, disposition: 'inline') %>" class="w-full border border-gray-200 dark:border-gray-700 rounded bg-white" style="height: 70vh; min-height: 500px;" title="Signed document preview"></iframe>
               <div class="mt-3 flex items-center justify-between">
-                <p class="text-xs text-gray-500"><%= latest_signed.display_label %> — <%= latest_signed.formatted_date %></p>
+                <p class="text-xs text-gray-500 dark:text-gray-400"><%= latest_signed.display_label %> — <%= latest_signed.formatted_date %></p>
                 <div class="flex items-center space-x-4">
-                  <%= link_to rails_blob_path(latest_signed.file, disposition: "inline"), target: "_blank", class: "inline-flex items-center text-xs text-gray-500 hover:text-gray-700 transition-colors" do %>
+                  <%= link_to rails_blob_path(latest_signed.file, disposition: "inline"), target: "_blank", class: "inline-flex items-center text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors" do %>
                     <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5v-4m0 4h-4m4 0l-5-5"/></svg>
                     Full screen
                   <% end %>
-                  <%= link_to "Download", rails_blob_path(latest_signed.file, disposition: "attachment"), class: "text-xs text-blue-600 hover:text-blue-800 font-medium transition-colors" %>
+                  <%= link_to "Download", rails_blob_path(latest_signed.file, disposition: "attachment"), class: "text-xs text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium transition-colors" %>
                 </div>
               </div>
             <% else %>
-              <p class="text-sm text-gray-500 text-center py-8">Signed version is being generated...</p>
+              <p class="text-sm text-gray-500 dark:text-gray-400 text-center py-8">Signed version is being generated...</p>
             <% end %>
           </div>
         <% end %>
