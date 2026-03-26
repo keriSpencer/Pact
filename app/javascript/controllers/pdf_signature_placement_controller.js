@@ -361,7 +361,8 @@ export default class extends Controller {
       type: fieldType, label: customLabel, required: true, position: this.signatureFields.length + 1
     }
     this.signatureFields.push(newField)
-    this.selectedFieldId = newField.id
+    // Don't auto-select — keep type picker visible for placing more fields
+    this.selectedFieldId = null
     this.updateFormData(); this.redrawFields(); this.updateFieldsList()
     this.element.focus()
   }
@@ -378,7 +379,8 @@ export default class extends Controller {
       type: fieldType, label: customLabel, required: true, position: this.signatureFields.length + 1
     }
     this.signatureFields.push(newField)
-    this.selectedFieldId = newField.id
+    // Don't auto-select — keep the type picker visible so the user can place more fields
+    this.selectedFieldId = null
     this.updateFormData(); this.redrawFields(); this.updateFieldsList()
     this.element.focus()
   }
