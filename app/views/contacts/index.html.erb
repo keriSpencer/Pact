@@ -1,22 +1,24 @@
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-  <div class="flex justify-between items-center mb-6">
+  <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
     <div>
       <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100">Contacts</h1>
       <p class="mt-1 text-sm text-gray-500 dark:text-gray-400"><%= @contacts.count %> total</p>
     </div>
-    <%= link_to new_contact_path, class: "px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors" do %>
+    <%= link_to new_contact_path, class: "self-start px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors" do %>
       New Contact
     <% end %>
   </div>
 
   <!-- Search & Filters -->
   <div class="mb-6 space-y-3">
-    <%= form_with url: contacts_path, method: :get, local: true, class: "flex" do |form| %>
-      <%= form.text_field :search, value: params[:search], placeholder: "Search contacts...", class: "flex-1 max-w-md" %>
-      <%= form.submit "Search", class: "ml-3 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors cursor-pointer", data: { turbo_submits_with: "Searching..." } %>
+    <%= form_with url: contacts_path, method: :get, local: true, class: "flex flex-col sm:flex-row gap-2 sm:gap-0" do |form| %>
+      <%= form.text_field :search, value: params[:search], placeholder: "Search contacts...", class: "flex-1 sm:max-w-md" %>
+      <div class="flex gap-2">
+        <%= form.submit "Search", class: "sm:ml-3 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors cursor-pointer", data: { turbo_submits_with: "Searching..." } %>
       <% if params[:search].present? || params[:tag_id].present? %>
-        <%= link_to "Clear", contacts_path, class: "ml-2 px-4 py-2 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors" %>
+        <%= link_to "Clear", contacts_path, class: "px-4 py-2 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors" %>
       <% end %>
+      </div>
     <% end %>
     <% if @filter_tags.any? %>
       <div class="flex flex-wrap gap-2">

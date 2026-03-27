@@ -4,209 +4,231 @@
     <p class="mt-1 text-sm text-gray-500 dark:text-gray-400"><%= current_organization.name %></p>
   </div>
 
-  <!-- Stats Row -->
-  <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-5">
-      <div class="flex items-center">
-        <div class="h-10 w-10 rounded-lg bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center">
-          <svg class="h-5 w-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
-          </svg>
-        </div>
-        <div class="ml-3">
-          <p class="text-2xl font-bold text-gray-900 dark:text-gray-100"><%= @contacts_count %></p>
-          <p class="text-xs text-gray-500 dark:text-gray-400">Contacts</p>
-        </div>
+  <% if @contacts_count == 0 && @documents_count == 0 %>
+    <!-- First-time user onboarding -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-8 sm:p-12 text-center">
+      <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-100 dark:bg-blue-900/30 mb-4">
+        <svg class="h-8 w-8 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+        </svg>
+      </div>
+      <h2 class="text-xl font-bold text-gray-900 dark:text-gray-100">Welcome to Pact</h2>
+      <p class="mt-2 text-gray-600 dark:text-gray-400 max-w-md mx-auto">
+        Get started by adding your first contact or uploading a document for signing.
+      </p>
+      <div class="mt-6 flex flex-col sm:flex-row justify-center gap-3">
+        <%= link_to "Add a Contact", new_contact_path, class: "px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors" %>
+        <%= link_to "Upload a Document", new_document_path, class: "px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors" %>
       </div>
     </div>
-
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-5">
-      <div class="flex items-center">
-        <div class="h-10 w-10 rounded-lg bg-purple-50 dark:bg-purple-900/30 flex items-center justify-center">
-          <svg class="h-5 w-5 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
-          </svg>
-        </div>
-        <div class="ml-3">
-          <p class="text-2xl font-bold text-gray-900 dark:text-gray-100"><%= @documents_count %></p>
-          <p class="text-xs text-gray-500 dark:text-gray-400">Documents</p>
-        </div>
-      </div>
-    </div>
-
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-5">
-      <div class="flex items-center">
-        <div class="h-10 w-10 rounded-lg bg-amber-50 dark:bg-amber-900/30 flex items-center justify-center">
-          <svg class="h-5 w-5 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-          </svg>
-        </div>
-        <div class="ml-3">
-          <p class="text-2xl font-bold text-gray-900 dark:text-gray-100"><%= @pending_count %></p>
-          <p class="text-xs text-gray-500 dark:text-gray-400">Pending</p>
+  <% else %>
+    <!-- Stats Row -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-5">
+        <div class="flex items-center">
+          <div class="h-10 w-10 rounded-lg bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center">
+            <svg class="h-5 w-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+            </svg>
+          </div>
+          <div class="ml-3">
+            <p class="text-2xl font-bold text-gray-900 dark:text-gray-100"><%= @contacts_count %></p>
+            <p class="text-xs text-gray-500 dark:text-gray-400">Contacts</p>
+          </div>
         </div>
       </div>
-    </div>
 
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-5">
-      <div class="flex items-center">
-        <div class="h-10 w-10 rounded-lg bg-green-50 dark:bg-green-900/30 flex items-center justify-center">
-          <svg class="h-5 w-5 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-          </svg>
-        </div>
-        <div class="ml-3">
-          <p class="text-2xl font-bold text-gray-900 dark:text-gray-100"><%= @signed_count %></p>
-          <p class="text-xs text-gray-500 dark:text-gray-400">Signed</p>
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-5">
+        <div class="flex items-center">
+          <div class="h-10 w-10 rounded-lg bg-purple-50 dark:bg-purple-900/30 flex items-center justify-center">
+            <svg class="h-5 w-5 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+            </svg>
+          </div>
+          <div class="ml-3">
+            <p class="text-2xl font-bold text-gray-900 dark:text-gray-100"><%= @documents_count %></p>
+            <p class="text-xs text-gray-500 dark:text-gray-400">Documents</p>
+          </div>
         </div>
       </div>
-    </div>
-  </div>
 
-  <!-- Two Column Layout -->
-  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-    <!-- Left Column: Needs Attention -->
-    <div class="space-y-6">
-      <!-- Overdue Follow-ups -->
-      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
-        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
-          <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Overdue Follow-ups</h2>
-          <% if @overdue_count > 0 %>
-            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800"><%= @overdue_count %></span>
-          <% end %>
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-5">
+        <div class="flex items-center">
+          <div class="h-10 w-10 rounded-lg bg-amber-50 dark:bg-amber-900/30 flex items-center justify-center">
+            <svg class="h-5 w-5 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+          </div>
+          <div class="ml-3">
+            <p class="text-2xl font-bold text-gray-900 dark:text-gray-100"><%= @pending_count %></p>
+            <p class="text-xs text-gray-500 dark:text-gray-400">Pending</p>
+          </div>
         </div>
-        <% if @overdue_followups.any? %>
-          <ul class="divide-y divide-gray-200 dark:divide-gray-700">
-            <% @overdue_followups.each do |note| %>
-              <li class="px-6 py-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-                <%= link_to contact_path(note.contact), class: "block" do %>
-                  <div class="flex items-center justify-between">
-                    <div>
-                      <p class="text-sm font-medium text-gray-900 dark:text-gray-100"><%= note.contact.full_name %></p>
-                      <p class="text-xs text-gray-500 dark:text-gray-400 truncate max-w-xs"><%= truncate(note.note, length: 60) %></p>
-                    </div>
-                    <span class="text-xs font-medium text-red-600 dark:text-red-400 whitespace-nowrap ml-2"><%= distance_of_time_in_words(note.follow_up_date, Date.current) %> overdue</span>
-                  </div>
-                <% end %>
-              </li>
-            <% end %>
-          </ul>
-        <% else %>
-          <div class="px-6 py-8 text-center">
-            <svg class="mx-auto h-8 w-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+      </div>
+
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-5">
+        <div class="flex items-center">
+          <div class="h-10 w-10 rounded-lg bg-green-50 dark:bg-green-900/30 flex items-center justify-center">
+            <svg class="h-5 w-5 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
             </svg>
-            <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">All caught up!</p>
           </div>
-        <% end %>
-      </div>
-
-      <!-- Pending Signatures -->
-      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
-        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
-          <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Pending Signatures</h2>
-          <% if @pending_count > 0 %>
-            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800"><%= @pending_count %></span>
-          <% end %>
+          <div class="ml-3">
+            <p class="text-2xl font-bold text-gray-900 dark:text-gray-100"><%= @signed_count %></p>
+            <p class="text-xs text-gray-500 dark:text-gray-400">Signed</p>
+          </div>
         </div>
-        <% if @pending_signatures.any? %>
-          <ul class="divide-y divide-gray-200 dark:divide-gray-700">
-            <% @pending_signatures.each do |sr| %>
-              <li class="px-6 py-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-                <%= link_to document_path(sr.document), class: "block" do %>
-                  <div class="flex items-center justify-between">
-                    <div>
-                      <p class="text-sm font-medium text-gray-900 dark:text-gray-100"><%= sr.document.name %></p>
-                      <p class="text-xs text-gray-500 dark:text-gray-400"><%= sr.signer_display_name %></p>
-                    </div>
-                    <span class="text-xs px-2 py-1 rounded-full <%= sr.status_color_class %>"><%= sr.status.humanize %></span>
-                  </div>
-                <% end %>
-              </li>
-            <% end %>
-          </ul>
-        <% else %>
-          <div class="px-6 py-8 text-center">
-            <p class="text-sm text-gray-500 dark:text-gray-400">No pending signature requests</p>
-          </div>
-        <% end %>
       </div>
     </div>
 
-    <!-- Right Column: Recent Activity -->
-    <div class="space-y-6">
-      <!-- Recently Signed -->
-      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
-        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-          <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Recently Signed</h2>
+    <!-- Two Column Layout -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <!-- Left Column: Needs Attention -->
+      <div class="space-y-6">
+        <!-- Overdue Follow-ups -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+          <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+            <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Overdue Follow-ups</h2>
+            <% if @overdue_count > 0 %>
+              <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800"><%= @overdue_count %></span>
+            <% end %>
+          </div>
+          <% if @overdue_followups.any? %>
+            <ul class="divide-y divide-gray-200 dark:divide-gray-700">
+              <% @overdue_followups.each do |note| %>
+                <li class="px-6 py-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                  <%= link_to contact_path(note.contact), class: "block" do %>
+                    <div class="flex items-center justify-between">
+                      <div class="min-w-0 flex-1">
+                        <p class="text-sm font-medium text-gray-900 dark:text-gray-100"><%= note.contact.full_name %></p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 truncate"><%= truncate(note.note, length: 60) %></p>
+                      </div>
+                      <span class="text-xs font-medium text-red-600 dark:text-red-400 whitespace-nowrap ml-2"><%= distance_of_time_in_words(note.follow_up_date, Date.current) %> overdue</span>
+                    </div>
+                  <% end %>
+                </li>
+              <% end %>
+            </ul>
+          <% else %>
+            <div class="px-6 py-8 text-center">
+              <svg class="mx-auto h-8 w-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+              <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">All caught up!</p>
+            </div>
+          <% end %>
         </div>
-        <% if @recent_signatures.any? %>
-          <ul class="divide-y divide-gray-200 dark:divide-gray-700">
-            <% @recent_signatures.each do |sr| %>
-              <li class="px-6 py-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-                <%= link_to document_path(sr.document), class: "block" do %>
-                  <div class="flex items-center justify-between">
-                    <div class="flex items-center">
-                      <svg class="h-4 w-4 text-green-500 mr-2 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                      </svg>
+
+        <!-- Pending Signatures -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+          <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+            <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Pending Signatures</h2>
+            <% if @pending_count > 0 %>
+              <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800"><%= @pending_count %></span>
+            <% end %>
+          </div>
+          <% if @pending_signatures.any? %>
+            <ul class="divide-y divide-gray-200 dark:divide-gray-700">
+              <% @pending_signatures.each do |sr| %>
+                <li class="px-6 py-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                  <%= link_to document_path(sr.document), class: "block" do %>
+                    <div class="flex items-center justify-between">
                       <div>
                         <p class="text-sm font-medium text-gray-900 dark:text-gray-100"><%= sr.document.name %></p>
                         <p class="text-xs text-gray-500 dark:text-gray-400"><%= sr.signer_display_name %></p>
                       </div>
+                      <span class="text-xs px-2 py-1 rounded-full <%= sr.status_color_class %>"><%= sr.status.humanize %></span>
                     </div>
-                    <span class="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap ml-2"><%= time_ago_in_words(sr.signed_at) %> ago</span>
-                  </div>
-                <% end %>
-              </li>
-            <% end %>
-          </ul>
-        <% else %>
-          <div class="px-6 py-8 text-center">
-            <p class="text-sm text-gray-500 dark:text-gray-400">No signed documents yet</p>
-          </div>
-        <% end %>
+                  <% end %>
+                </li>
+              <% end %>
+            </ul>
+          <% else %>
+            <div class="px-6 py-8 text-center">
+              <svg class="mx-auto h-8 w-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+              <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">All clear — no pending signatures</p>
+            </div>
+          <% end %>
+        </div>
       </div>
 
-      <!-- Recent Contacts -->
-      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
-        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
-          <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Recent Contacts</h2>
-          <%= link_to "View all", contacts_path, class: "text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-colors" %>
-        </div>
-        <% if @recent_contacts.any? %>
-          <ul class="divide-y divide-gray-200 dark:divide-gray-700">
-            <% @recent_contacts.each do |contact| %>
-              <li class="px-6 py-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-                <%= link_to contact_path(contact), class: "block" do %>
-                  <div class="flex items-center justify-between">
-                    <div class="flex items-center">
-                      <div class="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center shrink-0">
-                        <span class="text-xs font-medium text-white"><%= contact.first_name&.first %><%= contact.last_name&.first %></span>
-                      </div>
-                      <div class="ml-3">
-                        <p class="text-sm font-medium text-gray-900 dark:text-gray-100"><%= contact.full_name %></p>
-                        <p class="text-xs text-gray-500 dark:text-gray-400"><%= contact.company %></p>
-                      </div>
-                    </div>
-                    <span class="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap ml-2"><%= time_ago_in_words(contact.created_at) %> ago</span>
-                  </div>
-                <% end %>
-              </li>
-            <% end %>
-          </ul>
-        <% else %>
-          <div class="px-6 py-8 text-center">
-            <svg class="mx-auto h-8 w-8 text-gray-300 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
-            </svg>
-            <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">No contacts yet</p>
-            <div class="mt-4">
-              <%= link_to "New Contact", new_contact_path, class: "px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors" %>
-            </div>
+      <!-- Right Column: Recent Activity -->
+      <div class="space-y-6">
+        <!-- Recently Signed -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+          <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+            <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Recently Signed</h2>
           </div>
-        <% end %>
+          <% if @recent_signatures.any? %>
+            <ul class="divide-y divide-gray-200 dark:divide-gray-700">
+              <% @recent_signatures.each do |sr| %>
+                <li class="px-6 py-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                  <%= link_to document_path(sr.document), class: "block" do %>
+                    <div class="flex items-center justify-between">
+                      <div class="flex items-center min-w-0">
+                        <svg class="h-4 w-4 text-green-500 mr-2 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                        </svg>
+                        <div class="min-w-0">
+                          <p class="text-sm font-medium text-gray-900 dark:text-gray-100 truncate"><%= sr.document.name %></p>
+                          <p class="text-xs text-gray-500 dark:text-gray-400"><%= sr.signer_display_name %></p>
+                        </div>
+                      </div>
+                      <span class="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap ml-2"><%= time_ago_in_words(sr.signed_at) %> ago</span>
+                    </div>
+                  <% end %>
+                </li>
+              <% end %>
+            </ul>
+          <% else %>
+            <div class="px-6 py-8 text-center">
+              <p class="text-sm text-gray-500 dark:text-gray-400">No signed documents yet</p>
+            </div>
+          <% end %>
+        </div>
+
+        <!-- Recent Contacts -->
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+          <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+            <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Recent Contacts</h2>
+            <%= link_to "View all", contacts_path, class: "text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-colors" %>
+          </div>
+          <% if @recent_contacts.any? %>
+            <ul class="divide-y divide-gray-200 dark:divide-gray-700">
+              <% @recent_contacts.each do |contact| %>
+                <li class="px-6 py-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                  <%= link_to contact_path(contact), class: "block" do %>
+                    <div class="flex items-center justify-between">
+                      <div class="flex items-center min-w-0">
+                        <div class="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center shrink-0">
+                          <span class="text-xs font-medium text-white"><%= contact.first_name&.first %><%= contact.last_name&.first %></span>
+                        </div>
+                        <div class="ml-3 min-w-0">
+                          <p class="text-sm font-medium text-gray-900 dark:text-gray-100 truncate"><%= contact.full_name %></p>
+                          <p class="text-xs text-gray-500 dark:text-gray-400 truncate"><%= contact.company %></p>
+                        </div>
+                      </div>
+                      <span class="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap ml-2"><%= time_ago_in_words(contact.created_at) %> ago</span>
+                    </div>
+                  <% end %>
+                </li>
+              <% end %>
+            </ul>
+          <% else %>
+            <div class="px-6 py-8 text-center">
+              <svg class="mx-auto h-8 w-8 text-gray-300 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+              </svg>
+              <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">No contacts yet</p>
+              <div class="mt-4">
+                <%= link_to "New Contact", new_contact_path, class: "px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors" %>
+              </div>
+            </div>
+          <% end %>
+        </div>
       </div>
     </div>
-  </div>
+  <% end %>
 </div>
