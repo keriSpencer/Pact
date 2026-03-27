@@ -50,15 +50,15 @@ export default class extends Controller {
 
     this.suggestionsTarget.innerHTML = contacts.map(c => `
       <button type="button"
-              class="w-full text-left px-3 py-2 hover:bg-blue-50 transition-colors cursor-pointer"
+              class="w-full text-left px-3 py-2 hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-colors cursor-pointer rounded-md"
               data-action="click->contact-picker#selectContact"
               data-contact-id="${c.id}"
               data-contact-email="${this.escapeHtml(c.email || '')}"
               data-contact-name="${this.escapeHtml(c.name || '')}"
               data-contact-company="${this.escapeHtml(c.company || '')}"
               data-contact-title="${this.escapeHtml(c.title || '')}">
-        <div class="text-sm font-medium text-gray-900">${this.escapeHtml(c.name)}</div>
-        <div class="text-xs text-gray-500">${this.escapeHtml(c.email)}${c.company ? ' · ' + this.escapeHtml(c.company) : ''}</div>
+        <div class="text-sm font-medium text-gray-900 dark:text-gray-100">${this.escapeHtml(c.name)}</div>
+        <div class="text-xs text-gray-500 dark:text-gray-400">${this.escapeHtml(c.email)}${c.company ? ' · ' + this.escapeHtml(c.company) : ''}</div>
       </button>
     `).join('')
 
@@ -90,7 +90,7 @@ export default class extends Controller {
   showLinkedBadge(name) {
     if (!this.hasLinkedBadgeTarget) return
     this.linkedBadgeTarget.innerHTML = `
-      <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+      <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300">
         <svg class="h-3 w-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-1.102-4.243a4 4 0 015.656 0l4 4a4 4 0 01-5.656 5.656l-1.1-1.1"/></svg>
         Linked to ${this.escapeHtml(name)}
       </span>
