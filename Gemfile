@@ -48,7 +48,7 @@ group :development, :test do
   gem "faker"
   gem "shoulda-matchers"
   gem "shoulda-context"
-  gem "minitest", "~> 5.25"
+  gem "minitest", "~> 6.0"
 end
 
 group :development do
