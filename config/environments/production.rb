@@ -58,12 +58,11 @@ Rails.application.configure do
   config.action_mailer.default_url_options = { host: ENV.fetch("APP_HOST", "pact.herokuapp.com"), protocol: "https" }
   config.action_mailer.smtp_settings = {
     address: "smtp.resend.com",
-    port: 465,
+    port: 587,
     user_name: "resend",
     password: ENV["RESEND_API_KEY"],
     authentication: :plain,
-    enable_starttls_auto: true,
-    ssl: true
+    enable_starttls: true
   }
 
   # Enable locale fallbacks for I18n (makes lookups for any locale fall back to
