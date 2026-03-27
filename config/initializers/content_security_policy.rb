@@ -13,7 +13,7 @@ Rails.application.configure do
     policy.script_src  :self, :https, "cdn.jsdelivr.net"
     policy.style_src   :self, :https, :unsafe_inline
     policy.connect_src :self, :https, "cdn.jsdelivr.net"
-    policy.frame_src   :self, :blob
+    policy.frame_src   :self, :blob, :https
     policy.frame_ancestors :self
   end
 
