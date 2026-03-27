@@ -196,14 +196,24 @@
           </div>
           <div class="divide-y divide-gray-200 dark:divide-gray-700">
             <% @document.signature_requests.order(created_at: :desc).each do |sr| %>
-              <div class="px-6 py-3 flex items-center justify-between">
+              <div class="px-6 py-3 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
                 <div>
-                  <p class="text-sm font-medium text-gray-900 dark:text-gray-100"><%= sr.signer_display_name %></p>
-                  <p class="text-xs text-gray-500 dark:text-gray-400"><%= sr.signer_email %></p>
+                  <% if sr.signer_email.present? %>
+                    <p class="text-sm font-medium text-gray-900 dark:text-gray-100"><%= sr.signer_display_name %></p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400"><%= sr.signer_email %></p>
+                  <% else %>
+                    <p class="text-sm font-medium text-gray-400 dark:text-gray-500 italic">No signer yet</p>
+                    <p class="text-xs text-gray-400 dark:text-gray-500">Created <%= time_ago_in_words(sr.created_at) %> ago</p>
+                  <% end %>
                 </div>
                 <div class="flex items-center space-x-2">
                   <span class="text-xs px-2 py-1 rounded-full <%= sr.status_color_class %>"><%= sr.status.humanize %></span>
-                  <% if sr.can_sign? %>
+                  <% if sr.draft? %>
+                    <div class="flex space-x-1">
+                      <%= link_to "Edit", edit_document_signature_request_path(@document, sr), class: "text-xs text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-colors" %>
+                      <%= link_to "Delete", discard_draft_document_signature_request_path(@document, sr), data: { "turbo-method": "delete", turbo_confirm: "Delete this draft?" }, class: "text-xs text-red-600 hover:text-red-800 transition-colors" %>
+                    </div>
+                  <% elsif sr.can_sign? %>
                     <div class="flex space-x-1">
                       <%= link_to "Edit", edit_document_signature_request_path(@document, sr), class: "text-xs text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-colors" %>
                       <%= link_to "Cancel", cancel_document_signature_request_path(@document, sr), data: { "turbo-method": "post", turbo_confirm: "Cancel this signature request?" }, class: "text-xs text-red-600 hover:text-red-800 transition-colors" %>
