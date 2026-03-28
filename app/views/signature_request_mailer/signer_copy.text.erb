@@ -1,0 +1,14 @@
+Your Signed Document
+
+Hello <%= @signature_request.signer_display_name %>,
+
+Thank you for signing "<%= @document.name %>". Here is your confirmation.
+
+Document: <%= @document.name %>
+Requested by: <%= @signature_request.requester.full_name %>
+Signed on: <%= @signature_request.signed_at&.strftime("%B %d, %Y at %l:%M %p") %>
+
+View your signed document:
+<%= @view_url %>
+
+Keep this email for your records.

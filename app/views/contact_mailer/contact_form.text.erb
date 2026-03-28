@@ -1,0 +1,12 @@
+New inquiry from the Pact website
+
+Name: <%= @name %>
+Email: <%= @email %>
+<% if @phone.present? -%>
+Phone: <%= @phone %>
+<% end -%>
+<% if @message.present? %>
+Message:
+<%= @message %>
+<% end %>
+Reply directly to this email to respond to <%= @name %>.

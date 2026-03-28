@@ -1,0 +1,12 @@
+Document Signed Successfully
+
+Hello <%= @signature_request.requester.full_name %>,
+
+Great news! <%= @signature_request.signer_display_name %> has signed your document.
+
+Document: <%= @document.name %>
+Signed by: <%= @signature_request.signer_display_name %> (<%= @signature_request.signer_email %>)
+Signed on: <%= @signature_request.signed_at&.strftime("%B %d, %Y at %l:%M %p") %>
+
+View the signed document in your Pact account:
+<%= document_url(@document) %>

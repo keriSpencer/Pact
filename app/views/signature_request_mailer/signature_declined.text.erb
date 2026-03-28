@@ -1,0 +1,13 @@
+Signature Declined
+
+Hello <%= @signature_request.requester.full_name %>,
+
+Unfortunately, <%= @signature_request.signer_display_name %> has declined to sign your document.
+
+Document: <%= @document.name %>
+Declined by: <%= @signature_request.signer_display_name %> (<%= @signature_request.signer_email %>)
+<% if @signature_request.decline_reason.present? %>
+Reason: "<%= @signature_request.decline_reason %>"
+<% end %>
+View this signature request in your Pact account:
+<%= document_url(@document) %>

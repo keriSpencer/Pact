@@ -1,0 +1,16 @@
+Reminder: Document Awaiting Your Signature
+
+Hello <%= @signature_request.signer_display_name %>,
+
+This is a friendly reminder that <%= @signature_request.requester.full_name %> is waiting for your signature on a document.
+
+Document: <%= @document.name %>
+From: <%= @signature_request.requester.full_name %>
+<% if @signature_request.expires_at.present? -%>
+Expires: <%= @signature_request.expires_at.strftime("%B %d, %Y") %>
+<% end -%>
+<% if @signature_request.message.present? %>
+"<%= @signature_request.message %>"
+<% end %>
+Review and sign your document:
+<%= @signing_url %>
