@@ -11,6 +11,10 @@ class ApplicationController < ActionController::Base
 
   private
 
+  def after_sign_in_path_for(resource)
+    dashboard_path
+  end
+
   def set_current_user
     Current.user = current_user if user_signed_in?
   end

@@ -1,0 +1,31 @@
+<p style="font-size: 16px; color: #374151; margin-bottom: 24px;">You have a new inquiry from the Pact website.</p>
+
+<div style="background-color: #f9fafb; border-radius: 8px; padding: 20px; margin-bottom: 24px;">
+  <table cellpadding="0" cellspacing="0" style="width: 100%;">
+    <tr>
+      <td style="padding: 8px 16px 8px 0; color: #6b7280; font-size: 14px; vertical-align: top; width: 80px;">Name</td>
+      <td style="padding: 8px 0; color: #111827; font-size: 14px; font-weight: 600;"><%= @name %></td>
+    </tr>
+    <tr>
+      <td style="padding: 8px 16px 8px 0; color: #6b7280; font-size: 14px; vertical-align: top;">Email</td>
+      <td style="padding: 8px 0; color: #111827; font-size: 14px;"><%= mail_to @email, @email, style: "color: #2563eb; text-decoration: none;" %></td>
+    </tr>
+    <% if @phone.present? %>
+    <tr>
+      <td style="padding: 8px 16px 8px 0; color: #6b7280; font-size: 14px; vertical-align: top;">Phone</td>
+      <td style="padding: 8px 0; color: #111827; font-size: 14px;"><%= @phone %></td>
+    </tr>
+    <% end %>
+  </table>
+</div>
+
+<% if @message.present? %>
+<p style="font-size: 14px; color: #6b7280; margin-bottom: 8px;">Message:</p>
+<div style="background-color: #f9fafb; border-radius: 8px; padding: 16px; margin-bottom: 24px;">
+  <p style="font-size: 14px; color: #374151; white-space: pre-wrap; margin: 0;"><%= @message %></p>
+</div>
+<% end %>
+
+<p style="font-size: 13px; color: #9ca3af; margin-top: 24px;">
+  Reply directly to this email to respond to <%= @name %>.
+</p>

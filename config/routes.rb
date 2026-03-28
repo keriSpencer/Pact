@@ -63,8 +63,13 @@ Rails.application.routes.draw do
     end
   end
 
-  # Root route
-  root "dashboard#index"
+  # Landing page (public)
+  root "pages#home"
+  get "contact", to: "pages#contact", as: :contact
+  post "contact", to: "pages#submit_contact"
+
+  # Authenticated dashboard
+  get "dashboard", to: "dashboard#index", as: :dashboard
 
   # Contacts
   resources :contacts do
