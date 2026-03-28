@@ -75,8 +75,10 @@ Rails.application.configure do
   # Only use :id for inspections in production.
   config.active_record.attributes_for_inspect = [ :id ]
 
-  # Allow Heroku hosts
+  # Allow Heroku and custom domain hosts
   config.hosts << ENV["APP_HOST"] if ENV["APP_HOST"].present?
   config.hosts << /.*\.herokuapp\.com/
+  config.hosts << "pactapp.io"
+  config.hosts << "www.pactapp.io"
   config.host_authorization = { exclude: ->(request) { request.path == "/up" } }
 end
