@@ -10,26 +10,26 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_03_24_100000) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_28_200000) do
   create_table "active_storage_attachments", force: :cascade do |t|
-    t.string "name", null: false
-    t.string "record_type", null: false
-    t.bigint "record_id", null: false
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
+    t.string "name", null: false
+    t.bigint "record_id", null: false
+    t.string "record_type", null: false
     t.index ["blob_id"], name: "index_active_storage_attachments_on_blob_id"
     t.index ["record_type", "record_id", "name", "blob_id"], name: "index_active_storage_attachments_uniqueness", unique: true
   end
 
   create_table "active_storage_blobs", force: :cascade do |t|
-    t.string "key", null: false
-    t.string "filename", null: false
-    t.string "content_type"
-    t.text "metadata"
-    t.string "service_name", null: false
     t.bigint "byte_size", null: false
     t.string "checksum"
+    t.string "content_type"
     t.datetime "created_at", null: false
+    t.string "filename", null: false
+    t.string "key", null: false
+    t.text "metadata"
+    t.string "service_name", null: false
     t.index ["key"], name: "index_active_storage_blobs_on_key", unique: true
   end
 
@@ -40,11 +40,11 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_24_100000) do
   end
 
   create_table "contact_assignments", force: :cascade do |t|
-    t.integer "contact_id", null: false
-    t.integer "user_id"
     t.datetime "assigned_at"
+    t.integer "contact_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "user_id"
     t.index ["contact_id", "user_id"], name: "index_contact_assignments_on_contact_id_and_user_id", unique: true
     t.index ["contact_id"], name: "index_contact_assignments_on_contact_id"
     t.index ["user_id"], name: "index_contact_assignments_on_user_id"
@@ -52,14 +52,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_24_100000) do
 
   create_table "contact_notes", force: :cascade do |t|
     t.integer "contact_id", null: false
-    t.integer "user_id"
-    t.text "note", null: false
     t.string "contact_type"
     t.datetime "contacted_at"
-    t.date "follow_up_date"
-    t.datetime "follow_up_completed_at"
     t.datetime "created_at", null: false
+    t.datetime "follow_up_completed_at"
+    t.date "follow_up_date"
+    t.text "note", null: false
     t.datetime "updated_at", null: false
+    t.integer "user_id"
     t.index ["contact_id", "contacted_at"], name: "index_contact_notes_on_contact_id_and_contacted_at"
     t.index ["contact_id"], name: "index_contact_notes_on_contact_id"
     t.index ["follow_up_date"], name: "index_contact_notes_on_follow_up_date"
@@ -68,8 +68,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_24_100000) do
 
   create_table "contact_tags", force: :cascade do |t|
     t.integer "contact_id", null: false
-    t.integer "tag_id", null: false
     t.datetime "created_at", null: false
+    t.integer "tag_id", null: false
     t.datetime "updated_at", null: false
     t.index ["contact_id", "tag_id"], name: "index_contact_tags_on_contact_id_and_tag_id", unique: true
     t.index ["contact_id"], name: "index_contact_tags_on_contact_id"
@@ -77,16 +77,16 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_24_100000) do
   end
 
   create_table "contacts", force: :cascade do |t|
-    t.integer "organization_id", null: false
+    t.string "company"
+    t.datetime "created_at", null: false
+    t.datetime "deleted_at"
+    t.string "email", null: false
     t.string "first_name", null: false
     t.string "last_name"
-    t.string "email", null: false
-    t.string "phone"
-    t.string "company"
-    t.string "title"
     t.string "linkedin_url"
-    t.datetime "deleted_at"
-    t.datetime "created_at", null: false
+    t.integer "organization_id", null: false
+    t.string "phone"
+    t.string "title"
     t.datetime "updated_at", null: false
     t.index ["created_at"], name: "index_contacts_on_created_at"
     t.index ["deleted_at"], name: "index_contacts_on_deleted_at"
@@ -95,18 +95,18 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_24_100000) do
   end
 
   create_table "document_shares", force: :cascade do |t|
-    t.integer "document_id", null: false
-    t.integer "user_id"
+    t.integer "access_count", default: 0
+    t.datetime "accessed_at"
     t.integer "contact_id"
-    t.integer "shared_by_id", null: false
+    t.datetime "created_at", null: false
+    t.integer "document_id", null: false
+    t.datetime "expires_at"
+    t.datetime "first_access_at"
     t.integer "permission_level", null: false
     t.string "share_token"
-    t.datetime "expires_at"
-    t.datetime "accessed_at"
-    t.datetime "first_access_at"
-    t.integer "access_count", default: 0
-    t.datetime "created_at", null: false
+    t.integer "shared_by_id", null: false
     t.datetime "updated_at", null: false
+    t.integer "user_id"
     t.index ["contact_id"], name: "index_document_shares_on_contact_id"
     t.index ["document_id"], name: "index_document_shares_on_document_id"
     t.index ["share_token"], name: "index_document_shares_on_share_token", unique: true
@@ -115,15 +115,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_24_100000) do
   end
 
   create_table "document_versions", force: :cascade do |t|
-    t.integer "document_id", null: false
-    t.integer "signature_request_id"
-    t.integer "parent_version_id"
-    t.string "version_type", default: "original", null: false
-    t.string "label"
-    t.bigint "file_size"
     t.string "checksum"
     t.datetime "created_at", null: false
+    t.integer "document_id", null: false
+    t.bigint "file_size"
+    t.string "label"
+    t.integer "parent_version_id"
+    t.integer "signature_request_id"
     t.datetime "updated_at", null: false
+    t.string "version_type", default: "original", null: false
     t.index ["document_id", "version_type"], name: "index_document_versions_on_document_id_and_version_type"
     t.index ["document_id"], name: "index_document_versions_on_document_id"
     t.index ["parent_version_id"], name: "index_document_versions_on_parent_version_id"
@@ -131,20 +131,20 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_24_100000) do
   end
 
   create_table "documents", force: :cascade do |t|
-    t.integer "organization_id", null: false
-    t.integer "user_id", null: false
-    t.integer "folder_id"
     t.integer "contact_id"
-    t.string "name", null: false
-    t.text "description"
-    t.bigint "file_size"
     t.string "content_type"
-    t.integer "visibility", default: 0, null: false
-    t.integer "status", default: 0, null: false
-    t.string "file_hash"
-    t.integer "version", default: 1, null: false
     t.datetime "created_at", null: false
+    t.text "description"
+    t.string "file_hash"
+    t.bigint "file_size"
+    t.integer "folder_id"
+    t.string "name", null: false
+    t.integer "organization_id", null: false
+    t.integer "status", default: 0, null: false
     t.datetime "updated_at", null: false
+    t.integer "user_id", null: false
+    t.integer "version", default: 1, null: false
+    t.integer "visibility", default: 0, null: false
     t.index ["contact_id", "created_at"], name: "index_documents_on_contact_id_and_created_at"
     t.index ["contact_id"], name: "index_documents_on_contact_id"
     t.index ["file_hash"], name: "index_documents_on_file_hash"
@@ -155,16 +155,16 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_24_100000) do
   end
 
   create_table "folders", force: :cascade do |t|
-    t.integer "organization_id", null: false
-    t.integer "user_id", null: false
-    t.integer "parent_id"
-    t.string "name", null: false
-    t.text "description"
-    t.string "path", null: false
-    t.integer "visibility", default: 0, null: false
     t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
     t.datetime "deleted_at"
+    t.text "description"
+    t.string "name", null: false
+    t.integer "organization_id", null: false
+    t.integer "parent_id"
+    t.string "path", null: false
+    t.datetime "updated_at", null: false
+    t.integer "user_id", null: false
+    t.integer "visibility", default: 0, null: false
     t.index ["deleted_at"], name: "index_folders_on_deleted_at"
     t.index ["organization_id", "path"], name: "index_folders_on_organization_id_and_path", unique: true
     t.index ["organization_id"], name: "index_folders_on_organization_id"
@@ -173,93 +173,101 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_24_100000) do
   end
 
   create_table "organizations", force: :cascade do |t|
-    t.string "name", null: false
-    t.string "slug", null: false
-    t.text "description"
     t.boolean "active", default: true, null: false
     t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "current_period_end"
+    t.text "description"
+    t.string "name", null: false
+    t.string "plan", default: "free", null: false
     t.string "schema_name"
+    t.string "slug", null: false
+    t.string "stripe_customer_id"
+    t.string "stripe_subscription_id"
+    t.string "subscription_status", default: "active"
+    t.datetime "updated_at", null: false
     t.index ["active"], name: "index_organizations_on_active"
     t.index ["name"], name: "index_organizations_on_name"
+    t.index ["plan"], name: "index_organizations_on_plan"
     t.index ["schema_name"], name: "index_organizations_on_schema_name", unique: true
     t.index ["slug"], name: "index_organizations_on_slug", unique: true
+    t.index ["stripe_customer_id"], name: "index_organizations_on_stripe_customer_id", unique: true
+    t.index ["stripe_subscription_id"], name: "index_organizations_on_stripe_subscription_id", unique: true
   end
 
   create_table "signature_artifacts", force: :cascade do |t|
+    t.text "artifact_data", null: false
+    t.string "artifact_type", default: "signature", null: false
+    t.string "capture_method", default: "typed", null: false
+    t.datetime "created_at", null: false
+    t.string "ip_address"
     t.integer "signature_request_id", null: false
     t.string "signer_email", null: false
-    t.string "artifact_type", default: "signature", null: false
-    t.text "artifact_data", null: false
     t.string "typed_text"
-    t.string "capture_method", default: "typed", null: false
-    t.string "ip_address"
-    t.text "user_agent"
-    t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.text "user_agent"
     t.index ["signature_request_id"], name: "index_signature_artifacts_on_signature_request_id"
   end
 
   create_table "signature_field_completions", force: :cascade do |t|
-    t.integer "signature_field_id", null: false
-    t.integer "signature_artifact_id", null: false
-    t.string "signer_email", null: false
-    t.string "ip_address"
-    t.text "user_agent"
     t.datetime "completed_at", null: false
     t.datetime "created_at", null: false
+    t.string "ip_address"
+    t.integer "signature_artifact_id", null: false
+    t.integer "signature_field_id", null: false
+    t.string "signer_email", null: false
     t.datetime "updated_at", null: false
+    t.text "user_agent"
     t.index ["signature_artifact_id"], name: "index_signature_field_completions_on_signature_artifact_id"
     t.index ["signature_field_id"], name: "index_signature_field_completions_on_signature_field_id", unique: true
   end
 
   create_table "signature_fields", force: :cascade do |t|
-    t.integer "signature_request_id", null: false
+    t.datetime "created_at", null: false
+    t.string "field_type", default: "signature", null: false
+    t.decimal "height_percent", precision: 5, scale: 2, default: "8.0"
+    t.string "label"
     t.integer "page_number", default: 1, null: false
+    t.integer "position", null: false
+    t.boolean "required", default: true, null: false
+    t.integer "signature_request_id", null: false
+    t.datetime "updated_at", null: false
+    t.decimal "width_percent", precision: 5, scale: 2, default: "25.0"
     t.decimal "x_percent", precision: 5, scale: 2, null: false
     t.decimal "y_percent", precision: 5, scale: 2, null: false
-    t.decimal "width_percent", precision: 5, scale: 2, default: "25.0"
-    t.decimal "height_percent", precision: 5, scale: 2, default: "8.0"
-    t.string "field_type", default: "signature", null: false
-    t.string "label"
-    t.boolean "required", default: true, null: false
-    t.integer "position", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
     t.index ["signature_request_id"], name: "index_signature_fields_on_signature_request_id"
   end
 
   create_table "signature_requests", force: :cascade do |t|
-    t.integer "document_id", null: false
-    t.integer "requester_id", null: false
-    t.integer "signer_id"
+    t.boolean "auto_matched", default: false
     t.integer "contact_id"
-    t.string "signer_email"
-    t.string "signer_name"
-    t.integer "status", default: 0
-    t.text "message"
-    t.datetime "signed_at"
-    t.datetime "sent_at"
-    t.datetime "viewed_at"
-    t.text "signature_data"
+    t.datetime "created_at", null: false
+    t.text "decline_reason"
+    t.integer "document_id", null: false
     t.datetime "expires_at"
-    t.string "signature_token", null: false
-    t.decimal "signature_x", precision: 5, scale: 2
-    t.decimal "signature_y", precision: 5, scale: 2
-    t.integer "signature_page", default: 1
-    t.decimal "signature_width", precision: 5, scale: 2, default: "25.0"
-    t.decimal "signature_height", precision: 5, scale: 2, default: "8.0"
     t.integer "fields_completed_count", default: 0
     t.integer "fields_required_count", default: 0
+    t.string "ip_address"
+    t.datetime "last_edited_at"
+    t.text "message"
+    t.integer "requester_id", null: false
+    t.datetime "sent_at"
+    t.text "signature_data"
+    t.decimal "signature_height", precision: 5, scale: 2, default: "8.0"
+    t.integer "signature_page", default: 1
+    t.string "signature_token", null: false
+    t.decimal "signature_width", precision: 5, scale: 2, default: "25.0"
+    t.decimal "signature_x", precision: 5, scale: 2
+    t.decimal "signature_y", precision: 5, scale: 2
+    t.datetime "signed_at"
+    t.string "signer_email"
+    t.integer "signer_id"
+    t.string "signer_name"
+    t.integer "status", default: 0
+    t.datetime "updated_at", null: false
+    t.text "user_agent"
+    t.datetime "viewed_at"
     t.datetime "voided_at"
     t.integer "voided_by_id"
-    t.text "decline_reason"
-    t.string "ip_address"
-    t.text "user_agent"
-    t.datetime "last_edited_at"
-    t.boolean "auto_matched", default: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
     t.index ["contact_id"], name: "index_signature_requests_on_contact_id"
     t.index ["document_id"], name: "index_signature_requests_on_document_id"
     t.index ["requester_id"], name: "index_signature_requests_on_requester_id"
@@ -271,31 +279,31 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_24_100000) do
   end
 
   create_table "signature_template_fields", force: :cascade do |t|
-    t.integer "signature_template_id", null: false
+    t.datetime "created_at", null: false
+    t.string "field_type", default: "signature", null: false
+    t.decimal "height_percent", precision: 5, scale: 2, default: "8.0"
+    t.string "label"
     t.integer "page_number", default: 1, null: false
+    t.integer "position", null: false
+    t.boolean "required", default: true, null: false
+    t.integer "signature_template_id", null: false
+    t.datetime "updated_at", null: false
+    t.decimal "width_percent", precision: 5, scale: 2, default: "25.0"
     t.decimal "x_percent", precision: 5, scale: 2, null: false
     t.decimal "y_percent", precision: 5, scale: 2, null: false
-    t.decimal "width_percent", precision: 5, scale: 2, default: "25.0"
-    t.decimal "height_percent", precision: 5, scale: 2, default: "8.0"
-    t.string "field_type", default: "signature", null: false
-    t.string "label"
-    t.boolean "required", default: true, null: false
-    t.integer "position", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
     t.index ["signature_template_id"], name: "index_signature_template_fields_on_signature_template_id"
   end
 
   create_table "signature_templates", force: :cascade do |t|
-    t.string "name", null: false
+    t.datetime "created_at", null: false
     t.text "description"
     t.integer "document_id", null: false
-    t.integer "user_id", null: false
-    t.integer "organization_id", null: false
-    t.integer "use_count", default: 0, null: false
     t.datetime "last_used_at"
-    t.datetime "created_at", null: false
+    t.string "name", null: false
+    t.integer "organization_id", null: false
     t.datetime "updated_at", null: false
+    t.integer "use_count", default: 0, null: false
+    t.integer "user_id", null: false
     t.index ["document_id", "name"], name: "index_signature_templates_on_document_id_and_name", unique: true
     t.index ["document_id"], name: "index_signature_templates_on_document_id"
     t.index ["organization_id"], name: "index_signature_templates_on_organization_id"
@@ -303,41 +311,41 @@ ActiveRecord::Schema[8.0].define(version: 2026_03_24_100000) do
   end
 
   create_table "tags", force: :cascade do |t|
-    t.integer "organization_id", null: false
-    t.string "name", null: false
     t.string "color", null: false
-    t.text "description"
     t.datetime "created_at", null: false
+    t.text "description"
+    t.string "name", null: false
+    t.integer "organization_id", null: false
     t.datetime "updated_at", null: false
     t.index ["organization_id", "name"], name: "index_tags_on_organization_id_and_name", unique: true
     t.index ["organization_id"], name: "index_tags_on_organization_id"
   end
 
   create_table "users", force: :cascade do |t|
-    t.string "email", default: "", null: false
-    t.string "encrypted_password", default: "", null: false
-    t.string "reset_password_token"
-    t.datetime "reset_password_sent_at"
-    t.datetime "remember_created_at"
-    t.string "first_name"
-    t.string "last_name"
-    t.string "title"
-    t.string "phone"
-    t.integer "role", default: 0, null: false
-    t.boolean "email_notifications", default: true, null: false
-    t.string "timezone", default: "UTC"
-    t.integer "organization_id"
-    t.datetime "deleted_at"
     t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.string "invitation_token"
-    t.datetime "invitation_created_at"
-    t.datetime "invitation_sent_at"
+    t.datetime "deleted_at"
+    t.string "email", default: "", null: false
+    t.boolean "email_notifications", default: true, null: false
+    t.string "encrypted_password", default: "", null: false
+    t.string "first_name"
     t.datetime "invitation_accepted_at"
+    t.datetime "invitation_created_at"
     t.integer "invitation_limit"
-    t.string "invited_by_type"
-    t.integer "invited_by_id"
+    t.datetime "invitation_sent_at"
+    t.string "invitation_token"
     t.integer "invitations_count", default: 0
+    t.integer "invited_by_id"
+    t.string "invited_by_type"
+    t.string "last_name"
+    t.integer "organization_id"
+    t.string "phone"
+    t.datetime "remember_created_at"
+    t.datetime "reset_password_sent_at"
+    t.string "reset_password_token"
+    t.integer "role", default: 0, null: false
+    t.string "timezone", default: "UTC"
+    t.string "title"
+    t.datetime "updated_at", null: false
     t.index ["deleted_at"], name: "index_users_on_deleted_at"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["invitation_token"], name: "index_users_on_invitation_token", unique: true

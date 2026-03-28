@@ -71,6 +71,12 @@ Rails.application.routes.draw do
   # Authenticated dashboard
   get "dashboard", to: "dashboard#index", as: :dashboard
 
+  # Billing & Subscriptions
+  get "billing", to: "subscriptions#billing"
+  get "subscribe/:plan", to: "subscriptions#checkout", as: :subscribe
+  post "billing/portal", to: "subscriptions#portal", as: :billing_portal
+  post "stripe/webhooks", to: "stripe_webhooks#create"
+
   # Contacts
   resources :contacts do
     collection do

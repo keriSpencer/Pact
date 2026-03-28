@@ -1,5 +1,6 @@
 class DocumentsController < ApplicationController
   before_action :authenticate_user!
+  before_action :check_document_limit, only: [:new, :create]
   before_action :set_document, only: [:show, :edit, :update, :destroy, :download, :preview, :versions]
   before_action :check_document_access, only: [:show, :edit, :update, :destroy, :download, :preview, :versions]
 
@@ -114,6 +115,13 @@ class DocumentsController < ApplicationController
   end
 
   private
+
+  def check_document_limit
+    return if current_organization.can_create_document?
+
+    flash[:alert] = "You've reached your #{current_organization.document_limit} document limit this month. Upgrade your plan for more."
+    redirect_to billing_path
+  end
 
   def set_document
     @document = Document.find(params[:id])

@@ -14,6 +14,46 @@ class Organization < ApplicationRecord
 
   scope :active, -> { where(active: true) }
 
+  PLAN_LIMITS = { "free" => 3, "starter" => 10, "pro" => Float::INFINITY }.freeze
+
+  def document_limit
+    PLAN_LIMITS[plan] || 3
+  end
+
+  def documents_used_this_month
+    documents.where("created_at >= ?", Time.current.beginning_of_month).count
+  end
+
+  def can_create_document?
+    documents_used_this_month < document_limit
+  end
+
+  def documents_remaining_this_month
+    limit = document_limit
+    return Float::INFINITY if limit == Float::INFINITY
+    [limit - documents_used_this_month, 0].max
+  end
+
+  def free_plan?
+    plan == "free"
+  end
+
+  def paid_plan?
+    plan.in?(%w[starter pro])
+  end
+
+  def pro_plan?
+    plan == "pro"
+  end
+
+  def subscription_active?
+    subscription_status.in?(%w[active trialing])
+  end
+
+  def plan_display_name
+    plan.to_s.capitalize
+  end
+
   def admins
     users.where(role: :admin)
   end

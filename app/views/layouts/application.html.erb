@@ -54,6 +54,9 @@
                   <%= link_to admin_users_path, class: "#{request.path.start_with?('/admin') ? 'text-blue-600 dark:text-blue-400 font-semibold' : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100'} inline-flex items-center px-1 text-sm font-medium transition-colors", role: "menuitem" do %>
                     Admin
                   <% end %>
+                  <%= link_to billing_path, class: "#{request.path == billing_path ? 'text-blue-600 dark:text-blue-400 font-semibold' : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100'} inline-flex items-center px-1 text-sm font-medium transition-colors", role: "menuitem" do %>
+                    Billing
+                  <% end %>
                 <% end %>
               </div>
             </div>
