@@ -26,6 +26,6 @@ class PagesController < ApplicationController
       message: params[:message].to_s.strip
     ).deliver_later
 
-    redirect_to contact_path, notice: "Thanks for reaching out! We'll be in touch soon."
+    redirect_to contact_us_path, notice: "Thanks for reaching out! We'll be in touch soon."
   end
 end

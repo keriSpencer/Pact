@@ -65,7 +65,7 @@ Rails.application.routes.draw do
 
   # Landing page (public)
   root "pages#home"
-  get "contact", to: "pages#contact", as: :contact
+  get "contact", to: "pages#contact", as: :contact_us
   post "contact", to: "pages#submit_contact"
 
   # Authenticated dashboard
