@@ -7,9 +7,16 @@
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
-    <link rel="icon" href="/icon.png" type="image/png">
-    <link rel="icon" href="/icon.svg" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="/icon.png">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="manifest" href="/site.webmanifest">
+    <meta name="theme-color" content="#2563EB">
+    <meta property="og:image" content="https://pactapp.io/og-image.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
 
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
@@ -20,7 +27,11 @@
     <nav class="sticky top-0 z-50 bg-white/80 backdrop-blur-lg border-b border-gray-100">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16 items-center">
-          <%= link_to root_path, class: "text-xl font-bold text-gray-900 tracking-tight" do %>
+          <%= link_to root_path, class: "flex items-center gap-2 text-xl font-bold text-gray-900 tracking-tight", "aria-label": "Pact Home" do %>
+            <svg class="h-7 w-7" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M 100 35 L 55 55 Q 50 57 50 63 L 50 95 Q 50 130 100 165 Q 150 130 150 95 L 150 63 Q 150 57 145 55 Z" stroke="#2563EB" stroke-width="8" stroke-linejoin="round"/>
+              <path d="M 72 105 L 92 125 L 132 80" stroke="#2563EB" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
             Pact
           <% end %>
           <div class="flex items-center gap-6">
@@ -62,7 +73,13 @@
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div class="flex flex-col md:flex-row justify-between items-center gap-6">
           <div>
-            <span class="text-lg font-bold text-white">Pact</span>
+            <span class="flex items-center gap-2 text-lg font-bold text-white">
+              <svg class="h-6 w-6" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M 100 35 L 55 55 Q 50 57 50 63 L 50 95 Q 50 130 100 165 Q 150 130 150 95 L 150 63 Q 150 57 145 55 Z" stroke="#60A5FA" stroke-width="8" stroke-linejoin="round"/>
+                <path d="M 72 105 L 92 125 L 132 80" stroke="#60A5FA" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              Pact
+            </span>
             <p class="text-sm text-gray-500 mt-1">Document signing and contact management, simplified.</p>
           </div>
           <div class="flex items-center gap-8">

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 100" width="400" height="100">
+  <g transform="translate(10, 5) scale(0.45)">
+    <path d="M 100 35 L 55 55 Q 50 57 50 63 L 50 95 Q 50 130 100 165 Q 150 130 150 95 L 150 63 Q 150 57 145 55 Z"
+      fill="none" stroke="#60A5FA" stroke-width="8" stroke-linejoin="round"/>
+    <path d="M 72 105 L 92 125 L 132 80"
+      fill="none" stroke="#60A5FA" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <text x="115" y="68" font-family="system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif"
+    font-size="52" font-weight="700" fill="#F8FAFC" letter-spacing="-1">Pact</text>
+</svg>
