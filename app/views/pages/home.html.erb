@@ -504,6 +504,236 @@
   </div>
 </section>
 
+<!-- FAQ -->
+<section id="faq" class="py-24 lg:py-32 bg-gray-50 border-t border-gray-100">
+  <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-16">
+      <h2 class="text-3xl lg:text-4xl font-bold text-gray-900 tracking-tight">Frequently Asked Questions</h2>
+      <p class="mt-4 text-lg text-gray-500">Everything you need to know about signing documents with Pact.</p>
+    </div>
+
+    <!-- Legal Validity -->
+    <h3 class="text-sm font-bold text-blue-600 uppercase tracking-wider mb-6">Legal Validity</h3>
+    <div class="space-y-0 mb-12">
+      <details class="group border-b border-gray-200">
+        <summary class="flex items-center justify-between py-5 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+          <span class="text-base font-semibold text-gray-900 pr-4">Are documents signed with Pact legally binding?</span>
+          <svg class="h-5 w-5 text-gray-400 shrink-0 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </summary>
+        <div class="pb-5 text-sm text-gray-600 leading-relaxed">
+          <p>Yes. Electronic signatures have the same legal standing as handwritten signatures in the United States under two federal and state laws: the <strong>ESIGN Act</strong> (2000) and the <strong>Uniform Electronic Transactions Act (UETA)</strong>, adopted by 49 states. The ESIGN Act explicitly states that a signature "may not be denied legal effect, validity, or enforceability solely because it is in electronic form." Pact captures intent to sign, signer identity, timestamps, and IP addresses — meeting all the requirements these laws establish.</p>
+        </div>
+      </details>
+
+      <details class="group border-b border-gray-200">
+        <summary class="flex items-center justify-between py-5 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+          <span class="text-base font-semibold text-gray-900 pr-4">Will a document signed on Pact hold up in court?</span>
+          <svg class="h-5 w-5 text-gray-400 shrink-0 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </summary>
+        <div class="pb-5 text-sm text-gray-600 leading-relaxed">
+          <p>Yes. Federal courts have consistently upheld electronic signatures as valid evidence. The key is proving who signed and when — which is exactly what an audit trail provides. Every document signed through Pact generates a detailed audit trail that records the signer's email, IP address, timestamps for every action (opened, viewed, signed), and a tamper-evident SHA-256 hash of the document. Federal district courts have found that detailed e-signature audit logs satisfy authentication requirements under the Federal Rules of Evidence.</p>
+        </div>
+      </details>
+
+      <details class="group border-b border-gray-200">
+        <summary class="flex items-center justify-between py-5 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+          <span class="text-base font-semibold text-gray-900 pr-4">What exactly is an audit trail, and how does it protect me?</span>
+          <svg class="h-5 w-5 text-gray-400 shrink-0 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </summary>
+        <div class="pb-5 text-sm text-gray-600 leading-relaxed">
+          <p>An audit trail is a timestamped, chronological record of every action taken during the signing process. Pact's audit trail captures: when the document was sent, when the signer opened it, their IP address and browser, when each field was completed, and when they signed. A cryptographic SHA-256 hash proves the document hasn't been altered since signing. This record is attached to every completed document as a certificate of completion. If a signer ever disputes their signature, the audit trail serves as your evidence.</p>
+        </div>
+      </details>
+
+      <details class="group border-b border-gray-200">
+        <summary class="flex items-center justify-between py-5 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+          <span class="text-base font-semibold text-gray-900 pr-4">Are electronic signatures valid internationally?</span>
+          <svg class="h-5 w-5 text-gray-400 shrink-0 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </summary>
+        <div class="pb-5 text-sm text-gray-600 leading-relaxed">
+          <p>In most countries, yes. The EU recognizes electronic signatures under the <strong>eIDAS Regulation</strong>, which establishes three tiers: simple, advanced, and qualified. Pact's signatures qualify as "advanced" under eIDAS, which is legally valid for the vast majority of business contracts across all 27 EU member states. Over 60 countries worldwide have enacted laws recognizing electronic signatures. Some high-stakes documents (like certain real estate transfers) may require a "qualified" electronic signature with a government-issued digital certificate in some EU jurisdictions.</p>
+        </div>
+      </details>
+
+      <details class="group border-b border-gray-200">
+        <summary class="flex items-center justify-between py-5 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+          <span class="text-base font-semibold text-gray-900 pr-4">Are there any documents I can't sign electronically?</span>
+          <svg class="h-5 w-5 text-gray-400 shrink-0 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </summary>
+        <div class="pb-5 text-sm text-gray-600 leading-relaxed">
+          <p>Yes — a small number of document types are excluded by law. Under the ESIGN Act and UETA, you cannot use electronic signatures for: wills, codicils, and testamentary trusts; adoption and divorce papers; court orders and notices; documents required to accompany hazardous materials transport; and certain notices related to cancellation of utility services, foreclosure, or eviction. Everything else — contracts, NDAs, lease agreements, invoices, proposals, offer letters, SOWs — can be signed electronically.</p>
+        </div>
+      </details>
+
+      <details class="group border-b border-gray-200">
+        <summary class="flex items-center justify-between py-5 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+          <span class="text-base font-semibold text-gray-900 pr-4">Is an e-signature as strong as a notarized signature?</span>
+          <svg class="h-5 w-5 text-gray-400 shrink-0 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </summary>
+        <div class="pb-5 text-sm text-gray-600 leading-relaxed">
+          <p>They serve different purposes. An e-signature proves that a party agreed to a document — and is legally binding for most business contracts. A notarized signature adds a third-party witness (the notary) who verifies the signer's identity in person. Most business documents (contracts, NDAs, proposals, agreements) do not require notarization. If your document does require notarization, you'd need a Remote Online Notarization (RON) service, which is a separate process. For the vast majority of documents Pact users send, a standard e-signature is all that's needed.</p>
+        </div>
+      </details>
+    </div>
+
+    <!-- Security & Privacy -->
+    <h3 class="text-sm font-bold text-blue-600 uppercase tracking-wider mb-6">Security & Privacy</h3>
+    <div class="space-y-0 mb-12">
+      <details class="group border-b border-gray-200">
+        <summary class="flex items-center justify-between py-5 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+          <span class="text-base font-semibold text-gray-900 pr-4">How does Pact keep my documents secure?</span>
+          <svg class="h-5 w-5 text-gray-400 shrink-0 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </summary>
+        <div class="pb-5 text-sm text-gray-600 leading-relaxed">
+          <p>Pact uses bank-level encryption: TLS 1.3 for data in transit and AES-256 encryption for documents stored at rest on AWS S3. Access is restricted to the sender and designated signers. Every signed document includes a tamper-evident SHA-256 cryptographic hash — if even a single character is changed after signing, the hash won't match, making any alteration immediately detectable.</p>
+        </div>
+      </details>
+
+      <details class="group border-b border-gray-200">
+        <summary class="flex items-center justify-between py-5 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+          <span class="text-base font-semibold text-gray-900 pr-4">Can someone forge or tamper with a signed document?</span>
+          <svg class="h-5 w-5 text-gray-400 shrink-0 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </summary>
+        <div class="pb-5 text-sm text-gray-600 leading-relaxed">
+          <p>No. Each completed document is sealed with a SHA-256 cryptographic hash (a unique digital fingerprint). Any modification to the document after signing — even adding a space — would change the hash and break the seal, making tampering immediately evident. Combined with the audit trail (which logs every action with timestamps, IP addresses, and browser information), it's significantly harder to forge an e-signed document than a traditional wet-ink signature.</p>
+        </div>
+      </details>
+
+      <details class="group border-b border-gray-200">
+        <summary class="flex items-center justify-between py-5 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+          <span class="text-base font-semibold text-gray-900 pr-4">Is Pact GDPR compliant?</span>
+          <svg class="h-5 w-5 text-gray-400 shrink-0 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </summary>
+        <div class="pb-5 text-sm text-gray-600 leading-relaxed">
+          <p>Yes. Pact processes personal data (names, emails, IP addresses) only as necessary for the signing process. Signers' data is not sold or shared with third parties. Under GDPR, electronic signatures must demonstrate non-repudiation and data integrity — Pact's audit trail and encryption satisfy both requirements.</p>
+        </div>
+      </details>
+
+      <details class="group border-b border-gray-200">
+        <summary class="flex items-center justify-between py-5 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+          <span class="text-base font-semibold text-gray-900 pr-4">Can I use Pact for healthcare or HIPAA-regulated documents?</span>
+          <svg class="h-5 w-5 text-gray-400 shrink-0 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </summary>
+        <div class="pb-5 text-sm text-gray-600 leading-relaxed">
+          <p>Electronic signatures are permitted under HIPAA, provided the platform uses encryption for data in transit and at rest, maintains tamper-proof audit logs, and supports identity verification. However, if your documents contain Protected Health Information (PHI), you'll need a Business Associate Agreement (BAA) in place. <%= link_to "Contact us", contact_us_path, class: "text-blue-600 hover:text-blue-500 font-medium" %> if you need HIPAA-compliant signing — we can discuss your specific requirements.</p>
+        </div>
+      </details>
+    </div>
+
+    <!-- Using Pact -->
+    <h3 class="text-sm font-bold text-blue-600 uppercase tracking-wider mb-6">Using Pact</h3>
+    <div class="space-y-0 mb-12">
+      <details class="group border-b border-gray-200">
+        <summary class="flex items-center justify-between py-5 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+          <span class="text-base font-semibold text-gray-900 pr-4">Does my signer need a Pact account to sign?</span>
+          <svg class="h-5 w-5 text-gray-400 shrink-0 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </summary>
+        <div class="pb-5 text-sm text-gray-600 leading-relaxed">
+          <p>No. Your signer receives an email with a secure link. They click the link, review the document, and sign — all in their browser. No account creation, no app downloads, no passwords. The signer's identity is verified through their email address, IP address, and the full audit trail.</p>
+        </div>
+      </details>
+
+      <details class="group border-b border-gray-200">
+        <summary class="flex items-center justify-between py-5 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+          <span class="text-base font-semibold text-gray-900 pr-4">What happens after a document is signed?</span>
+          <svg class="h-5 w-5 text-gray-400 shrink-0 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </summary>
+        <div class="pb-5 text-sm text-gray-600 leading-relaxed">
+          <p>Both you and the signer receive a completed copy of the signed document via email, along with a certificate of completion that includes the full audit trail. The signed document is also stored in your Pact dashboard, encrypted and accessible anytime. You can download the signed PDF at any point.</p>
+        </div>
+      </details>
+
+      <details class="group border-b border-gray-200">
+        <summary class="flex items-center justify-between py-5 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+          <span class="text-base font-semibold text-gray-900 pr-4">Can I send a document to multiple signers?</span>
+          <svg class="h-5 w-5 text-gray-400 shrink-0 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </summary>
+        <div class="pb-5 text-sm text-gray-600 leading-relaxed">
+          <p>Yes. You can add multiple signers to a single document and assign specific signature fields to each person. Signers can sign in any order.</p>
+        </div>
+      </details>
+
+      <details class="group border-b border-gray-200">
+        <summary class="flex items-center justify-between py-5 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+          <span class="text-base font-semibold text-gray-900 pr-4">What file types can I upload?</span>
+          <svg class="h-5 w-5 text-gray-400 shrink-0 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </summary>
+        <div class="pb-5 text-sm text-gray-600 leading-relaxed">
+          <p>Pact accepts PDF files. PDFs are the industry standard for document signing because they preserve formatting across all devices and operating systems. If you have a Word doc or other format, simply save or export it as a PDF before uploading.</p>
+        </div>
+      </details>
+    </div>
+
+    <!-- Pricing & Plans -->
+    <h3 class="text-sm font-bold text-blue-600 uppercase tracking-wider mb-6">Pricing & Plans</h3>
+    <div class="space-y-0 mb-12">
+      <details class="group border-b border-gray-200">
+        <summary class="flex items-center justify-between py-5 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+          <span class="text-base font-semibold text-gray-900 pr-4">Is there a free plan?</span>
+          <svg class="h-5 w-5 text-gray-400 shrink-0 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </summary>
+        <div class="pb-5 text-sm text-gray-600 leading-relaxed">
+          <p>Yes. Pact's free plan lets you send up to 3 documents per month at no cost — forever. It includes signing, audit trails, and email notifications. No credit card required to sign up. If you need more volume, our Starter plan ($9/mo) gives you 10 documents per month plus the built-in contact CRM.</p>
+        </div>
+      </details>
+
+      <details class="group border-b border-gray-200">
+        <summary class="flex items-center justify-between py-5 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+          <span class="text-base font-semibold text-gray-900 pr-4">How does Pact's pricing compare to DocuSign?</span>
+          <svg class="h-5 w-5 text-gray-400 shrink-0 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </summary>
+        <div class="pb-5 text-sm text-gray-600 leading-relaxed">
+          <p>DocuSign's cheapest plan (Personal) costs $10-15/month and limits you to 5 envelopes per month with no free tier. Pact's Starter plan is $9/month (or $7/month billed annually) and gives you 10 documents per month — double the volume at a lower price. Pact's Pro plan ($19/mo) offers unlimited documents with no overage fees.</p>
+        </div>
+      </details>
+
+      <details class="group border-b border-gray-200">
+        <summary class="flex items-center justify-between py-5 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+          <span class="text-base font-semibold text-gray-900 pr-4">What does "envelope" mean, and does Pact use envelope limits?</span>
+          <svg class="h-5 w-5 text-gray-400 shrink-0 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </summary>
+        <div class="pb-5 text-sm text-gray-600 leading-relaxed">
+          <p>An "envelope" is DocuSign's term for a single signing transaction. Envelope-based pricing is the #1 complaint about DocuSign because it's confusing and expensive if you go over your limit. Pact keeps it simple: on our free and Starter plans, you have a set number of documents per month. On Pro, it's unlimited. No envelope jargon, no overage fees.</p>
+        </div>
+      </details>
+
+      <details class="group border-b border-gray-200">
+        <summary class="flex items-center justify-between py-5 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+          <span class="text-base font-semibold text-gray-900 pr-4">Can I cancel anytime?</span>
+          <svg class="h-5 w-5 text-gray-400 shrink-0 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </summary>
+        <div class="pb-5 text-sm text-gray-600 leading-relaxed">
+          <p>Yes. Monthly plans can be canceled at any time — no contracts, no cancellation fees. Annual plans are billed upfront for the year and remain active until the end of your billing period. Your signed documents remain accessible even after cancellation.</p>
+        </div>
+      </details>
+    </div>
+
+    <!-- About Pact -->
+    <h3 class="text-sm font-bold text-blue-600 uppercase tracking-wider mb-6">About Pact</h3>
+    <div class="space-y-0">
+      <details class="group border-b border-gray-200">
+        <summary class="flex items-center justify-between py-5 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+          <span class="text-base font-semibold text-gray-900 pr-4">What makes Pact different from DocuSign, Dropbox Sign, etc.?</span>
+          <svg class="h-5 w-5 text-gray-400 shrink-0 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </summary>
+        <div class="pb-5 text-sm text-gray-600 leading-relaxed">
+          <p>Three things. First, <strong>built-in contact management</strong> — Pact is the only signing tool that also keeps your client contacts organized with notes, tags, and activity tracking. No one else bundles this. Second, <strong>honest pricing</strong> — simple tiers, no envelope limits on Pro, no overage fees, and a real free plan. Third, <strong>simplicity</strong> — Pact is built for people who need a handful of documents signed per month, not enterprise sales teams. No bloat, no learning curve.</p>
+        </div>
+      </details>
+
+      <details class="group border-b border-gray-200">
+        <summary class="flex items-center justify-between py-5 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+          <span class="text-base font-semibold text-gray-900 pr-4">Who is Pact built for?</span>
+          <svg class="h-5 w-5 text-gray-400 shrink-0 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </summary>
+        <div class="pb-5 text-sm text-gray-600 leading-relaxed">
+          <p>Freelancers, consultants, real estate agents, small agencies, solo practitioners, and anyone who needs a handful of documents signed each month without paying enterprise prices. If you've been using DocuSign and feel like you're paying for features you'll never use, Pact is for you.</p>
+        </div>
+      </details>
+    </div>
+  </div>
+</section>
+
 <!-- CTA -->
 <section class="bg-gray-950 relative overflow-hidden">
   <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_rgba(59,130,246,0.15),transparent_70%)]"></div>

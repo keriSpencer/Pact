@@ -14,6 +14,8 @@ class DocumentVersion < ApplicationRecord
     audit_certificate: "audit_certificate"
   }
 
+  before_save :compute_checksum, if: -> { file.attached? && checksum.blank? }
+
   validates :version_type, presence: true
   validates :signature_request_id, uniqueness: true, allow_nil: true
 
@@ -38,5 +40,13 @@ class DocumentVersion < ApplicationRecord
 
   def formatted_date
     created_at.strftime("%b %d, %Y at %l:%M %p")
+  end
+
+  private
+
+  def compute_checksum
+    self.checksum = Digest::SHA256.hexdigest(file.download)
+  rescue ActiveStorage::FileNotFoundError
+    nil
   end
 end
