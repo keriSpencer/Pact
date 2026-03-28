@@ -24,7 +24,7 @@
   <% else %>
     <!-- Stats Row -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-5">
+      <%= link_to contacts_path, class: "bg-white dark:bg-gray-800 rounded-lg shadow-sm p-5 hover:shadow-md transition-shadow" do %>
         <div class="flex items-center">
           <div class="h-10 w-10 rounded-lg bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center">
             <svg class="h-5 w-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -36,9 +36,9 @@
             <p class="text-xs text-gray-500 dark:text-gray-400">Contacts</p>
           </div>
         </div>
-      </div>
+      <% end %>
 
-      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-5">
+      <%= link_to folders_path, class: "bg-white dark:bg-gray-800 rounded-lg shadow-sm p-5 hover:shadow-md transition-shadow" do %>
         <div class="flex items-center">
           <div class="h-10 w-10 rounded-lg bg-purple-50 dark:bg-purple-900/30 flex items-center justify-center">
             <svg class="h-5 w-5 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -50,9 +50,9 @@
             <p class="text-xs text-gray-500 dark:text-gray-400">Documents</p>
           </div>
         </div>
-      </div>
+      <% end %>
 
-      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-5">
+      <%= link_to folders_path, class: "bg-white dark:bg-gray-800 rounded-lg shadow-sm p-5 hover:shadow-md transition-shadow" do %>
         <div class="flex items-center">
           <div class="h-10 w-10 rounded-lg bg-amber-50 dark:bg-amber-900/30 flex items-center justify-center">
             <svg class="h-5 w-5 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -64,9 +64,9 @@
             <p class="text-xs text-gray-500 dark:text-gray-400">Pending</p>
           </div>
         </div>
-      </div>
+      <% end %>
 
-      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-5">
+      <%= link_to archive_documents_path, class: "bg-white dark:bg-gray-800 rounded-lg shadow-sm p-5 hover:shadow-md transition-shadow" do %>
         <div class="flex items-center">
           <div class="h-10 w-10 rounded-lg bg-green-50 dark:bg-green-900/30 flex items-center justify-center">
             <svg class="h-5 w-5 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -78,7 +78,7 @@
             <p class="text-xs text-gray-500 dark:text-gray-400">Signed</p>
           </div>
         </div>
-      </div>
+      <% end %>
     </div>
 
     <!-- Two Column Layout -->
