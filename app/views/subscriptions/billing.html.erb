@@ -36,13 +36,13 @@
     </div>
 
     <!-- Usage meter -->
-    <% unless @organization.pro_plan? %>
+    <% unless @organization.pro_plan? || @organization.needs_subscription? %>
       <div class="mt-6 pt-6 border-t border-gray-100 dark:border-gray-700">
         <div class="flex justify-between text-sm mb-2">
           <span class="text-gray-600 dark:text-gray-400">Documents this month</span>
           <span class="font-semibold text-gray-900 dark:text-gray-100"><%= @organization.documents_used_this_month %> / <%= @organization.document_limit %></span>
         </div>
-        <% usage_pct = [(@organization.documents_used_this_month.to_f / @organization.document_limit * 100).round, 100].min %>
+        <% usage_pct = @organization.document_limit > 0 ? [(@organization.documents_used_this_month.to_f / @organization.document_limit * 100).round, 100].min : 0 %>
         <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
           <div class="h-2.5 rounded-full transition-all <%= usage_pct >= 90 ? 'bg-red-500' : usage_pct >= 70 ? 'bg-amber-500' : 'bg-blue-600' %>"
                style="width: <%= usage_pct %>%"></div>
