@@ -341,7 +341,7 @@
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="text-center max-w-2xl mx-auto">
       <h2 class="text-3xl lg:text-4xl font-bold text-gray-900 tracking-tight">Simple, transparent pricing</h2>
-      <p class="mt-4 text-lg text-gray-500">Start free. Upgrade when you need to. No surprises.</p>
+      <p class="mt-4 text-lg text-gray-500">Try any plan free for 14 days. Cancel anytime.</p>
     </div>
 
     <!-- Monthly / Annual Toggle -->
@@ -358,48 +358,7 @@
       </div>
     </div>
 
-    <div class="mt-12 grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-      <!-- Free -->
-      <div class="rounded-2xl border border-gray-200 p-8 flex flex-col">
-        <div>
-          <h3 class="text-lg font-semibold text-gray-900">Free</h3>
-          <div class="mt-4 flex items-baseline gap-1">
-            <span class="text-5xl font-extrabold text-gray-900">$0</span>
-            <span class="text-gray-500">/mo</span>
-          </div>
-          <p class="mt-2 text-sm text-gray-500">Forever free. No credit card needed.</p>
-        </div>
-        <ul class="mt-8 space-y-3.5 flex-1">
-          <li class="flex items-center gap-3 text-sm text-gray-600">
-            <svg class="h-4 w-4 text-blue-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-            3 documents per month
-          </li>
-          <li class="flex items-center gap-3 text-sm text-gray-600">
-            <svg class="h-4 w-4 text-blue-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-            Unlimited contacts
-          </li>
-          <li class="flex items-center gap-3 text-sm text-gray-600">
-            <svg class="h-4 w-4 text-blue-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-            Email notifications
-          </li>
-          <li class="flex items-center gap-3 text-sm text-gray-600">
-            <svg class="h-4 w-4 text-blue-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-            Secure cloud storage
-          </li>
-          <li class="flex items-center gap-3 text-sm text-gray-600">
-            <svg class="h-4 w-4 text-blue-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-            No signer account needed
-          </li>
-        </ul>
-        <div class="mt-8">
-          <%= link_to new_user_registration_path,
-              class: "block text-center px-6 py-3 text-sm font-semibold text-gray-700 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors" do %>
-            Get Started Free
-          <% end %>
-        </div>
-        <p class="mt-4 text-xs text-center text-gray-400 italic">No free tier from DocuSign or Adobe Sign</p>
-      </div>
-
+    <div class="mt-12 grid md:grid-cols-2 gap-8 max-w-3xl mx-auto">
       <!-- Starter -->
       <div class="rounded-2xl border border-gray-200 p-8 flex flex-col">
         <div>
@@ -422,23 +381,31 @@
           </li>
           <li class="flex items-center gap-3 text-sm text-gray-600">
             <svg class="h-4 w-4 text-blue-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-            Everything in Free
+            Unlimited contacts
           </li>
           <li class="flex items-center gap-3 text-sm text-gray-600">
             <svg class="h-4 w-4 text-blue-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-            Priority email support
+            Email notifications &amp; audit trails
+          </li>
+          <li class="flex items-center gap-3 text-sm text-gray-600">
+            <svg class="h-4 w-4 text-blue-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+            Secure cloud storage
+          </li>
+          <li class="flex items-center gap-3 text-sm text-gray-600">
+            <svg class="h-4 w-4 text-blue-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+            No signer account needed
           </li>
         </ul>
         <div class="mt-8">
           <%= link_to subscribe_path("starter", interval: "monthly"),
-              class: "block text-center px-6 py-3 text-sm font-semibold text-white bg-blue-600 rounded-xl hover:bg-blue-700 shadow-lg shadow-blue-600/25 transition-all",
+              class: "block text-center px-6 py-3 text-sm font-semibold text-gray-700 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors",
               data: { pricing_toggle_target: "monthlyContent" } do %>
-            Subscribe to Starter
+            Start 14-Day Free Trial
           <% end %>
           <%= link_to subscribe_path("starter", interval: "annual"),
-              class: "block text-center px-6 py-3 text-sm font-semibold text-white bg-blue-600 rounded-xl hover:bg-blue-700 shadow-lg shadow-blue-600/25 transition-all hidden",
+              class: "block text-center px-6 py-3 text-sm font-semibold text-gray-700 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors hidden",
               data: { pricing_toggle_target: "annualContent" } do %>
-            Subscribe to Starter
+            Start 14-Day Free Trial
           <% end %>
         </div>
         <p class="mt-4 text-xs text-center text-gray-400 italic">Half the price of DocuSign Personal</p>
@@ -490,12 +457,12 @@
           <%= link_to subscribe_path("pro", interval: "monthly"),
               class: "block text-center px-6 py-3 text-sm font-semibold text-white bg-blue-600 rounded-xl hover:bg-blue-700 shadow-lg shadow-blue-600/25 transition-all",
               data: { pricing_toggle_target: "monthlyContent" } do %>
-            Subscribe to Pro
+            Start 14-Day Free Trial
           <% end %>
           <%= link_to subscribe_path("pro", interval: "annual"),
               class: "block text-center px-6 py-3 text-sm font-semibold text-white bg-blue-600 rounded-xl hover:bg-blue-700 shadow-lg shadow-blue-600/25 transition-all hidden",
               data: { pricing_toggle_target: "annualContent" } do %>
-            Subscribe to Pro
+            Start 14-Day Free Trial
           <% end %>
         </div>
         <p class="mt-4 text-xs text-center text-gray-400 italic">PandaDoc charges $49/mo for CRM + signing</p>
@@ -673,7 +640,7 @@
           <svg class="h-5 w-5 text-gray-400 shrink-0 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
         </summary>
         <div class="pb-5 text-sm text-gray-600 leading-relaxed">
-          <p>Yes. Pact's free plan lets you send up to 3 documents per month at no cost — forever. It includes signing, audit trails, and email notifications. No credit card required to sign up. If you need more volume, our Starter plan ($9/mo) gives you 10 documents per month plus the built-in contact CRM.</p>
+          <p>Every plan starts with a 14-day free trial — full access, no charge until the trial ends. Our Starter plan ($9/mo) gives you 10 documents per month, and Pro ($19/mo) is unlimited. Cancel anytime during the trial and you won't be charged.</p>
         </div>
       </details>
 
@@ -739,7 +706,7 @@
   <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_rgba(59,130,246,0.15),transparent_70%)]"></div>
   <div class="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-24 lg:py-32 text-center">
     <h2 class="text-3xl lg:text-4xl font-bold text-white tracking-tight">Ready to simplify your workflow?</h2>
-    <p class="mt-4 text-lg text-gray-400 max-w-2xl mx-auto">Create your free account in 30 seconds. No credit card required.</p>
+    <p class="mt-4 text-lg text-gray-400 max-w-2xl mx-auto">Start your 14-day free trial. No charge until the trial ends.</p>
     <div class="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
       <%= link_to new_user_registration_path, class: "inline-flex items-center justify-center px-8 py-3.5 text-base font-semibold text-white bg-blue-600 rounded-xl hover:bg-blue-500 shadow-lg shadow-blue-600/25 transition-all hover:shadow-xl hover:shadow-blue-500/30" do %>
         Create Free Account

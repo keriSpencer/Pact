@@ -18,17 +18,25 @@ class SubscriptionsController < ApplicationController
 
     customer = find_or_create_stripe_customer
 
-    session = Stripe::Checkout::Session.create(
+    checkout_params = {
       customer: customer.id,
       mode: "subscription",
       line_items: [{ price: price_id, quantity: 1 }],
       success_url: billing_url + "?upgraded=1",
       cancel_url: billing_url,
+      subscription_data: { trial_period_days: 14 },
       metadata: {
         organization_id: current_organization.id,
         plan: plan
       }
-    )
+    }
+
+    # Skip trial if org already had a subscription (returning customer)
+    if current_organization.stripe_customer_id.present? && current_organization.current_period_end.present?
+      checkout_params.delete(:subscription_data)
+    end
+
+    session = Stripe::Checkout::Session.create(checkout_params)
 
     redirect_to session.url, allow_other_host: true
   end

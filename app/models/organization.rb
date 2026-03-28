@@ -14,7 +14,7 @@ class Organization < ApplicationRecord
 
   scope :active, -> { where(active: true) }
 
-  PLAN_LIMITS = { "free" => 3, "starter" => 10, "pro" => Float::INFINITY }.freeze
+  PLAN_LIMITS = { "free" => 0, "starter" => 10, "pro" => Float::INFINITY }.freeze
 
   def document_limit
     PLAN_LIMITS[plan] || 3
@@ -48,6 +48,10 @@ class Organization < ApplicationRecord
 
   def subscription_active?
     subscription_status.in?(%w[active trialing])
+  end
+
+  def needs_subscription?
+    plan == "free"
   end
 
   def plan_display_name

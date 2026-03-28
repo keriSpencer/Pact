@@ -63,30 +63,13 @@
 
   <!-- Plan Cards -->
   <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-6">
-    <%= @organization.free_plan? ? "Upgrade your plan" : "Available plans" %>
+    <%= @organization.needs_subscription? ? "Choose a plan to get started" : "Available plans" %>
   </h2>
+  <% if @organization.needs_subscription? %>
+    <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">All plans include a 14-day free trial. You won't be charged until the trial ends.</p>
+  <% end %>
 
-  <div class="grid md:grid-cols-3 gap-6">
-    <!-- Free -->
-    <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6 flex flex-col <%= @organization.plan == 'free' ? 'ring-2 ring-blue-600' : '' %>">
-      <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Free</h3>
-      <div class="mt-3 flex items-baseline gap-1">
-        <span class="text-4xl font-extrabold text-gray-900 dark:text-gray-100">$0</span>
-        <span class="text-gray-500">/mo</span>
-      </div>
-      <ul class="mt-6 space-y-3 flex-1 text-sm text-gray-600 dark:text-gray-400">
-        <li class="flex items-center gap-2"><svg class="h-4 w-4 text-blue-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> 3 documents per month</li>
-        <li class="flex items-center gap-2"><svg class="h-4 w-4 text-blue-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Unlimited contacts</li>
-        <li class="flex items-center gap-2"><svg class="h-4 w-4 text-blue-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Email notifications</li>
-        <li class="flex items-center gap-2"><svg class="h-4 w-4 text-blue-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Secure cloud storage</li>
-      </ul>
-      <div class="mt-6">
-        <% if @organization.plan == "free" %>
-          <span class="block text-center px-4 py-2.5 text-sm font-semibold text-gray-400 bg-gray-100 dark:bg-gray-700 rounded-lg">Current Plan</span>
-        <% end %>
-      </div>
-    </div>
-
+  <div class="grid md:grid-cols-2 gap-6 max-w-2xl">
     <!-- Starter -->
     <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6 flex flex-col <%= @organization.plan == 'starter' ? 'ring-2 ring-blue-600' : '' %>">
       <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Starter</h3>
@@ -106,7 +89,7 @@
         <% elsif current_user.can_manage_users? %>
           <%= link_to subscribe_path("starter", interval: "monthly"),
               class: "block text-center px-4 py-2.5 text-sm font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors" do %>
-            <%= @organization.pro_plan? ? "Downgrade" : "Upgrade" %> to Starter
+            <%= @organization.needs_subscription? ? "Start 14-Day Free Trial" : @organization.pro_plan? ? "Downgrade to Starter" : "Upgrade to Starter" %>
           <% end %>
         <% end %>
       </div>
@@ -135,7 +118,7 @@
         <% elsif current_user.can_manage_users? %>
           <%= link_to subscribe_path("pro", interval: "monthly"),
               class: "block text-center px-4 py-2.5 text-sm font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors" do %>
-            Upgrade to Pro
+            <%= @organization.needs_subscription? ? "Start 14-Day Free Trial" : "Upgrade to Pro" %>
           <% end %>
         <% end %>
       </div>

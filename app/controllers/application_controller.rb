@@ -3,6 +3,7 @@ class ApplicationController < ActionController::Base
   include OrganizationScoped
 
   before_action :set_current_user
+  before_action :require_subscription!
 
   allow_browser versions: :modern
 
@@ -13,6 +14,15 @@ class ApplicationController < ActionController::Base
 
   def after_sign_in_path_for(resource)
     dashboard_path
+  end
+
+  def require_subscription!
+    return unless user_signed_in?
+    return if devise_controller?
+    return if self.class.name.in?(%w[PagesController SubscriptionsController StripeWebhooksController])
+    return unless current_organization&.needs_subscription?
+
+    redirect_to billing_path, alert: "Please select a plan to get started."
   end
 
   def set_current_user
