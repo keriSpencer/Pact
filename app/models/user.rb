@@ -18,6 +18,7 @@ class User < ApplicationRecord
   has_many :contact_notes, dependent: :nullify
   has_many :folders, dependent: :destroy
   has_many :documents, dependent: :destroy
+  has_many :push_devices, class_name: "ApplicationPushDevice", as: :user, dependent: :destroy
 
   after_update :invalidate_caches
   after_destroy :invalidate_caches

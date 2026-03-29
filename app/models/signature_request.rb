@@ -87,6 +87,7 @@ class SignatureRequest < ApplicationRecord
     SignatureRequestMailer.signature_completed(self).deliver_later
     # Send the signer a copy — they can view via their signing token
     SignatureRequestMailer.signer_copy(self).deliver_later
+    send_signed_push_notification
     true
   end
 
@@ -117,6 +118,7 @@ class SignatureRequest < ApplicationRecord
 
     GenerateSignedPdfJob.perform_later(id) if document.pdf?
     SignatureRequestMailer.signature_completed(self).deliver_later
+    send_signed_push_notification
     true
   end
 
@@ -215,6 +217,16 @@ class SignatureRequest < ApplicationRecord
       self.contact = matched
       self.auto_matched = true
     end
+  end
+
+  def send_signed_push_notification
+    return unless requester.push_devices.any?
+
+    notification = ApplicationPushNotification
+      .with_data(path: "/documents/#{document.id}")
+      .new(title: "Document signed!", body: "#{signer_display_name} signed your doc!")
+
+    notification.deliver_later_to(requester.push_devices)
   end
 
   def default_host

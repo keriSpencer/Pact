@@ -1,0 +1,6 @@
+shared:
+  apple:
+    key_id: <%= ENV["APNS_KEY_ID"] %>
+    encryption_key: <%= ENV["APNS_ENCRYPTION_KEY"]&.dump %>
+    team_id: <%= ENV["APNS_TEAM_ID"] %>
+    topic: io.pactapp.rubynative

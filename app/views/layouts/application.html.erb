@@ -27,6 +27,7 @@
   <body class="bg-gray-50 dark:bg-gray-900 min-h-screen overflow-x-hidden">
     <% if user_signed_in? %>
       <%= native_tabs_tag %>
+      <%= native_push_tag %>
       <%= yield :native_signals %>
 
       <% unless native_app? %>
