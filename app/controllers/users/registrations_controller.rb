@@ -9,10 +9,17 @@ class Users::RegistrationsController < Devise::RegistrationsController
       resource.organization = Organization.new(name: org_name, active: true)
       resource.role = :admin
     end
+
+    # Map browser IANA timezone to Rails timezone
+    if resource.timezone.present?
+      rails_tz = ActiveSupport::TimeZone::MAPPING.key(resource.timezone) ||
+                 ActiveSupport::TimeZone.all.find { |tz| tz.tzinfo.canonical_identifier == resource.timezone }&.name
+      resource.timezone = rails_tz || "UTC"
+    end
   end
 
   def sign_up_params
-    params.require(:user).permit(:first_name, :last_name, :email, :password, :password_confirmation)
+    params.require(:user).permit(:first_name, :last_name, :email, :password, :password_confirmation, :timezone)
   end
 
   def account_update_params
