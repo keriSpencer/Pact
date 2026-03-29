@@ -24,7 +24,7 @@
     <%= javascript_importmap_tags %>
   </head>
 
-  <body class="bg-gray-50 dark:bg-gray-900 min-h-screen">
+  <body class="bg-gray-50 dark:bg-gray-900 min-h-screen overflow-x-hidden">
     <% if user_signed_in? %>
       <%= native_tabs_tag %>
       <%= yield :native_signals %>
@@ -154,7 +154,7 @@
       </main>
     <% else %>
       <!-- Unauthenticated layout -->
-      <div class="min-h-screen flex items-center justify-center">
+      <div class="min-h-screen flex items-center justify-center px-4">
         <div class="max-w-md w-full space-y-8">
           <div>
             <div class="mt-6 flex items-center justify-center gap-3">
