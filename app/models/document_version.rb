@@ -39,7 +39,8 @@ class DocumentVersion < ApplicationRecord
   end
 
   def formatted_date
-    created_at.strftime("%b %d, %Y at %l:%M %p")
+    tz = Current.user&.timezone || "UTC"
+    created_at.in_time_zone(tz).strftime("%b %d, %Y at %l:%M %p %Z")
   end
 
   private
