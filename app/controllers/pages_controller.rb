@@ -6,12 +6,8 @@ class PagesController < ApplicationController
     redirect_to dashboard_path if user_signed_in?
   end
 
-  skip_before_action :require_subscription!, only: :launch
-  skip_before_action :set_current_user, only: :launch
-  skip_before_action :allow_browser, only: :launch
-
   def launch
-    redirect_to user_signed_in? ? dashboard_path : new_user_session_path, allow_other_host: true
+    redirect_to user_signed_in? ? dashboard_path : new_user_session_path
   end
 
   def contact
