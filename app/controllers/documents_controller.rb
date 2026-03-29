@@ -83,7 +83,8 @@ class DocumentsController < ApplicationController
 
   def archive
     @documents = organization_documents.where(status: :archived)
-                                       .includes(:user, :signature_requests)
+                                       .includes(:user, :signature_requests,
+                                                 versions: :signature_request)
                                        .order(updated_at: :desc)
   end
 
