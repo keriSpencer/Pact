@@ -67,15 +67,34 @@
     <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">Choose a plan to get started</h2>
     <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">All plans include a 14-day free trial. You won't be charged until the trial ends.</p>
 
+    <!-- Monthly / Annual Toggle (defaults to annual) -->
+    <div class="mb-8 flex justify-start" data-controller="pricing-toggle" data-pricing-toggle-default-value="annual">
+      <div class="inline-flex rounded-xl bg-gray-100 dark:bg-gray-700 p-1">
+        <button data-pricing-toggle-target="monthlyBtn" data-action="pricing-toggle#showMonthly"
+                class="px-5 py-2 text-sm font-semibold rounded-lg transition-all cursor-pointer text-gray-600">
+          Monthly
+        </button>
+        <button data-pricing-toggle-target="annualBtn" data-action="pricing-toggle#showAnnual"
+                class="px-5 py-2 text-sm font-semibold rounded-lg transition-all cursor-pointer bg-white dark:bg-gray-600 text-gray-900 dark:text-gray-100 shadow-sm">
+          Annual <span class="text-emerald-600 dark:text-emerald-400 font-bold">-22%</span>
+        </button>
+      </div>
+    </div>
+
     <div class="grid md:grid-cols-2 gap-6 max-w-2xl">
       <!-- Starter -->
       <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6 flex flex-col">
         <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Starter</h3>
-        <div class="mt-3 flex items-baseline gap-1">
+        <div class="mt-3 flex items-baseline gap-1 hidden" data-pricing-toggle-target="monthlyContent">
           <span class="text-4xl font-extrabold text-gray-900 dark:text-gray-100">$9</span>
           <span class="text-gray-500">/mo</span>
         </div>
-        <p class="mt-1 text-xs text-emerald-600 font-medium">or $7/mo billed annually</p>
+        <div class="mt-3 flex items-baseline gap-1" data-pricing-toggle-target="annualContent">
+          <span class="text-4xl font-extrabold text-gray-900 dark:text-gray-100">$7</span>
+          <span class="text-gray-500">/mo</span>
+        </div>
+        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400 hidden" data-pricing-toggle-target="monthlyContent">Billed monthly</p>
+        <p class="mt-1 text-xs text-emerald-600 dark:text-emerald-400 font-medium" data-pricing-toggle-target="annualContent">$84/year — save 22%</p>
         <ul class="mt-6 space-y-3 flex-1 text-sm text-gray-600 dark:text-gray-400">
           <li class="flex items-center gap-2"><svg class="h-4 w-4 text-blue-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> 10 documents per month</li>
           <li class="flex items-center gap-2"><svg class="h-4 w-4 text-blue-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Unlimited contacts</li>
@@ -83,7 +102,13 @@
         </ul>
         <div class="mt-6">
           <%= link_to subscribe_path("starter", interval: "monthly"),
-              class: "block text-center px-4 py-2.5 text-sm font-semibold text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors" do %>
+              class: "block text-center px-4 py-2.5 text-sm font-semibold text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors hidden",
+              data: { pricing_toggle_target: "monthlyContent" } do %>
+            Start 14-Day Free Trial
+          <% end %>
+          <%= link_to subscribe_path("starter", interval: "annual"),
+              class: "block text-center px-4 py-2.5 text-sm font-semibold text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors",
+              data: { pricing_toggle_target: "annualContent" } do %>
             Start 14-Day Free Trial
           <% end %>
         </div>
@@ -93,11 +118,16 @@
       <div class="rounded-xl border-2 border-blue-600 bg-white dark:bg-gray-800 p-6 flex flex-col relative">
         <span class="absolute -top-3 left-1/2 -translate-x-1/2 bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full">Most Popular</span>
         <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Pro</h3>
-        <div class="mt-3 flex items-baseline gap-1">
+        <div class="mt-3 flex items-baseline gap-1 hidden" data-pricing-toggle-target="monthlyContent">
           <span class="text-4xl font-extrabold text-gray-900 dark:text-gray-100">$19</span>
           <span class="text-gray-500">/mo</span>
         </div>
-        <p class="mt-1 text-xs text-emerald-600 font-medium">or $15/mo billed annually</p>
+        <div class="mt-3 flex items-baseline gap-1" data-pricing-toggle-target="annualContent">
+          <span class="text-4xl font-extrabold text-gray-900 dark:text-gray-100">$15</span>
+          <span class="text-gray-500">/mo</span>
+        </div>
+        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400 hidden" data-pricing-toggle-target="monthlyContent">Billed monthly</p>
+        <p class="mt-1 text-xs text-emerald-600 dark:text-emerald-400 font-medium" data-pricing-toggle-target="annualContent">$180/year — save 21%</p>
         <ul class="mt-6 space-y-3 flex-1 text-sm text-gray-600 dark:text-gray-400">
           <li class="flex items-center gap-2"><svg class="h-4 w-4 text-blue-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> <strong class="text-gray-900 dark:text-gray-100">Unlimited</strong> documents</li>
           <li class="flex items-center gap-2"><svg class="h-4 w-4 text-blue-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Team member access</li>
@@ -107,7 +137,13 @@
         </ul>
         <div class="mt-6">
           <%= link_to subscribe_path("pro", interval: "monthly"),
-              class: "block text-center px-4 py-2.5 text-sm font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors" do %>
+              class: "block text-center px-4 py-2.5 text-sm font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors hidden",
+              data: { pricing_toggle_target: "monthlyContent" } do %>
+            Start 14-Day Free Trial
+          <% end %>
+          <%= link_to subscribe_path("pro", interval: "annual"),
+              class: "block text-center px-4 py-2.5 text-sm font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors",
+              data: { pricing_toggle_target: "annualContent" } do %>
             Start 14-Day Free Trial
           <% end %>
         </div>

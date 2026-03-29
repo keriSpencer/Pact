@@ -2,9 +2,14 @@ import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
   static targets = ["monthlyContent", "annualContent", "monthlyBtn", "annualBtn"]
+  static values = { default: { type: String, default: "monthly" } }
 
   connect() {
-    this.showMonthly()
+    if (this.defaultValue === "annual") {
+      this.showAnnual()
+    } else {
+      this.showMonthly()
+    }
   }
 
   showMonthly() {
