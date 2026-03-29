@@ -28,71 +28,72 @@
     <% if user_signed_in? %>
       <%= native_tabs_tag %>
       <%= yield :native_signals %>
-      <!-- Navigation -->
-      <nav class="bg-white dark:bg-gray-800 shadow dark:shadow-gray-900/50 fixed top-0 left-0 right-0 z-50" role="navigation" aria-label="Main navigation">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div class="flex justify-between h-16">
-            <div class="flex items-center">
-              <div class="flex-shrink-0 flex items-center">
-                <%= link_to dashboard_path, class: "flex items-center gap-2 text-xl font-bold text-gray-900 dark:text-gray-100", "aria-label": "Pact Home" do %>
-                  <svg class="h-7 w-7" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M 100 35 L 55 55 Q 50 57 50 63 L 50 95 Q 50 130 100 165 Q 150 130 150 95 L 150 63 Q 150 57 145 55 Z" stroke="#2563EB" stroke-width="8" stroke-linejoin="round"/>
-                    <path d="M 72 105 L 92 125 L 132 80" stroke="#2563EB" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
-                  </svg>
-                  Pact
-                <% end %>
-              </div>
-              <!-- Desktop nav links -->
-              <div class="hidden sm:ml-6 sm:flex sm:space-x-6" role="menubar">
-                <%= link_to dashboard_path, class: "#{request.path == dashboard_path ? 'text-blue-600 dark:text-blue-400 font-semibold' : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100'} inline-flex items-center px-1 text-sm font-medium transition-colors", role: "menuitem" do %>
-                  Dashboard
-                <% end %>
-                <%= link_to contacts_path, class: "#{request.path.start_with?('/contacts') ? 'text-blue-600 dark:text-blue-400 font-semibold' : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100'} inline-flex items-center px-1 text-sm font-medium transition-colors", role: "menuitem" do %>
-                  Contacts
-                <% end %>
-                <%= link_to folders_path, class: "#{request.path.start_with?('/folders') || request.path.start_with?('/documents') ? 'text-blue-600 dark:text-blue-400 font-semibold' : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100'} inline-flex items-center px-1 text-sm font-medium transition-colors", role: "menuitem" do %>
-                  Documents
-                <% end %>
-                <%= link_to billing_path, class: "#{request.path == billing_path ? 'text-blue-600 dark:text-blue-400 font-semibold' : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100'} inline-flex items-center px-1 text-sm font-medium transition-colors", role: "menuitem" do %>
-                  Billing
-                <% end %>
-              </div>
-            </div>
-            <!-- Right side -->
-            <div class="hidden sm:flex sm:items-center sm:space-x-4">
-              <div class="relative">
-                <%= form_with url: search_path, method: :get, local: true, class: "relative" do |form| %>
-                  <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <svg class="h-4 w-4 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                    </svg>
-                  </div>
-                  <%= form.text_field :q, value: params[:q], placeholder: "Search...", autocomplete: "off",
-                      class: "block w-48 pl-9 pr-3 py-1.5 border border-gray-200 dark:border-gray-600 rounded-lg text-sm bg-gray-50 dark:bg-gray-700 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:bg-white dark:focus:bg-gray-600 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all" %>
-                <% end %>
-              </div>
+
+      <% unless native_app? %>
+        <!-- Navigation -->
+        <nav class="bg-white dark:bg-gray-800 shadow dark:shadow-gray-900/50 fixed top-0 left-0 right-0 z-50" role="navigation" aria-label="Main navigation">
+          <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
               <div class="flex items-center">
-                <%= link_to user_path(current_user), class: "flex items-center text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100" do %>
+                <div class="flex-shrink-0 flex items-center">
+                  <%= link_to dashboard_path, class: "flex items-center gap-2 text-xl font-bold text-gray-900 dark:text-gray-100", "aria-label": "Pact Home" do %>
+                    <svg class="h-7 w-7" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M 100 35 L 55 55 Q 50 57 50 63 L 50 95 Q 50 130 100 165 Q 150 130 150 95 L 150 63 Q 150 57 145 55 Z" stroke="#2563EB" stroke-width="8" stroke-linejoin="round"/>
+                      <path d="M 72 105 L 92 125 L 132 80" stroke="#2563EB" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    Pact
+                  <% end %>
+                </div>
+                <!-- Desktop nav links -->
+                <div class="hidden sm:ml-6 sm:flex sm:space-x-6" role="menubar">
+                  <%= link_to dashboard_path, class: "#{request.path == dashboard_path ? 'text-blue-600 dark:text-blue-400 font-semibold' : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100'} inline-flex items-center px-1 text-sm font-medium transition-colors", role: "menuitem" do %>
+                    Dashboard
+                  <% end %>
+                  <%= link_to contacts_path, class: "#{request.path.start_with?('/contacts') ? 'text-blue-600 dark:text-blue-400 font-semibold' : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100'} inline-flex items-center px-1 text-sm font-medium transition-colors", role: "menuitem" do %>
+                    Contacts
+                  <% end %>
+                  <%= link_to folders_path, class: "#{request.path.start_with?('/folders') || request.path.start_with?('/documents') ? 'text-blue-600 dark:text-blue-400 font-semibold' : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100'} inline-flex items-center px-1 text-sm font-medium transition-colors", role: "menuitem" do %>
+                    Documents
+                  <% end %>
+                  <%= link_to billing_path, class: "#{request.path == billing_path ? 'text-blue-600 dark:text-blue-400 font-semibold' : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100'} inline-flex items-center px-1 text-sm font-medium transition-colors", role: "menuitem" do %>
+                    Billing
+                  <% end %>
+                </div>
+              </div>
+              <!-- Right side -->
+              <div class="hidden sm:flex sm:items-center sm:space-x-4">
+                <div class="relative">
+                  <%= form_with url: search_path, method: :get, local: true, class: "relative" do |form| %>
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <svg class="h-4 w-4 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                      </svg>
+                    </div>
+                    <%= form.text_field :q, value: params[:q], placeholder: "Search...", autocomplete: "off",
+                        class: "block w-48 pl-9 pr-3 py-1.5 border border-gray-200 dark:border-gray-600 rounded-lg text-sm bg-gray-50 dark:bg-gray-700 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:bg-white dark:focus:bg-gray-600 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all" %>
+                  <% end %>
+                </div>
+                <div class="flex items-center">
+                  <%= link_to user_path(current_user), class: "flex items-center text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100" do %>
+                    <div class="h-7 w-7 rounded-full bg-blue-600 flex items-center justify-center">
+                      <span class="text-xs font-medium text-white"><%= current_user.initials %></span>
+                    </div>
+                  <% end %>
+                  <%= link_to "Sign out", destroy_user_session_path, data: { "turbo-method": "delete" }, class: "ml-3 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200" %>
+                </div>
+              </div>
+              <!-- Mobile right side -->
+              <div class="flex items-center sm:hidden">
+                <%= link_to user_path(current_user), class: "p-2", "aria-label": "Profile" do %>
                   <div class="h-7 w-7 rounded-full bg-blue-600 flex items-center justify-center">
                     <span class="text-xs font-medium text-white"><%= current_user.initials %></span>
                   </div>
                 <% end %>
-                <%= link_to "Sign out", destroy_user_session_path, data: { "turbo-method": "delete" }, class: "ml-3 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200" %>
               </div>
             </div>
-            <!-- Mobile right side -->
-            <div class="flex items-center sm:hidden">
-              <%= link_to user_path(current_user), class: "p-2", "aria-label": "Profile" do %>
-                <div class="h-7 w-7 rounded-full bg-blue-600 flex items-center justify-center">
-                  <span class="text-xs font-medium text-white"><%= current_user.initials %></span>
-                </div>
-              <% end %>
-            </div>
           </div>
-        </div>
-      </nav>
+        </nav>
 
-      <% unless native_app? %>
         <!-- Mobile Bottom Tab Bar -->
         <nav class="sm:hidden fixed bottom-0 left-0 right-0 z-50 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 safe-area-inset-bottom" role="navigation" aria-label="Mobile navigation">
           <div class="flex justify-around items-center h-14">
@@ -119,7 +120,7 @@
       <% end %>
 
       <!-- Main content -->
-      <main class="pt-16 pb-20 sm:pb-0">
+      <main class="<%= native_app? ? '' : 'pt-16 pb-20 sm:pb-0' %>">
         <!-- Flash messages -->
         <div id="flash" role="alert" aria-live="polite">
           <% if notice %>

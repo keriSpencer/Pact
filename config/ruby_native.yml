@@ -1,5 +1,5 @@
 app:
-  mode: normal
+  mode: advanced
   entry_path: /dashboard
 
 appearance:
@@ -21,3 +21,9 @@ tabs:
   - title: Documents
     path: /folders
     icon: folder
+
+screenshots:
+  paths:
+    - /
+    - /contacts
+    - /documents
