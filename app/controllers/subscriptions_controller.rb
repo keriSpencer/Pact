@@ -4,6 +4,11 @@ class SubscriptionsController < ApplicationController
 
   def billing
     @organization = current_organization
+
+    # Sync from Stripe when returning from checkout (webhook may not have fired yet)
+    if params[:upgraded] && @organization.stripe_customer_id.present? && @organization.needs_subscription?
+      sync_subscription_from_stripe
+    end
   end
 
   def checkout
@@ -68,6 +73,32 @@ class SubscriptionsController < ApplicationController
       )
       current_organization.update!(stripe_customer_id: customer.id)
       customer
+    end
+  end
+
+  def sync_subscription_from_stripe
+    subscriptions = Stripe::Subscription.list(customer: current_organization.stripe_customer_id, limit: 1)
+    sub = subscriptions.data.first
+    return unless sub
+
+    plan = plan_from_stripe_price(sub.items.data.first.price.id)
+    current_organization.update!(
+      stripe_subscription_id: sub.id,
+      plan: plan || "starter",
+      subscription_status: sub.status,
+      current_period_end: Time.at(sub.current_period_end)
+    )
+    @organization.reload
+  rescue Stripe::StripeError => e
+    Rails.logger.error "Stripe sync failed: #{e.message}"
+  end
+
+  def plan_from_stripe_price(price_id)
+    case price_id
+    when ENV["STRIPE_STARTER_MONTHLY_PRICE_ID"], ENV["STRIPE_STARTER_ANNUAL_PRICE_ID"]
+      "starter"
+    when ENV["STRIPE_PRO_MONTHLY_PRICE_ID"], ENV["STRIPE_PRO_ANNUAL_PRICE_ID"]
+      "pro"
     end
   end
 
