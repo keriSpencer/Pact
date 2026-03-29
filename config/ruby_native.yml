@@ -1,6 +1,6 @@
 app:
   mode: advanced
-  entry_path: /dashboard
+  entry_path: /users/sign_in
 
 appearance:
   tint_color: "#2563EB"
