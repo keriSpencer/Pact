@@ -6,20 +6,20 @@
         <p class="mt-1 text-sm text-gray-500 dark:text-gray-400"><%= @document.description %></p>
       <% end %>
     </div>
-    <div class="flex flex-wrap gap-2">
-      <%= link_to "Download", download_document_path(@document), class: "px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors" %>
+    <div class="flex flex-wrap items-center gap-2">
+      <%= link_to "Download", download_document_path(@document), class: "px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors" %>
       <% if @document.pdf? %>
-        <%= link_to "Preview", preview_document_path(@document), target: "_blank", class: "px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors" %>
+        <%= link_to "Preview", preview_document_path(@document), target: "_blank", class: "px-3 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors" %>
       <% end %>
       <% if @document.pdf? %>
-        <%= link_to "Request Signature", new_document_signature_request_path(@document), class: "px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700 transition-colors" %>
+        <%= link_to "Request Signature", new_document_signature_request_path(@document), class: "px-3 py-1.5 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700 transition-colors" %>
       <% end %>
       <% if @document.user == current_user || current_user.admin? %>
-        <%= link_to "Edit", edit_document_path(@document), class: "px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors" %>
+        <%= link_to "Edit", edit_document_path(@document), class: "px-3 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors" %>
         <% if @document.has_signed_requests? %>
-          <%= link_to "Delete", document_path(@document), data: { "turbo-method": "delete", turbo_confirm: "This document has signed versions. It will be archived (not permanently deleted) to preserve the signing history for legal compliance. Continue?" }, class: "px-4 py-2 text-sm font-medium text-red-600 bg-white dark:bg-gray-700 border border-red-300 dark:border-red-500/50 rounded-md hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors" %>
+          <%= link_to "Delete", document_path(@document), data: { "turbo-method": "delete", turbo_confirm: "This document has signed versions. It will be archived (not permanently deleted) to preserve the signing history for legal compliance. Continue?" }, class: "px-3 py-1.5 text-sm font-medium text-red-600 dark:text-red-400 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors" %>
         <% else %>
-          <%= link_to "Delete", document_path(@document), data: { "turbo-method": "delete", turbo_confirm: "Delete '#{@document.name}'?" }, class: "px-4 py-2 text-sm font-medium text-red-600 bg-white dark:bg-gray-700 border border-red-300 dark:border-red-500/50 rounded-md hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors" %>
+          <%= link_to "Delete", document_path(@document), data: { "turbo-method": "delete", turbo_confirm: "Delete '#{@document.name}'?" }, class: "px-3 py-1.5 text-sm font-medium text-red-600 dark:text-red-400 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors" %>
         <% end %>
       <% end %>
     </div>
