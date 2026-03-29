@@ -37,12 +37,13 @@ class StripeWebhooksController < ApplicationController
 
     subscription = Stripe::Subscription.retrieve(session.subscription)
 
+    period_end = subscription.try(:current_period_end) || subscription.try(:[], :current_period_end)
     org.update!(
       stripe_subscription_id: subscription.id,
       stripe_customer_id: session.customer,
       plan: session.metadata["plan"],
       subscription_status: subscription.status,
-      current_period_end: Time.at(subscription.current_period_end)
+      current_period_end: period_end ? Time.at(period_end) : nil
     )
   end
 
@@ -52,10 +53,11 @@ class StripeWebhooksController < ApplicationController
 
     plan = plan_from_price(subscription.items.data.first.price.id)
 
+    period_end = subscription.try(:current_period_end) || subscription.try(:[], :current_period_end)
     org.update!(
       plan: plan || org.plan,
       subscription_status: subscription.status,
-      current_period_end: Time.at(subscription.current_period_end)
+      current_period_end: period_end ? Time.at(period_end) : nil
     )
   end
 

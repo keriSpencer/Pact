@@ -82,11 +82,12 @@ class SubscriptionsController < ApplicationController
     return unless sub
 
     plan = plan_from_stripe_price(sub.items.data.first.price.id)
+    period_end = sub.try(:current_period_end) || sub.try(:[], :current_period_end)
     current_organization.update!(
       stripe_subscription_id: sub.id,
       plan: plan || "starter",
       subscription_status: sub.status,
-      current_period_end: Time.at(sub.current_period_end)
+      current_period_end: period_end ? Time.at(period_end) : nil
     )
     @organization.reload
   rescue Stripe::StripeError => e
