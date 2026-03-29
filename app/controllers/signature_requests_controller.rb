@@ -11,7 +11,8 @@ class SignatureRequestsController < ApplicationController
       signer_email: params[:signer_email] || "",
       signer_name: params[:signer_name] || ""
     )
-    redirect_to edit_document_signature_request_path(@document, @signature_request)
+    @signature_fields = @signature_request.signature_fields.order(:position)
+    render :edit
   end
 
   def edit
