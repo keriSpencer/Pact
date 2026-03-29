@@ -15,7 +15,7 @@
         on <%= @signature_request.signed_at&.strftime("%B %d, %Y at %l:%M %p") %>.
       </p>
 
-      <% signed_version = @signature_request.document.latest_signed_version %>
+      <% signed_version = @signature_request.signed_version %>
       <% if signed_version&.file&.attached? %>
         <div class="mt-6 flex justify-center space-x-4">
           <%= link_to rails_blob_path(signed_version.file, disposition: "inline"), target: "_blank", class: "inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors" do %>
