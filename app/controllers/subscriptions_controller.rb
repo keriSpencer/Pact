@@ -77,6 +77,8 @@ class SubscriptionsController < ApplicationController
   end
 
   def sync_subscription_from_stripe
+    was_free = current_organization.needs_subscription?
+
     subscriptions = Stripe::Subscription.list(customer: current_organization.stripe_customer_id, limit: 1)
     sub = subscriptions.data.first
     return unless sub
@@ -90,6 +92,11 @@ class SubscriptionsController < ApplicationController
       current_period_end: period_end ? Time.at(period_end) : nil
     )
     @organization.reload
+
+    # Send welcome email on first subscription
+    if was_free && current_organization.paid_plan?
+      WelcomeMailer.welcome(current_user).deliver_later
+    end
   rescue Stripe::StripeError => e
     Rails.logger.error "Stripe sync failed: #{e.message}"
   end

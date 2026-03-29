@@ -35,6 +35,7 @@ class StripeWebhooksController < ApplicationController
     org = Organization.find_by(id: session.metadata["organization_id"])
     return unless org
 
+    was_free = org.needs_subscription?
     subscription = Stripe::Subscription.retrieve(session.subscription)
 
     period_end = subscription.try(:current_period_end) || subscription.try(:[], :current_period_end)
@@ -45,6 +46,12 @@ class StripeWebhooksController < ApplicationController
       subscription_status: subscription.status,
       current_period_end: period_end ? Time.at(period_end) : nil
     )
+
+    # Send welcome email on first subscription
+    if was_free && org.paid_plan?
+      user = org.primary_admin || org.users.first
+      WelcomeMailer.welcome(user).deliver_later if user
+    end
   end
 
   def handle_subscription_updated(subscription)
