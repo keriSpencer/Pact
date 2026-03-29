@@ -65,6 +65,7 @@ Rails.application.routes.draw do
 
   # Authenticated dashboard
   get "dashboard", to: "dashboard#index", as: :dashboard
+  get "profile", to: "users#profile_redirect", as: :my_profile
 
   # Billing & Subscriptions
   get "billing", to: "subscriptions#billing"

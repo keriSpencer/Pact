@@ -28,6 +28,10 @@ class UsersController < ApplicationController
     redirect_to user_path(current_user)
   end
 
+  def profile_redirect
+    redirect_to user_path(current_user)
+  end
+
   def edit
   end
 

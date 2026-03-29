@@ -21,6 +21,9 @@ tabs:
   - title: Documents
     path: /folders
     icon: folder
+  - title: Profile
+    path: /profile
+    icon: person.circle
 
 screenshots:
   paths:
