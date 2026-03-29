@@ -5,8 +5,8 @@ class SubscriptionsController < ApplicationController
   def billing
     @organization = current_organization
 
-    # Sync from Stripe when returning from checkout (webhook may not have fired yet)
-    if params[:upgraded] && @organization.stripe_customer_id.present? && @organization.needs_subscription?
+    # Sync from Stripe when returning from checkout or portal
+    if (params[:upgraded] || params[:synced]) && @organization.stripe_customer_id.present?
       sync_subscription_from_stripe
     end
   end
@@ -54,7 +54,7 @@ class SubscriptionsController < ApplicationController
 
     session = Stripe::BillingPortal::Session.create(
       customer: current_organization.stripe_customer_id,
-      return_url: billing_url
+      return_url: billing_url + "?synced=1"
     )
 
     redirect_to session.url, allow_other_host: true

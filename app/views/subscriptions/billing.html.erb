@@ -28,7 +28,7 @@
           <% end %>
         </div>
       </div>
-      <% if @organization.stripe_subscription_id.present? && current_user.can_manage_users? %>
+      <% if @organization.stripe_customer_id.present? && current_user.can_manage_users? %>
         <%= link_to billing_portal_path, data: { "turbo-method": "post" },
             class: "inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors" do %>
           Manage Subscription
@@ -117,17 +117,30 @@
 
   <% elsif @organization.plan == "starter" && current_user.can_manage_users? %>
     <!-- Starter user: show upgrade option -->
-    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-6">
       <div class="flex items-center justify-between flex-wrap gap-4">
         <div>
           <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Need more documents?</h2>
-          <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Upgrade to Pro for unlimited documents, team access, and built-in CRM.</p>
+          <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Upgrade to Pro for unlimited documents, team access, and built-in CRM. You'll only pay the prorated difference.</p>
         </div>
-        <%= link_to subscribe_path("pro", interval: "monthly"),
-            class: "inline-flex items-center px-4 py-2 text-sm font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors" do %>
+        <%= link_to billing_portal_path, data: { "turbo-method": "post" },
+            class: "inline-flex items-center px-4 py-2 text-sm font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors shrink-0" do %>
           Upgrade to Pro — $19/mo
         <% end %>
       </div>
+    </div>
+  <% end %>
+
+  <% if @organization.paid_plan? && @organization.stripe_customer_id.present? && current_user.can_manage_users? %>
+    <!-- Cancel / manage -->
+    <div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+      <p class="text-sm text-gray-500 dark:text-gray-400">
+        Need to cancel or change your plan?
+        <%= link_to billing_portal_path, data: { "turbo-method": "post" }, class: "text-blue-600 hover:text-blue-500 font-medium" do %>
+          Manage your subscription
+        <% end %>
+        — you can cancel anytime, switch plans, or update payment details.
+      </p>
     </div>
   <% end %>
 </div>
