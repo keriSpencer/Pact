@@ -154,6 +154,7 @@
         <%= yield %>
       </main>
     <% else %>
+      <%= yield :native_signals %>
       <!-- Unauthenticated layout -->
       <div class="min-h-screen flex items-center justify-center px-4">
         <div class="max-w-md w-full space-y-8 overflow-hidden">

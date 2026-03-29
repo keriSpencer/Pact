@@ -1,22 +1,22 @@
 <% content_for :native_signals, native_form_tag %>
-<%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { class: "mt-8 space-y-6" }) do |f| %>
+<%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { class: "mt-8 space-y-6", data: native_form_data }) do |f| %>
   <%= render "devise/shared/error_messages", resource: resource %>
 
   <div class="space-y-4">
     <div class="grid grid-cols-2 gap-4">
       <div>
         <%= f.label :first_name, class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
-        <%= f.text_field :first_name, autofocus: true, autocomplete: "given-name", placeholder: "First name", class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" %>
+        <%= f.text_field :first_name, autofocus: true, autocomplete: "given-name", placeholder: "First name", class: "mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-base sm:text-sm" %>
       </div>
       <div>
         <%= f.label :last_name, class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
-        <%= f.text_field :last_name, autocomplete: "family-name", placeholder: "Last name", class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" %>
+        <%= f.text_field :last_name, autocomplete: "family-name", placeholder: "Last name", class: "mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-base sm:text-sm" %>
       </div>
     </div>
 
     <div>
       <%= f.label :email, class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
-      <%= f.email_field :email, autocomplete: "email", placeholder: "you@company.com", class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" %>
+      <%= f.email_field :email, autocomplete: "email", placeholder: "you@company.com", class: "mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-base sm:text-sm" %>
     </div>
 
     <div>
@@ -24,12 +24,12 @@
       <% if @minimum_password_length %>
         <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5"><%= @minimum_password_length %> characters minimum</p>
       <% end %>
-      <%= f.password_field :password, autocomplete: "new-password", class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" %>
+      <%= f.password_field :password, autocomplete: "new-password", class: "mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-base sm:text-sm" %>
     </div>
 
     <div>
       <%= f.label :password_confirmation, class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
-      <%= f.password_field :password_confirmation, autocomplete: "new-password", class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" %>
+      <%= f.password_field :password_confirmation, autocomplete: "new-password", class: "mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-base sm:text-sm" %>
     </div>
   </div>
 
@@ -37,7 +37,7 @@
   <script>document.getElementById("user_timezone").value = Intl.DateTimeFormat().resolvedOptions().timeZone;</script>
 
   <div>
-    <%= f.submit "Create Account", class: "w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors cursor-pointer", data: { turbo_submits_with: "Creating account..." } %>
+    <%= f.submit "Create Account", class: "w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors cursor-pointer", data: native_submit_data.merge(turbo_submits_with: "Creating account...") %>
   </div>
 
   <div class="text-center">
