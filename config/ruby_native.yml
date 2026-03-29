@@ -1,0 +1,23 @@
+app:
+  mode: normal
+  entry_path: /dashboard
+
+appearance:
+  tint_color: "#2563EB"
+  background_color:
+    light: "#FFFFFF"
+    dark: "#111827"
+  status_bar_color:
+    light: "#FFFFFF"
+    dark: "#1F2937"
+
+tabs:
+  - title: Home
+    path: /dashboard
+    icon: house
+  - title: Contacts
+    path: /contacts
+    icon: person.2
+  - title: Documents
+    path: /folders
+    icon: folder

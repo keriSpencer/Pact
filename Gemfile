@@ -62,3 +62,5 @@ group :test do
 end
 
 gem "stripe", "~> 19.0"
+
+gem "ruby_native", "~> 0.3.2"
