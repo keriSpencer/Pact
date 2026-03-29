@@ -59,6 +59,7 @@ Rails.application.routes.draw do
   end
 
   # Landing page (public)
+  get "launch", to: "pages#launch"
   root "pages#home"
   get "contact", to: "pages#contact", as: :contact_us
   post "contact", to: "pages#submit_contact", as: :submit_contact

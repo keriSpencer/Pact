@@ -6,6 +6,10 @@ class PagesController < ApplicationController
     redirect_to dashboard_path if user_signed_in?
   end
 
+  def launch
+    redirect_to user_signed_in? ? dashboard_path : new_user_session_path
+  end
+
   def contact
   end
 

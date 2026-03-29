@@ -1,6 +1,6 @@
 app:
   mode: advanced
-  entry_path: /users/sign_in
+  entry_path: /launch
 
 appearance:
   tint_color: "#2563EB"
