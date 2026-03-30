@@ -32,6 +32,15 @@
 
 ### Up Next
 - [ ] **Google OAuth** — Sign in with Google
+- [ ] **Password show/hide toggle** — Eye icon on login/signup forms
+- [ ] **Reuse drawn signature** — Pre-fill subsequent fields after first signature
+- [ ] **Snap-to-align guides** — Alignment lines when placing fields (Keynote-style)
+- [ ] **Accessibility: non-color indicators** — Signer initials/labels on fields for colorblind users
+- [ ] **Signer field visibility toggles** — Eye icon to show/hide each signer's fields
+- [ ] **Live-update signer dropdown** — Reflect name changes in assignment dropdown
+- [ ] **Collapse completed envelopes** — Don't push preview off-screen
+- [ ] **Per-envelope signed PDF view** — Each envelope card links to its specific signed version
+- [ ] **Saved signature in profile** — Store drawn signature for reuse across sessions
 - [ ] Bulk document operations
 - [ ] Calendar view for follow-ups
 - [ ] API endpoints for external integrations
@@ -67,6 +76,11 @@
 - Multi-signer documents (Phases 1-8): envelope pattern, signing roles,
   parallel/sequential mode, self-sign, per-signer tokens, multi-signer
   PDF stamping, all-signers-completed notifications
+- Fix: signer data persists when adding/removing signers
+- Fix: active signer highlight visible in dark mode
+- Fix: field reassignment dropdown with signer names
+- Fix: never expose drawn signatures to other signers (privacy/security)
+- Fix: page crash from rendering base64 data as text
 - Merged partner's changes: Stripe billing, landing page, RubyNative,
   brand kit, registration, timezone support, mobile fixes
 
