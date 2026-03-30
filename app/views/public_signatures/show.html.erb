@@ -58,6 +58,41 @@
       </p>
     </div>
 
+  <% elsif @waiting %>
+    <!-- Waiting for turn (sequential signing) -->
+    <div class="bg-white rounded-xl shadow-sm p-8 sm:p-12 text-center">
+      <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-100 mb-4">
+        <svg class="h-8 w-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+      </div>
+      <h2 class="text-2xl font-bold text-gray-900">Waiting for Your Turn</h2>
+      <p class="mt-2 text-gray-600">
+        This document requires signatures in a specific order. You'll be notified by email when it's your turn to sign
+        "<strong><%= @signature_request.document.name %></strong>".
+      </p>
+      <div class="mt-6 bg-gray-50 rounded-lg p-4 text-left space-y-2">
+        <div class="flex justify-between">
+          <span class="text-sm text-gray-500">Requested by</span>
+          <span class="text-sm font-medium text-gray-900"><%= @signature_request.requester.full_name %></span>
+        </div>
+        <% if @signature_request.signing_envelope %>
+          <div class="mt-3 space-y-1.5">
+            <p class="text-xs text-gray-500 font-medium uppercase">Signing order</p>
+            <% @signature_request.signing_envelope.signing_roles.in_order.each do |role| %>
+              <div class="flex items-center space-x-2 text-sm">
+                <span class="inline-block w-2 h-2 rounded-full" style="background-color: <%= role.color %>"></span>
+                <span class="<%= role.signed? ? 'text-green-600 font-medium' : 'text-gray-500' %>">
+                  <%= role.display_name %>
+                  <%= role.signed? ? '(signed)' : role == @signature_request.signing_role ? '(you)' : '' %>
+                </span>
+              </div>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
   <% elsif @signature_request.can_sign? %>
     <% if @signature_request.uses_multi_field? %>
       <!-- Guided Signing Stepper -->
@@ -66,6 +101,7 @@
            data-signing-stepper-pdf-url-value="<%= rails_blob_path(@signature_request.document.file, disposition: 'inline') %>"
            data-signing-stepper-sign-token-value="<%= @signature_request.signature_token %>"
            data-signing-stepper-fields-value="<%= @signature_request.signature_fields.order(:position).map { |f| { id: f.id, page: f.page_number, x: f.x_percent, y: f.y_percent, width: f.width_percent, height: f.height_percent, type: f.field_type, label: f.label || f.field_type.humanize, required: f.required, completed: f.completed?, artifact_value: f.completed? ? f.completion&.signature_artifact&.typed_text || f.completion&.signature_artifact&.artifact_data : nil } }.to_json %>"
+           data-signing-stepper-other-fields-value="<%= (@other_signer_fields || []).to_json %>"
            data-signing-stepper-signer-name-value="<%= @signature_request.signer_name %>"
            data-signing-stepper-signer-email-value="<%= @signature_request.signer_email %>"
            data-signing-stepper-capture-artifact-url-value="<%= capture_artifact_signature_path(@signature_request.signature_token) %>"

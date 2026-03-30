@@ -1,0 +1,15 @@
+All Parties Have Signed
+
+Hello <%= @envelope.requester.full_name %>,
+
+Great news! All parties have signed your document "<%= @document.name %>".
+
+Document: <%= @document.name %>
+Completed: <%= @envelope.completed_at&.strftime("%B %d, %Y at %l:%M %p") %>
+
+Signers:
+<% @roles.each do |role| %>
+- <%= role.display_name %> (<%= role.display_email %>)<% if role.signature_request&.signed_at %> - Signed <%= role.signature_request.signed_at.strftime("%B %d, %Y at %l:%M %p") %><% end %>
+<% end %>
+
+View document: <%= document_url(@document) %>

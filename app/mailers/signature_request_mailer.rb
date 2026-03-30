@@ -51,4 +51,15 @@ class SignatureRequestMailer < ApplicationMailer
       subject: "Reminder: Signature requested for #{@document.name}"
     )
   end
+
+  def all_signers_completed(signing_envelope)
+    @envelope = signing_envelope
+    @document = signing_envelope.document
+    @roles = signing_envelope.signing_roles.in_order.includes(:signature_request)
+
+    mail(
+      to: signing_envelope.requester.email,
+      subject: "All parties have signed: #{@document.name}"
+    )
+  end
 end

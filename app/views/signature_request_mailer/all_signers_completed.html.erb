@@ -1,0 +1,35 @@
+<h2>All Parties Have Signed</h2>
+
+<p>Hello <%= @envelope.requester.full_name %>,</p>
+
+<p>
+  Great news! All parties have signed your document <strong>"<%= @document.name %>"</strong>.
+</p>
+
+<div class="highlight">
+  <p><strong>Document:</strong> <%= @document.name %></p>
+  <p><strong>Completed:</strong> <%= @envelope.completed_at&.strftime("%B %d, %Y at %l:%M %p") %></p>
+</div>
+
+<p><strong>Signers:</strong></p>
+<div class="highlight">
+  <% @roles.each do |role| %>
+    <p>
+      <strong><%= role.display_name %></strong>
+      (<%= role.display_email %>)
+      <% if role.signature_request&.signed_at %>
+        &mdash; Signed <%= role.signature_request.signed_at.strftime("%B %d, %Y at %l:%M %p") %>
+      <% end %>
+    </p>
+  <% end %>
+</div>
+
+<p>
+  You can view and download the fully signed document from your Pact account.
+</p>
+
+<p style="text-align: center; margin: 24px 0;">
+  <a href="<%= document_url(@document) %>" class="btn-primary">
+    View Document
+  </a>
+</p>

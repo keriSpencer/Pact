@@ -13,6 +13,7 @@
       <% end %>
       <% if @document.pdf? %>
         <%= link_to "Request Signature", new_document_signature_request_path(@document), class: "px-3 py-1.5 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700 transition-colors" %>
+        <%= link_to "Multi-Signer", new_document_signing_envelope_path(@document), class: "px-3 py-1.5 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 transition-colors" %>
       <% end %>
       <% if @document.user == current_user || current_user.admin? %>
         <%= link_to "Edit", edit_document_path(@document), class: "px-3 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors" %>
@@ -188,6 +189,103 @@
 
     <!-- Main content -->
     <div class="lg:col-span-2 space-y-6">
+      <!-- Signing Envelopes -->
+      <% envelopes = @document.signing_envelopes.where.not(status: :draft).includes(signing_roles: :signature_request).order(created_at: :desc) %>
+      <% if envelopes.any? %>
+        <% envelopes.each do |envelope| %>
+          <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+              <div>
+                <h2 class="text-sm font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-wider">Multi-Signer Envelope</h2>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                  <%= envelope.signing_mode.humanize %> signing
+                  <span class="mx-1">&middot;</span>
+                  <span class="<%= envelope.completed? ? 'text-green-600' : envelope.voided? ? 'text-red-600' : 'text-blue-600' %>">
+                    <%= envelope.status.humanize %>
+                  </span>
+                </p>
+              </div>
+              <% if envelope.active? %>
+                <%= link_to "Void All", void_document_signing_envelope_path(@document, envelope),
+                      data: { "turbo-method": "post", turbo_confirm: "Void this signing envelope? All pending requests will be cancelled." },
+                      class: "text-xs text-red-600 hover:text-red-800 transition-colors" %>
+              <% end %>
+            </div>
+
+            <!-- Progress bar -->
+            <div class="px-6 py-3 border-b border-gray-200 dark:border-gray-700">
+              <div class="flex items-center justify-between mb-1">
+                <span class="text-xs text-gray-500 dark:text-gray-400">Progress</span>
+                <span class="text-xs font-medium text-gray-700 dark:text-gray-300"><%= envelope.completion_progress %>%</span>
+              </div>
+              <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5">
+                <div class="<%= envelope.completed? ? 'bg-green-500' : 'bg-blue-600' %> h-1.5 rounded-full transition-all" style="width: <%= envelope.completion_progress %>%"></div>
+              </div>
+            </div>
+
+            <!-- Signer list -->
+            <div class="divide-y divide-gray-200 dark:divide-gray-700">
+              <% envelope.signing_roles.in_order.each do |role| %>
+                <div class="px-6 py-3 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                  <div class="flex items-center space-x-3">
+                    <span class="inline-block w-2.5 h-2.5 rounded-full shrink-0" style="background-color: <%= role.color %>"></span>
+                    <div>
+                      <p class="text-sm font-medium text-gray-900 dark:text-gray-100"><%= role.display_name %></p>
+                      <p class="text-xs text-gray-500 dark:text-gray-400"><%= role.display_email %></p>
+                    </div>
+                  </div>
+                  <div class="flex items-center space-x-2">
+                    <% if role.signed? %>
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
+                        <svg class="h-3 w-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                        <%= role.status_text %>
+                      </span>
+                    <% elsif role.can_sign_now? %>
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400">Pending</span>
+                      <% if envelope.active? && role.signature_request %>
+                        <%= link_to "Resend", resend_document_signature_request_path(@document, role.signature_request),
+                              data: { "turbo-method": "post" },
+                              class: "text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors" %>
+                      <% end %>
+                    <% else %>
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400">Waiting</span>
+                    <% end %>
+                  </div>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      <% end %>
+
+      <!-- Draft Envelopes -->
+      <% draft_envelopes = @document.signing_envelopes.where(status: :draft).order(created_at: :desc) %>
+      <% if draft_envelopes.any? %>
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+          <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+            <h2 class="text-sm font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-wider">Draft Envelopes</h2>
+          </div>
+          <div class="divide-y divide-gray-200 dark:divide-gray-700">
+            <% draft_envelopes.each do |envelope| %>
+              <div class="px-6 py-3 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                <div>
+                  <p class="text-sm text-gray-600 dark:text-gray-400">
+                    <%= envelope.signing_roles.count %> signer<%= envelope.signing_roles.count != 1 ? 's' : '' %> &middot;
+                    Created <%= time_ago_in_words(envelope.created_at) %> ago
+                  </p>
+                </div>
+                <div class="flex items-center space-x-2">
+                  <%= link_to "Edit", edit_document_signing_envelope_path(@document, envelope), class: "text-xs text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-colors" %>
+                  <%= link_to "Void", void_document_signing_envelope_path(@document, envelope),
+                        data: { "turbo-method": "post", turbo_confirm: "Delete this draft?" },
+                        class: "text-xs text-red-600 hover:text-red-800 transition-colors" %>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+
       <!-- Signature Requests -->
       <% if @document.signature_requests.any? %>
         <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm">

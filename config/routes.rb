@@ -36,6 +36,14 @@ Rails.application.routes.draw do
         post :apply
       end
     end
+    resources :signing_envelopes, only: [:new, :edit, :update] do
+      member do
+        post :add_role
+        delete :remove_role
+        post :send_envelope
+        post :void
+      end
+    end
   end
 
   # Public signature routes (no auth)

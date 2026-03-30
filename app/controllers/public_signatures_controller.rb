@@ -11,7 +11,38 @@ class PublicSignaturesController < ApplicationController
   def show
     @signature_request.mark_as_viewed!
     @fields = @signature_request.signature_fields.includes(:completion).order(:position)
-    auto_complete_pre_fillable_fields
+
+    # Multi-signer: check if it's this signer's turn (sequential mode)
+    @waiting = false
+    if @signature_request.signing_envelope.present? && @signature_request.signing_role.present?
+      envelope = @signature_request.signing_envelope
+      if envelope.sequential? && envelope.active? && !envelope.can_signer_sign?(@signature_request.signing_role)
+        @waiting = true
+      end
+
+      # Collect other signers' completed fields for overlay display
+      @other_signer_fields = []
+      envelope.signature_requests.where.not(id: @signature_request.id).each do |other_req|
+        other_req.signature_fields.includes(:completion, :signing_role).where.not(signing_role: nil).each do |field|
+          next unless field.completed?
+          @other_signer_fields << {
+            page: field.page_number,
+            x: field.x_percent,
+            y: field.y_percent,
+            width: field.width_percent,
+            height: field.height_percent,
+            type: field.field_type,
+            label: field.label,
+            signer_name: other_req.signer_display_name,
+            role_color: field.signing_role&.color || '#9CA3AF',
+            completed: true,
+            artifact_value: field.completion&.signature_artifact&.typed_text || field.completion&.signature_artifact&.artifact_data
+          }
+        end
+      end
+    end
+
+    auto_complete_pre_fillable_fields unless @waiting
   end
 
   def sign

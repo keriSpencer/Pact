@@ -6,12 +6,13 @@ export default class extends Controller {
     "canvasContainer", "fieldsList", "fieldCount", "addFieldType",
     "labelInput", "fieldLabel", "fieldTypePill",
     "customLabelInput", "customLabelField", "templateNameInput",
-    "typePicker", "fieldInspector"
+    "typePicker", "fieldInspector", "roleCard"
   ]
   static values = {
     pdfUrl: String,
     currentPage: { type: Number, default: 1 },
-    totalPages: { type: Number, default: 1 }
+    totalPages: { type: Number, default: 1 },
+    multiSigner: { type: Boolean, default: false }
   }
 
   get fieldDefaults() {
@@ -46,11 +47,25 @@ export default class extends Controller {
     this.customFieldMode = false
     this.mouseDownPos = null
 
+    // Multi-signer role tracking
+    this.currentRoleId = null
+    this.currentRoleColor = null
+
     this._onMouseMove = this.onDocumentMouseMove.bind(this)
     this._onMouseUp = this.onDocumentMouseUp.bind(this)
 
     this.restoreFields()
     this.loadPdf()
+
+    // Auto-select first role in multi-signer mode
+    if (this.multiSignerValue && this.hasRoleCardTarget) {
+      const firstCard = this.roleCardTargets[0]
+      if (firstCard) {
+        this.currentRoleId = firstCard.dataset.roleId
+        this.currentRoleColor = firstCard.dataset.roleColor
+        this.highlightActiveRole()
+      }
+    }
   }
 
   restoreFields() {
@@ -69,7 +84,9 @@ export default class extends Controller {
         type: data.field_type || 'signature',
         label: data.label || null,
         required: data.required !== false,
-        position: data.position || (index + 1)
+        position: data.position || (index + 1),
+        role_id: data.role_id || null,
+        role_color: data.role_color || null
       }))
       this.updateFieldsList()
     } catch (e) {
@@ -333,7 +350,9 @@ export default class extends Controller {
     const { startXPct, startYPct } = this.dragState
     const canvas = this.canvasTarget, ctx = canvas.getContext("2d")
     const fieldType = this.hasAddFieldTypeTarget ? this.addFieldTypeTarget.value : 'signature'
-    const colors = this.fieldColor(fieldType)
+    const colors = (this.multiSignerValue && this.currentRoleColor)
+      ? this.roleFieldColor(this.currentRoleColor)
+      : this.fieldColor(fieldType)
     const x1 = (Math.min(startXPct, xPct) / 100) * canvas.width
     const y1 = (Math.min(startYPct, yPct) / 100) * canvas.height
     const w = (Math.abs(xPct - startXPct) / 100) * canvas.width
@@ -358,7 +377,8 @@ export default class extends Controller {
     const newField = {
       id: this.nextFieldId++, x: parseFloat(cx.toFixed(2)), y: parseFloat(cy.toFixed(2)),
       page: this.currentPageValue, width: parseFloat(wPct.toFixed(2)), height: parseFloat(hPct.toFixed(2)),
-      type: fieldType, label: customLabel, required: true, position: this.signatureFields.length + 1
+      type: fieldType, label: customLabel, required: true, position: this.signatureFields.length + 1,
+      role_id: this.currentRoleId, role_color: this.currentRoleColor
     }
     this.signatureFields.push(newField)
     // Don't auto-select — keep type picker visible for placing more fields
@@ -376,7 +396,8 @@ export default class extends Controller {
     const newField = {
       id: this.nextFieldId++, x: Math.max(5, Math.min(95, xPct)), y: Math.max(5, Math.min(95, yPct)),
       page: this.currentPageValue, width: defaults.width, height: defaults.height,
-      type: fieldType, label: customLabel, required: true, position: this.signatureFields.length + 1
+      type: fieldType, label: customLabel, required: true, position: this.signatureFields.length + 1,
+      role_id: this.currentRoleId, role_color: this.currentRoleColor
     }
     this.signatureFields.push(newField)
     // Don't auto-select — keep the type picker visible so the user can place more fields
@@ -443,7 +464,9 @@ export default class extends Controller {
   drawFieldMarker(ctx, canvas, field, number, isSelected) {
     const x = (field.x / 100) * canvas.width, y = (field.y / 100) * canvas.height
     const w = (field.width / 100) * canvas.width, h = (field.height / 100) * canvas.height
-    const colors = this.fieldColor(field.type)
+    const colors = (this.multiSignerValue && field.role_color)
+      ? this.roleFieldColor(field.role_color)
+      : this.fieldColor(field.type)
     ctx.strokeStyle = colors.solid; ctx.lineWidth = isSelected ? 3 : 2
     ctx.setLineDash(isSelected ? [] : [5, 5])
     ctx.strokeRect(x - w/2, y - h/2, w, h)
@@ -512,13 +535,16 @@ export default class extends Controller {
         checkbox: { label: 'Checkbox', color: 'bg-gray-100 text-gray-800', badge: 'bg-gray-600' }
       }
       // Field list (compact, no inline editing)
+      const isMultiSigner = this.multiSignerValue
       this.fieldsListTarget.innerHTML = this.signatureFields.map((field, index) => {
         const cfg = typeConfig[field.type] || typeConfig.signature
         const isSelected = field.id === this.selectedFieldId
         const sel = isSelected ? 'ring-2 ring-purple-400 bg-purple-50' : 'bg-gray-50 hover:bg-gray-100'
         const displayLabel = field.label ? `"${field.label}"` : ''
+        const roleDot = (isMultiSigner && field.role_color) ? `<span class="inline-block w-2.5 h-2.5 rounded-full shrink-0" style="background-color: ${field.role_color}"></span>` : ''
         return `<div class="flex items-center justify-between py-2 px-3 ${sel} rounded-lg cursor-pointer transition-colors" data-action="click->pdf-signature-placement#selectField" data-field-id="${field.id}">
           <div class="flex items-center space-x-2 min-w-0">
+            ${roleDot}
             <span class="flex items-center justify-center h-6 w-6 rounded-full ${cfg.badge} text-white text-xs font-bold shrink-0">${index + 1}</span>
             <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${cfg.color} shrink-0">${cfg.label}</span>
             ${displayLabel ? `<span class="text-xs text-gray-500 truncate">${displayLabel}</span>` : ''}
@@ -619,7 +645,8 @@ export default class extends Controller {
     this.fieldsInputTarget.value = JSON.stringify(this.signatureFields.map(f => ({
       page_number: f.page, x_percent: f.x.toFixed(2), y_percent: f.y.toFixed(2),
       width_percent: f.width.toFixed(2), height_percent: f.height.toFixed(2),
-      field_type: f.type, required: f.required, position: f.position, label: f.label || null
+      field_type: f.type, required: f.required, position: f.position, label: f.label || null,
+      role_id: f.role_id || null, role_color: f.role_color || null
     })))
   }
 
@@ -727,13 +754,16 @@ export default class extends Controller {
       title: { label: 'Title', color: 'bg-pink-100 text-pink-800', badge: 'bg-pink-600' },
       checkbox: { label: 'Checkbox', color: 'bg-gray-100 text-gray-800', badge: 'bg-gray-600' }
     }
+    const isMultiSigner = this.multiSignerValue
     this.fieldsListTarget.innerHTML = this.signatureFields.map((field, index) => {
       const cfg = typeConfig[field.type] || typeConfig.signature
       const isSelected = field.id === this.selectedFieldId
       const sel = isSelected ? 'ring-2 ring-purple-400 bg-purple-50' : 'bg-gray-50 hover:bg-gray-100'
       const displayLabel = field.label ? `"${field.label}"` : ''
+      const roleDot = (isMultiSigner && field.role_color) ? `<span class="inline-block w-2.5 h-2.5 rounded-full shrink-0" style="background-color: ${field.role_color}"></span>` : ''
       return `<div class="flex items-center justify-between py-2 px-3 ${sel} rounded-lg cursor-pointer transition-colors" data-action="click->pdf-signature-placement#selectField" data-field-id="${field.id}">
         <div class="flex items-center space-x-2 min-w-0">
+          ${roleDot}
           <span class="flex items-center justify-center h-6 w-6 rounded-full ${cfg.badge} text-white text-xs font-bold shrink-0">${index + 1}</span>
           <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${cfg.color} shrink-0">${cfg.label}</span>
           ${displayLabel ? `<span class="text-xs text-gray-500 truncate">${displayLabel}</span>` : ''}
@@ -783,6 +813,52 @@ export default class extends Controller {
     if (this.hasLoadingStateTarget) {
       this.loadingStateTarget.innerHTML = `<div class="text-center text-red-600 py-8"><p>${message}</p></div>`
       this.loadingStateTarget.classList.remove("hidden")
+    }
+  }
+
+  // Multi-signer methods
+  setActiveRole(event) {
+    // Find the role card (might be clicked on a child element)
+    const card = event.currentTarget.closest('[data-role-id]') || event.currentTarget
+    const roleId = card.dataset.roleId
+    const roleColor = card.dataset.roleColor
+    if (!roleId) return
+
+    this.currentRoleId = roleId
+    this.currentRoleColor = roleColor
+    this.highlightActiveRole()
+  }
+
+  highlightActiveRole() {
+    if (!this.hasRoleCardTarget) return
+    this.roleCardTargets.forEach(card => {
+      if (card.dataset.roleId === this.currentRoleId) {
+        card.classList.add('ring-2', 'ring-offset-1')
+        card.style.setProperty('--tw-ring-color', this.currentRoleColor || '#3B82F6')
+      } else {
+        card.classList.remove('ring-2', 'ring-offset-1')
+        card.style.removeProperty('--tw-ring-color')
+      }
+    })
+  }
+
+  toggleSelfSigner(event) {
+    const roleId = event.currentTarget.dataset.roleId
+    const fieldsContainer = document.getElementById(`role-signer-fields-${roleId}`)
+    if (fieldsContainer) {
+      fieldsContainer.classList.toggle('hidden', event.currentTarget.checked)
+    }
+  }
+
+  roleFieldColor(hexColor) {
+    // Convert hex to RGB for transparency
+    const r = parseInt(hexColor.slice(1, 3), 16)
+    const g = parseInt(hexColor.slice(3, 5), 16)
+    const b = parseInt(hexColor.slice(5, 7), 16)
+    return {
+      solid: hexColor,
+      fill: `rgba(${r},${g},${b},0.1)`,
+      selectedFill: `rgba(${r},${g},${b},0.2)`
     }
   }
 }

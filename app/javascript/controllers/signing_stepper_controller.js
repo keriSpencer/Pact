@@ -11,6 +11,7 @@ export default class extends Controller {
     pdfUrl: String,
     signToken: String,
     fields: Array,
+    otherFields: { type: Array, default: [] },
     signerName: { type: String, default: "" },
     signerEmail: { type: String, default: "" },
     captureArtifactUrl: String,
@@ -112,11 +113,52 @@ export default class extends Controller {
     const ctx = canvas.getContext("2d")
     if (this.pdfCanvasImage) ctx.putImageData(this.pdfCanvasImage, 0, 0)
 
+    // Draw other signers' completed fields as gray read-only overlays
+    if (this.otherFieldsValue && this.otherFieldsValue.length > 0) {
+      this.otherFieldsValue.forEach(field => {
+        if (field.page !== this.currentPage) return
+        this.drawOtherSignerField(ctx, canvas, field)
+      })
+    }
+
     this.sigFields.forEach((field, index) => {
       if (field.page !== this.currentPage) return
       const isCurrent = index === this.currentFieldIndex
       this.drawFieldOverlay(ctx, canvas, field, isCurrent)
     })
+  }
+
+  drawOtherSignerField(ctx, canvas, field) {
+    const x = (field.x / 100) * canvas.width
+    const y = (field.y / 100) * canvas.height
+    const w = ((field.width || 20) / 100) * canvas.width
+    const h = ((field.height || 6) / 100) * canvas.height
+    const left = x - w / 2
+    const top = y - h / 2
+
+    // Light gray background
+    ctx.strokeStyle = '#d1d5db'
+    ctx.lineWidth = 1
+    ctx.setLineDash([])
+    ctx.strokeRect(left, top, w, h)
+    ctx.fillStyle = 'rgba(243, 244, 246, 0.7)'
+    ctx.fillRect(left, top, w, h)
+
+    // Show artifact value or signer name
+    const displayText = field.artifact_value || field.signer_name || 'Signed'
+    const fontSize = Math.min(h * 0.45, 11)
+    ctx.fillStyle = '#9ca3af'
+    ctx.font = `${fontSize}px sans-serif`
+    ctx.textAlign = 'center'
+    ctx.textBaseline = 'middle'
+
+    // Truncate if needed
+    const maxWidth = w - 8
+    let text = displayText
+    while (ctx.measureText(text).width > maxWidth && text.length > 3) {
+      text = text.slice(0, -4) + '...'
+    }
+    ctx.fillText(text, x, y)
   }
 
   drawFieldOverlay(ctx, canvas, field, isCurrent) {
