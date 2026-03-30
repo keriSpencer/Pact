@@ -3,7 +3,9 @@ demo_org = Organization.find_or_create_by!(slug: "demo-org") do |org|
   org.name = "Demo Organization"
   org.active = true
 end
-puts "Created/found demo organization: #{demo_org.name}"
+# Ensure demo org has pro plan (free for life, no Stripe needed)
+demo_org.update_columns(plan: "pro", subscription_status: "active") if demo_org.plan == "free"
+puts "Created/found demo organization: #{demo_org.name} (#{demo_org.plan} plan)"
 
 # Create demo user (admin)
 demo_user = User.find_or_initialize_by(email: "demo@pactapp.com")
