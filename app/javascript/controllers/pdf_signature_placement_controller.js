@@ -836,9 +836,13 @@ export default class extends Controller {
       const roleId = card.dataset.roleId
       const roleColor = card.dataset.roleColor
       const labelInput = card.querySelector('input[type="text"]')
-      const roleName = labelInput ? labelInput.value : `Signer`
+      const roleLabel = labelInput ? labelInput.value : 'Signer'
+      const nameInput = card.querySelector('input[placeholder="Full name"]')
+      const emailInput = card.querySelector('input[type="email"]')
+      const signerName = nameInput?.value || emailInput?.value || ''
+      const displayName = signerName ? `${roleLabel} — ${signerName}` : roleLabel
       const selected = field.role_id === roleId ? 'selected' : ''
-      return `<option value="${roleId}" data-color="${roleColor}" ${selected}>${roleName}</option>`
+      return `<option value="${roleId}" data-color="${roleColor}" ${selected}>${displayName}</option>`
     }).join('')
 
     return `
