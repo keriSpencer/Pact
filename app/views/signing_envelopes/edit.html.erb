@@ -114,12 +114,13 @@
               </div>
             <% end %>
 
-            <%= link_to add_role_document_signing_envelope_path(@document, @envelope),
-                  data: { "turbo-method": "post" },
-                  class: "flex items-center justify-center w-full py-2 px-3 text-sm font-medium text-blue-600 dark:text-blue-400 border border-dashed border-blue-300 dark:border-blue-600 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors" do %>
+            <button type="submit" name="add_signer" value="1"
+                    formaction="<%= add_role_document_signing_envelope_path(@document, @envelope) %>"
+                    formmethod="post"
+                    class="flex items-center justify-center w-full py-2 px-3 text-sm font-medium text-blue-600 dark:text-blue-400 border border-dashed border-blue-300 dark:border-blue-600 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors cursor-pointer">
               <svg class="h-4 w-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
               Add Signer
-            <% end %>
+            </button>
           </div>
 
           <!-- Signing Mode Toggle -->

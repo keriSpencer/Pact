@@ -83,26 +83,39 @@ class SigningEnvelopesController < ApplicationController
   end
 
   def add_role
+    # Save current form state first
+    sync_roles_from_params
+    @draft_request = @envelope.signature_requests.where(status: :draft).first
+    sync_fields_from_json if @draft_request
+    @envelope.assign_attributes(envelope_params)
+    @envelope.save
+
     next_order = @envelope.signing_roles.maximum(:signing_order).to_i + 1
     color_index = @envelope.signing_roles.count % SigningRole::COLORS.length
-    @role = @envelope.signing_roles.create!(
+    @envelope.signing_roles.create!(
       label: "Signer #{@envelope.signing_roles.count + 1}",
       color: SigningRole::COLORS[color_index],
       signing_order: next_order
     )
 
-    redirect_to edit_document_signing_envelope_path(@document, @envelope), notice: "Signer added."
+    redirect_to edit_document_signing_envelope_path(@document, @envelope)
   end
 
   def remove_role
+    # Save current form state first
+    sync_roles_from_params
+    @draft_request = @envelope.signature_requests.where(status: :draft).first
+    sync_fields_from_json if @draft_request
+    @envelope.assign_attributes(envelope_params)
+    @envelope.save
+
     role = @envelope.signing_roles.find(params[:role_id])
     if @envelope.signing_roles.count > 1
-      # Remove fields assigned to this role
-      if (draft_request = @envelope.signature_requests.where(status: :draft).first)
-        draft_request.signature_fields.where(signing_role: role).destroy_all
+      if @draft_request
+        @draft_request.signature_fields.where(signing_role: role).destroy_all
       end
       role.destroy
-      redirect_to edit_document_signing_envelope_path(@document, @envelope), notice: "Signer removed."
+      redirect_to edit_document_signing_envelope_path(@document, @envelope)
     else
       redirect_to edit_document_signing_envelope_path(@document, @envelope), alert: "Must have at least one signer."
     end

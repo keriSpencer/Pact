@@ -622,6 +622,7 @@ export default class extends Controller {
                      class="block w-full text-sm rounded-md border-gray-300 py-1.5 px-2.5">
               <p class="text-xs text-gray-400 mt-1">${labelHelp}</p>
             </div>
+            ${this.multiSignerValue ? this.buildRoleDropdown(selectedField) : ''}
             <div class="flex justify-between items-center pt-1">
               <button type="button" data-action="click->pdf-signature-placement#deleteSelectedField"
                       class="text-xs text-red-600 hover:text-red-800 transition-colors">
@@ -829,15 +830,57 @@ export default class extends Controller {
     this.highlightActiveRole()
   }
 
+  buildRoleDropdown(field) {
+    if (!this.hasRoleCardTarget) return ''
+    const options = this.roleCardTargets.map(card => {
+      const roleId = card.dataset.roleId
+      const roleColor = card.dataset.roleColor
+      const labelInput = card.querySelector('input[type="text"]')
+      const roleName = labelInput ? labelInput.value : `Signer`
+      const selected = field.role_id === roleId ? 'selected' : ''
+      return `<option value="${roleId}" data-color="${roleColor}" ${selected}>${roleName}</option>`
+    }).join('')
+
+    return `
+      <div>
+        <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Assigned to</label>
+        <select data-action="change->pdf-signature-placement#reassignFieldRole"
+                data-field-id="${field.id}"
+                class="block w-full text-sm rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 py-1.5 px-2.5">
+          ${options}
+        </select>
+      </div>
+    `
+  }
+
+  reassignFieldRole(event) {
+    const fieldId = parseInt(event.currentTarget.dataset.fieldId)
+    const newRoleId = event.currentTarget.value
+    const selectedOption = event.currentTarget.selectedOptions[0]
+    const newColor = selectedOption?.dataset?.color || this.currentRoleColor
+
+    const field = this.signatureFields.find(f => f.id === fieldId)
+    if (!field) return
+
+    field.role_id = newRoleId
+    field.role_color = newColor
+    this.updateFormData()
+    this.redrawFields()
+    this.updateFieldsListOnly()
+  }
+
   highlightActiveRole() {
     if (!this.hasRoleCardTarget) return
     this.roleCardTargets.forEach(card => {
+      const color = this.currentRoleColor || '#3B82F6'
       if (card.dataset.roleId === this.currentRoleId) {
-        card.classList.add('ring-2', 'ring-offset-1')
-        card.style.setProperty('--tw-ring-color', this.currentRoleColor || '#3B82F6')
+        card.style.borderColor = color
+        card.style.borderWidth = '2px'
+        card.style.boxShadow = `0 0 0 1px ${color}40`
       } else {
-        card.classList.remove('ring-2', 'ring-offset-1')
-        card.style.removeProperty('--tw-ring-color')
+        card.style.borderColor = ''
+        card.style.borderWidth = ''
+        card.style.boxShadow = ''
       }
     })
   }
