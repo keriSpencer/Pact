@@ -144,8 +144,16 @@ export default class extends Controller {
     ctx.fillStyle = 'rgba(243, 244, 246, 0.7)'
     ctx.fillRect(left, top, w, h)
 
-    // Show artifact value or signer name
-    const displayText = field.artifact_value || field.signer_name || 'Signed'
+    // Show friendly text — never expose raw signature data to other signers
+    let displayText
+    if (field.artifact_value && field.artifact_value.startsWith('data:image/')) {
+      // Drawn signature/initials — show signer name, not the image
+      displayText = field.signer_name ? `Signed by ${field.signer_name}` : 'Signed ✓'
+    } else if (field.artifact_value) {
+      displayText = field.artifact_value
+    } else {
+      displayText = field.signer_name || 'Signed'
+    }
     const fontSize = Math.min(h * 0.45, 11)
     ctx.fillStyle = '#9ca3af'
     ctx.font = `${fontSize}px sans-serif`

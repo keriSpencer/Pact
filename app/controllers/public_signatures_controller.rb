@@ -36,7 +36,7 @@ class PublicSignaturesController < ApplicationController
             signer_name: other_req.signer_display_name,
             role_color: field.signing_role&.color || '#9CA3AF',
             completed: true,
-            artifact_value: field.completion&.signature_artifact&.typed_text || field.completion&.signature_artifact&.artifact_data
+            artifact_value: sanitized_artifact_value(field)
           }
         end
       end
@@ -193,6 +193,22 @@ class PublicSignaturesController < ApplicationController
   end
 
   private
+
+  # Never expose drawn signature images to other signers — privacy/security
+  def sanitized_artifact_value(field)
+    artifact = field.completion&.signature_artifact
+    return nil unless artifact
+
+    data = artifact.typed_text.presence || artifact.artifact_data
+    return nil unless data
+
+    # If it's a drawn image, don't expose it — show placeholder text
+    if data.start_with?("data:image/")
+      nil  # The JS will show "Signed by [name]" instead
+    else
+      data
+    end
+  end
 
   def set_signature_request
     @signature_request = SignatureRequest.find_by!(signature_token: params[:signature_token])
