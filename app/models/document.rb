@@ -9,6 +9,7 @@ class Document < ApplicationRecord
   has_many :versions, class_name: "DocumentVersion", dependent: :destroy
   has_many :document_shares, dependent: :destroy
   has_many :signature_requests, dependent: :destroy
+  has_many :signing_envelopes, dependent: :destroy
   has_many :signature_templates, dependent: :destroy
 
   has_one_attached :file

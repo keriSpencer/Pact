@@ -4,6 +4,8 @@ class SignatureRequest < ApplicationRecord
   belongs_to :signer, class_name: "User", optional: true
   belongs_to :voided_by, class_name: "User", optional: true
   belongs_to :contact, optional: true
+  belongs_to :signing_envelope, optional: true
+  belongs_to :signing_role, optional: true
 
   has_many :signature_fields, dependent: :destroy
   has_many :signature_artifacts, dependent: :destroy
@@ -80,13 +82,20 @@ class SignatureRequest < ApplicationRecord
       user_agent: user_agent
     )
 
-    GenerateSignedPdfJob.perform_later(id) if document.pdf?
-    GenerateAuditCertificateJob.perform_later(id)
-
-    # Notify requester that it's been signed
-    SignatureRequestMailer.signature_completed(self).deliver_later
-    # Send the signer a copy — they can view via their signing token
-    SignatureRequestMailer.signer_copy(self).deliver_later
+    if signing_envelope.present?
+      # Multi-signer: envelope coordinates PDF generation and notifications
+      signing_envelope.check_completion!
+      signing_envelope.send_next_signer_invitation! if signing_envelope.sequential?
+      # Notify requester of this individual signing
+      SignatureRequestMailer.signature_completed(self).deliver_later
+      SignatureRequestMailer.signer_copy(self).deliver_later
+    else
+      # Legacy single-signer: generate PDF and notify immediately
+      GenerateSignedPdfJob.perform_later(id) if document.pdf?
+      GenerateAuditCertificateJob.perform_later(id)
+      SignatureRequestMailer.signature_completed(self).deliver_later
+      SignatureRequestMailer.signer_copy(self).deliver_later
+    end
     send_signed_push_notification
     true
   end

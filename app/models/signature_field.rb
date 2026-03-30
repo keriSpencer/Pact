@@ -1,5 +1,6 @@
 class SignatureField < ApplicationRecord
   belongs_to :signature_request
+  belongs_to :signing_role, optional: true
   has_one :completion, class_name: "SignatureFieldCompletion", dependent: :destroy
 
   FIELD_TYPES = %w[signature initials date text name email company title checkbox].freeze

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_29_043748) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_30_100002) do
   create_table "action_push_native_devices", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "name"
@@ -241,11 +241,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_29_043748) do
     t.integer "position", null: false
     t.boolean "required", default: true, null: false
     t.integer "signature_request_id", null: false
+    t.integer "signing_role_id"
     t.datetime "updated_at", null: false
     t.decimal "width_percent", precision: 5, scale: 2, default: "25.0"
     t.decimal "x_percent", precision: 5, scale: 2, null: false
     t.decimal "y_percent", precision: 5, scale: 2, null: false
     t.index ["signature_request_id"], name: "index_signature_fields_on_signature_request_id"
+    t.index ["signing_role_id"], name: "index_signature_fields_on_signing_role_id"
   end
 
   create_table "signature_requests", force: :cascade do |t|
@@ -273,6 +275,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_29_043748) do
     t.string "signer_email"
     t.integer "signer_id"
     t.string "signer_name"
+    t.integer "signing_envelope_id"
+    t.integer "signing_role_id"
     t.integer "status", default: 0
     t.datetime "updated_at", null: false
     t.text "user_agent"
@@ -285,6 +289,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_29_043748) do
     t.index ["signature_token"], name: "index_signature_requests_on_signature_token", unique: true
     t.index ["signer_email"], name: "index_signature_requests_on_signer_email"
     t.index ["signer_id"], name: "index_signature_requests_on_signer_id"
+    t.index ["signing_envelope_id"], name: "index_signature_requests_on_signing_envelope_id"
+    t.index ["signing_role_id"], name: "index_signature_requests_on_signing_role_id"
     t.index ["status"], name: "index_signature_requests_on_status"
     t.index ["voided_by_id"], name: "index_signature_requests_on_voided_by_id"
   end
@@ -297,6 +303,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_29_043748) do
     t.integer "page_number", default: 1, null: false
     t.integer "position", null: false
     t.boolean "required", default: true, null: false
+    t.string "role_label"
     t.integer "signature_template_id", null: false
     t.datetime "updated_at", null: false
     t.decimal "width_percent", precision: 5, scale: 2, default: "25.0"
@@ -319,6 +326,40 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_29_043748) do
     t.index ["document_id"], name: "index_signature_templates_on_document_id"
     t.index ["organization_id"], name: "index_signature_templates_on_organization_id"
     t.index ["user_id"], name: "index_signature_templates_on_user_id"
+  end
+
+  create_table "signing_envelopes", force: :cascade do |t|
+    t.datetime "completed_at"
+    t.datetime "created_at", null: false
+    t.integer "document_id", null: false
+    t.text "message"
+    t.integer "requester_id", null: false
+    t.integer "signing_mode", default: 0, null: false
+    t.integer "status", default: 0, null: false
+    t.datetime "updated_at", null: false
+    t.datetime "voided_at"
+    t.integer "voided_by_id"
+    t.index ["document_id"], name: "index_signing_envelopes_on_document_id"
+    t.index ["requester_id"], name: "index_signing_envelopes_on_requester_id"
+    t.index ["status"], name: "index_signing_envelopes_on_status"
+    t.index ["voided_by_id"], name: "index_signing_envelopes_on_voided_by_id"
+  end
+
+  create_table "signing_roles", force: :cascade do |t|
+    t.string "color", default: "#3B82F6", null: false
+    t.integer "contact_id"
+    t.datetime "created_at", null: false
+    t.boolean "is_self_signer", default: false, null: false
+    t.string "label", null: false
+    t.string "signer_email"
+    t.string "signer_name"
+    t.integer "signing_envelope_id", null: false
+    t.integer "signing_order", default: 0, null: false
+    t.datetime "updated_at", null: false
+    t.index ["contact_id"], name: "index_signing_roles_on_contact_id"
+    t.index ["signing_envelope_id", "label"], name: "index_signing_roles_on_signing_envelope_id_and_label", unique: true
+    t.index ["signing_envelope_id", "signing_order"], name: "index_signing_roles_on_signing_envelope_id_and_signing_order"
+    t.index ["signing_envelope_id"], name: "index_signing_roles_on_signing_envelope_id"
   end
 
   create_table "tags", force: :cascade do |t|
@@ -394,8 +435,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_29_043748) do
   add_foreign_key "signature_field_completions", "signature_artifacts"
   add_foreign_key "signature_field_completions", "signature_fields"
   add_foreign_key "signature_fields", "signature_requests"
+  add_foreign_key "signature_fields", "signing_roles"
   add_foreign_key "signature_requests", "contacts"
   add_foreign_key "signature_requests", "documents"
+  add_foreign_key "signature_requests", "signing_envelopes"
+  add_foreign_key "signature_requests", "signing_roles"
   add_foreign_key "signature_requests", "users", column: "requester_id"
   add_foreign_key "signature_requests", "users", column: "signer_id"
   add_foreign_key "signature_requests", "users", column: "voided_by_id"
@@ -403,6 +447,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_29_043748) do
   add_foreign_key "signature_templates", "documents"
   add_foreign_key "signature_templates", "organizations"
   add_foreign_key "signature_templates", "users"
+  add_foreign_key "signing_envelopes", "documents"
+  add_foreign_key "signing_envelopes", "users", column: "requester_id"
+  add_foreign_key "signing_envelopes", "users", column: "voided_by_id"
+  add_foreign_key "signing_roles", "contacts"
+  add_foreign_key "signing_roles", "signing_envelopes"
   add_foreign_key "tags", "organizations"
   add_foreign_key "users", "organizations"
 end
