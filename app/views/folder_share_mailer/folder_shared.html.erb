@@ -1,0 +1,28 @@
+<h2>A folder has been shared with you</h2>
+
+<p>Hello,</p>
+
+<p>
+  <strong><%= @shared_by.full_name %></strong> has shared a folder with you on Pact.
+</p>
+
+<div class="highlight">
+  <p><strong>Folder:</strong> <%= @folder.name %></p>
+  <p><strong>From:</strong> <%= @shared_by.full_name %></p>
+  <% if @folder_share.expires_at.present? %>
+    <p><strong>Expires:</strong> <%= @folder_share.expires_at.strftime("%B %d, %Y") %></p>
+  <% end %>
+</div>
+
+<p>You can browse the folder contents and download files using the link below.</p>
+
+<p style="text-align: center; margin: 24px 0;">
+  <a href="<%= @share_url %>" class="btn-primary">
+    View Folder
+  </a>
+</p>
+
+<p class="link-fallback">
+  If the button above doesn't work, copy and paste this link into your browser:<br>
+  <%= @share_url %>
+</p>
