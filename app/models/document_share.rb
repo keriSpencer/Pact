@@ -12,7 +12,7 @@ class DocumentShare < ApplicationRecord
   validate :recipient_present
   validate :contact_permission_restrictions
 
-  before_validation :generate_share_token, if: -> { contact_id.present? && share_token.blank? }
+  before_validation :generate_share_token, if: -> { share_token.blank? && (contact_id.present? || public_link?) }
 
   scope :active, -> { where("expires_at IS NULL OR expires_at > ?", Time.current) }
   scope :expired, -> { where("expires_at IS NOT NULL AND expires_at <= ?", Time.current) }
@@ -62,6 +62,10 @@ class DocumentShare < ApplicationRecord
     contact_id.present? && user_id.blank?
   end
 
+  def public_link?
+    user_id.blank? && contact_id.blank?
+  end
+
   def share_url
     return nil unless share_token.present?
     Rails.application.routes.url_helpers.shared_document_url(share_token, host: default_host)
@@ -82,9 +86,7 @@ class DocumentShare < ApplicationRecord
   end
 
   def recipient_present
-    if user_id.blank? && contact_id.blank?
-      errors.add(:base, "Must share with either a user or a contact")
-    end
+    # Public links don't need a recipient
   end
 
   def contact_permission_restrictions

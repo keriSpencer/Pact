@@ -11,6 +11,27 @@
       <% if @document.pdf? %>
         <%= link_to "Preview", preview_document_path(@document), target: "_blank", class: "px-3 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors" %>
       <% end %>
+      <div id="share_link_section">
+        <% existing_share = @document.document_shares.where(user_id: nil, contact_id: nil).active.first %>
+        <% if existing_share %>
+          <div class="flex items-center gap-2 bg-gray-50 dark:bg-gray-700 rounded-lg p-3 border border-gray-200 dark:border-gray-600">
+            <svg class="h-4 w-4 text-green-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-1.102-4.243a4 4 0 015.656 0l4 4a4 4 0 01-5.656 5.656l-1.1-1.1"/></svg>
+            <input type="text" value="<%= existing_share.share_url %>" readonly
+                   class="flex-1 text-sm bg-transparent border-none p-0 text-gray-700 dark:text-gray-200 focus:ring-0 select-all"
+                   id="share_url_input"
+                   onclick="this.select()">
+            <button onclick="navigator.clipboard.writeText(document.getElementById('share_url_input').value).then(() => { this.textContent = 'Copied!'; setTimeout(() => this.textContent = 'Copy', 2000) })"
+                    class="px-3 py-1 text-xs font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 rounded-md hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors cursor-pointer whitespace-nowrap">
+              Copy
+            </button>
+            <%= link_to document_document_share_path(@document, existing_share), data: { "turbo-method": "delete", turbo_confirm: "Remove this share link?" }, class: "p-1 text-gray-400 hover:text-red-500 transition-colors" do %>
+              <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            <% end %>
+          </div>
+        <% else %>
+          <%= button_to "Share", document_document_shares_path(@document), method: :post, class: "px-3 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors cursor-pointer" %>
+        <% end %>
+      </div>
       <% if @document.pdf? %>
         <%= link_to "Request Signature", new_document_signature_request_path(@document), class: "px-3 py-1.5 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700 transition-colors" %>
       <% end %>
