@@ -336,6 +336,104 @@
   </div>
 </section>
 
+<!-- Desktop Sync -->
+<section class="py-24 lg:py-32 bg-white border-t border-gray-100">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="lg:grid lg:grid-cols-2 lg:gap-16 items-center">
+      <div>
+        <span class="inline-flex items-center gap-1.5 text-sm font-semibold text-blue-600 uppercase tracking-wider">
+          <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+          Desktop Sync
+        </span>
+        <h2 class="mt-3 text-3xl lg:text-4xl font-bold text-gray-900 tracking-tight">Sync folders from your Mac, automatically</h2>
+        <p class="mt-4 text-lg text-gray-500 leading-relaxed">
+          Install PactSync and choose up to 5 folders on your Mac. Documents sync automatically to your Pact account &mdash; no dragging, no uploading, no thinking about it.
+        </p>
+        <ul class="mt-8 space-y-4">
+          <li class="flex items-start gap-3">
+            <svg class="h-5 w-5 text-blue-600 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+            <span class="text-gray-600">Two-way sync &mdash; changes on either side stay in sync</span>
+          </li>
+          <li class="flex items-start gap-3">
+            <svg class="h-5 w-5 text-blue-600 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+            <span class="text-gray-600">Lives in your menu bar &mdash; no extra windows or clutter</span>
+          </li>
+          <li class="flex items-start gap-3">
+            <svg class="h-5 w-5 text-blue-600 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+            <span class="text-gray-600">Lightweight native Mac app &mdash; fast and uses minimal resources</span>
+          </li>
+          <li class="flex items-start gap-3">
+            <svg class="h-5 w-5 text-blue-600 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+            <span class="text-gray-600">Works with your existing Pact login &mdash; no extra accounts</span>
+          </li>
+        </ul>
+        <div class="mt-10">
+          <%= link_to sync_guide_path, class: "inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold text-white bg-blue-600 rounded-xl hover:bg-blue-700 shadow-lg shadow-blue-600/25 transition-all hover:shadow-xl hover:shadow-blue-600/30" do %>
+            Download PactSync for Mac
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- Menu Bar Mockup -->
+      <div class="mt-16 lg:mt-0">
+        <div class="relative max-w-sm mx-auto">
+          <!-- Back card -->
+          <div class="absolute top-6 -right-3 w-full h-full bg-white rounded-2xl shadow-lg border border-gray-100 transform rotate-2"></div>
+
+          <!-- Menu bar mockup -->
+          <div class="relative bg-gray-900 rounded-2xl shadow-2xl overflow-hidden">
+            <!-- Title bar -->
+            <div class="flex items-center justify-between px-4 py-2.5 bg-gray-800">
+              <div class="flex items-center gap-3">
+                <span class="text-white font-semibold text-sm">PactSync</span>
+              </div>
+              <span class="text-gray-400 text-xs">Alex Spencer</span>
+            </div>
+
+            <div class="px-4 py-3 space-y-3">
+              <!-- Status -->
+              <div class="flex items-center gap-2">
+                <div class="h-2 w-2 rounded-full bg-green-400"></div>
+                <span class="text-white text-sm font-medium">Synced</span>
+              </div>
+
+              <!-- Folder -->
+              <div class="flex items-center gap-2 text-gray-300 text-sm">
+                <svg class="h-4 w-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
+                Contracts
+              </div>
+
+              <div class="border-t border-gray-700"></div>
+
+              <!-- Recent files -->
+              <div class="space-y-2">
+                <div class="flex items-center gap-2">
+                  <svg class="h-3.5 w-3.5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 11l5-5m0 0l5 5m-5-5v12"/></svg>
+                  <span class="text-gray-300 text-xs">NDA-2026.pdf</span>
+                  <span class="text-gray-600 text-xs ml-auto">just now</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <svg class="h-3.5 w-3.5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 13l-5 5m0 0l-5-5m5 5V6"/></svg>
+                  <span class="text-gray-300 text-xs">ServiceAgreement.pdf</span>
+                  <span class="text-gray-600 text-xs ml-auto">2m ago</span>
+                </div>
+              </div>
+
+              <div class="border-t border-gray-700"></div>
+
+              <div class="flex items-center gap-2 text-gray-300 text-sm">
+                <svg class="h-4 w-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                Sync Now
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- Pricing -->
 <section id="pricing" class="py-24 lg:py-32 bg-white border-t border-gray-100" data-controller="pricing-toggle">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

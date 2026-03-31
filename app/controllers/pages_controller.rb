@@ -13,6 +13,9 @@ class PagesController < ApplicationController
   def contact
   end
 
+  def sync
+  end
+
   def submit_contact
     name = params[:name].to_s.strip
     email = params[:email].to_s.strip

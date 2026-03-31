@@ -1,0 +1,310 @@
+<% content_for(:title, "PactSync for Mac — Desktop File Syncing | Pact") %>
+
+<!-- Hero -->
+<section class="relative overflow-hidden">
+  <div class="absolute inset-0 bg-gradient-to-br from-white via-white to-blue-50/80"></div>
+  <div class="absolute inset-0 opacity-40" style="background-image: radial-gradient(circle at 1px 1px, rgb(209 213 219) 1px, transparent 0); background-size: 32px 32px;"></div>
+
+  <div class="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16 lg:pt-28 lg:pb-20">
+    <div class="text-center">
+      <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-50 border border-blue-100 text-sm font-medium text-blue-700 mb-6">
+        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+        macOS App
+      </div>
+      <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight text-gray-900 leading-tight">
+        PactSync <span class="text-blue-600">for Mac</span>
+      </h1>
+      <p class="mt-6 text-xl text-gray-500 max-w-2xl mx-auto leading-relaxed">
+        Automatically sync folders on your Mac with your Pact account. Drop files in a folder, they show up in Pact. Upload to Pact, they appear on your Mac.
+      </p>
+      <div class="mt-8">
+        <a href="#download" class="inline-flex items-center gap-2 px-8 py-3.5 text-base font-semibold text-white bg-blue-600 rounded-xl hover:bg-blue-700 shadow-lg shadow-blue-600/25 transition-all hover:shadow-xl hover:shadow-blue-600/30">
+          Download PactSync
+          <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+        </a>
+      </div>
+      <p class="mt-3 text-sm text-gray-400">Requires macOS 14 (Sonoma) or later</p>
+    </div>
+  </div>
+</section>
+
+<!-- Features Grid -->
+<section class="py-16 lg:py-24 border-t border-gray-100">
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="grid md:grid-cols-3 gap-10">
+      <div class="text-center">
+        <div class="mx-auto h-12 w-12 rounded-2xl bg-blue-50 flex items-center justify-center">
+          <svg class="h-6 w-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+        </div>
+        <h3 class="mt-4 text-lg font-semibold text-gray-900">Two-Way Sync</h3>
+        <p class="mt-2 text-sm text-gray-500 leading-relaxed">Files sync in both directions. Add a file locally or via the web &mdash; it appears everywhere.</p>
+      </div>
+      <div class="text-center">
+        <div class="mx-auto h-12 w-12 rounded-2xl bg-blue-50 flex items-center justify-center">
+          <svg class="h-6 w-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+        </div>
+        <h3 class="mt-4 text-lg font-semibold text-gray-900">Lightweight</h3>
+        <p class="mt-2 text-sm text-gray-500 leading-relaxed">Native Swift app that lives in your menu bar. No Electron, no bloat, minimal resource usage.</p>
+      </div>
+      <div class="text-center">
+        <div class="mx-auto h-12 w-12 rounded-2xl bg-blue-50 flex items-center justify-center">
+          <svg class="h-6 w-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+        </div>
+        <h3 class="mt-4 text-lg font-semibold text-gray-900">Secure</h3>
+        <p class="mt-2 text-sm text-gray-500 leading-relaxed">Uses your existing Pact credentials. Files are transferred over HTTPS and stored encrypted.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Download -->
+<section id="download" class="py-16 lg:py-24 bg-gray-50 border-t border-gray-100">
+  <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-8 sm:p-10 text-center">
+      <div class="mx-auto h-20 w-20 rounded-2xl bg-blue-50 flex items-center justify-center mb-6">
+        <svg class="h-10 w-10 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+      </div>
+      <h2 class="text-2xl font-bold text-gray-900">Download PactSync for Mac</h2>
+      <p class="mt-3 text-gray-500">Version 1.0.0 &middot; macOS 14+ required</p>
+      <div class="mt-6">
+        <a href="/PactSync-1.0.0.dmg" class="inline-flex items-center gap-2 px-8 py-3.5 text-base font-semibold text-white bg-blue-600 rounded-xl hover:bg-blue-700 shadow-lg shadow-blue-600/25 transition-all hover:shadow-xl hover:shadow-blue-600/30">
+          <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+          Download .dmg
+        </a>
+      </div>
+      <p class="mt-4 text-xs text-gray-400">Signed and notarized by Apple. No Gatekeeper warnings.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Setup Guide -->
+<section class="py-16 lg:py-24 border-t border-gray-100">
+  <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-16">
+      <h2 class="text-3xl font-bold text-gray-900 tracking-tight">Getting Started</h2>
+      <p class="mt-4 text-lg text-gray-500">Up and running in under a minute.</p>
+    </div>
+
+    <!-- Step 1: Install -->
+    <div class="mb-16">
+      <div class="flex items-center gap-4 mb-6">
+        <div class="flex-shrink-0 h-10 w-10 rounded-2xl bg-blue-600 text-white flex items-center justify-center text-lg font-bold">1</div>
+        <h3 class="text-xl font-semibold text-gray-900">Install</h3>
+      </div>
+      <div class="ml-14">
+        <p class="text-gray-600 leading-relaxed">
+          Open the downloaded <strong>.dmg</strong> file and drag PactSync into your Applications folder. Then launch it from Applications or Spotlight.
+        </p>
+        <div class="mt-6 rounded-xl overflow-hidden shadow-lg border border-gray-200">
+          <div class="bg-gray-800 px-4 py-2 flex items-center gap-2">
+            <div class="flex gap-1.5">
+              <div class="h-3 w-3 rounded-full bg-red-500"></div>
+              <div class="h-3 w-3 rounded-full bg-yellow-500"></div>
+              <div class="h-3 w-3 rounded-full bg-green-500"></div>
+            </div>
+            <span class="text-gray-400 text-xs ml-2">PactSync</span>
+          </div>
+          <div class="bg-gray-900 p-8 flex items-center justify-center gap-12">
+            <div class="text-center">
+              <div class="mx-auto h-16 w-16 rounded-xl bg-blue-100 flex items-center justify-center">
+                <svg class="h-10 w-10 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
+              </div>
+              <span class="text-gray-300 text-xs mt-2 block">Applications</span>
+            </div>
+            <svg class="h-6 w-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+            <div class="text-center">
+              <div class="mx-auto h-16 w-16 rounded-xl bg-white flex items-center justify-center shadow-sm">
+                <svg class="h-8 w-8" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M 100 35 L 55 55 Q 50 57 50 63 L 50 95 Q 50 130 100 165 Q 150 130 150 95 L 150 63 Q 150 57 145 55 Z" stroke="#2563EB" stroke-width="8" stroke-linejoin="round"/>
+                  <path d="M 72 105 L 92 125 L 132 80" stroke="#2563EB" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <span class="text-gray-300 text-xs mt-2 block">PactSync</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 2: Sign In -->
+    <div class="mb-16">
+      <div class="flex items-center gap-4 mb-6">
+        <div class="flex-shrink-0 h-10 w-10 rounded-2xl bg-blue-600 text-white flex items-center justify-center text-lg font-bold">2</div>
+        <h3 class="text-xl font-semibold text-gray-900">Sign In</h3>
+      </div>
+      <div class="ml-14">
+        <p class="text-gray-600 leading-relaxed">
+          Look for the <strong>checkmark icon</strong> in your Mac's menu bar (top-right of screen). Click it and then click <strong>"Sign In..."</strong>. Enter your Pact email and password.
+        </p>
+        <div class="mt-6 rounded-xl overflow-hidden shadow-lg border border-gray-200">
+          <div class="bg-gray-900 p-8">
+            <div class="max-w-[240px] mx-auto bg-gray-800 rounded-xl p-5">
+              <div class="flex flex-col items-center gap-3">
+                <div class="h-10 w-10 rounded-lg bg-white flex items-center justify-center">
+                  <svg class="h-6 w-6" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M 100 35 L 55 55 Q 50 57 50 63 L 50 95 Q 50 130 100 165 Q 150 130 150 95 L 150 63 Q 150 57 145 55 Z" stroke="#2563EB" stroke-width="8" stroke-linejoin="round"/>
+                    <path d="M 72 105 L 92 125 L 132 80" stroke="#2563EB" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </div>
+                <span class="text-white font-semibold text-sm">PactSync</span>
+                <span class="text-gray-400 text-xs">Sign in to start syncing</span>
+              </div>
+              <div class="mt-4 space-y-2">
+                <div class="rounded-md bg-gray-700 px-3 py-2 text-xs text-gray-400">you@email.com</div>
+                <div class="rounded-md bg-gray-700 px-3 py-2 text-xs text-gray-400">&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;</div>
+              </div>
+              <div class="mt-3 bg-blue-600 rounded-md py-2 text-center text-white text-xs font-medium">Sign In</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 3: Choose Folders -->
+    <div class="mb-16">
+      <div class="flex items-center gap-4 mb-6">
+        <div class="flex-shrink-0 h-10 w-10 rounded-2xl bg-blue-600 text-white flex items-center justify-center text-lg font-bold">3</div>
+        <h3 class="text-xl font-semibold text-gray-900">Choose Folders</h3>
+      </div>
+      <div class="ml-14">
+        <p class="text-gray-600 leading-relaxed">
+          Open <strong>Settings</strong> from the menu bar dropdown. Click <strong>"Add Folder..."</strong> to select folders you want to sync. You can add up to 5 folders. Each folder syncs to a matching folder in your Pact account.
+        </p>
+        <div class="mt-6 rounded-xl overflow-hidden shadow-lg border border-gray-200">
+          <div class="bg-gray-900 p-8">
+            <div class="max-w-[320px] mx-auto bg-gray-800 rounded-xl overflow-hidden">
+              <div class="px-4 py-3 border-b border-gray-700">
+                <span class="text-white text-sm font-medium">Watched Folders</span>
+              </div>
+              <div class="p-3 space-y-2">
+                <div class="flex items-center gap-3 bg-gray-750 rounded-lg p-2.5">
+                  <svg class="h-5 w-5 text-blue-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
+                  <div>
+                    <div class="text-white text-xs font-medium">Contracts</div>
+                    <div class="text-gray-500 text-[10px]">/Users/alex/Documents/Contracts</div>
+                  </div>
+                </div>
+                <div class="flex items-center gap-3 bg-gray-750 rounded-lg p-2.5">
+                  <svg class="h-5 w-5 text-blue-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
+                  <div>
+                    <div class="text-white text-xs font-medium">Invoices</div>
+                    <div class="text-gray-500 text-[10px]">/Users/alex/Desktop/Invoices</div>
+                  </div>
+                </div>
+              </div>
+              <div class="px-3 pb-3 flex justify-between items-center">
+                <span class="text-xs text-gray-500 bg-gray-700 px-3 py-1.5 rounded-md">Add Folder...</span>
+                <span class="text-[10px] text-gray-600">2/5 folders</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 4: Sync -->
+    <div class="mb-16">
+      <div class="flex items-center gap-4 mb-6">
+        <div class="flex-shrink-0 h-10 w-10 rounded-2xl bg-blue-600 text-white flex items-center justify-center text-lg font-bold">4</div>
+        <h3 class="text-xl font-semibold text-gray-900">Done &mdash; Files Sync Automatically</h3>
+      </div>
+      <div class="ml-14">
+        <p class="text-gray-600 leading-relaxed">
+          That's it. Any documents you add to your watched folders will automatically upload to Pact. Documents uploaded via the Pact website will download to your Mac. The menu bar icon shows your sync status at a glance:
+        </p>
+        <div class="mt-6 grid grid-cols-3 gap-4">
+          <div class="rounded-xl bg-gray-50 border border-gray-200 p-4 text-center">
+            <div class="mx-auto h-8 w-8 rounded-full bg-green-100 flex items-center justify-center mb-2">
+              <svg class="h-4 w-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+            </div>
+            <p class="text-sm font-medium text-gray-900">Synced</p>
+            <p class="text-xs text-gray-500 mt-1">Everything is up to date</p>
+          </div>
+          <div class="rounded-xl bg-gray-50 border border-gray-200 p-4 text-center">
+            <div class="mx-auto h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center mb-2">
+              <svg class="h-4 w-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+            </div>
+            <p class="text-sm font-medium text-gray-900">Syncing</p>
+            <p class="text-xs text-gray-500 mt-1">Files are being transferred</p>
+          </div>
+          <div class="rounded-xl bg-gray-50 border border-gray-200 p-4 text-center">
+            <div class="mx-auto h-8 w-8 rounded-full bg-red-100 flex items-center justify-center mb-2">
+              <svg class="h-4 w-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg>
+            </div>
+            <p class="text-sm font-medium text-gray-900">Error</p>
+            <p class="text-xs text-gray-500 mt-1">Something needs attention</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="py-16 lg:py-24 bg-gray-50 border-t border-gray-100">
+  <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+    <h2 class="text-2xl font-bold text-gray-900 text-center mb-12">Frequently Asked Questions</h2>
+    <div class="space-y-4">
+      <details class="group bg-white rounded-xl border border-gray-200 shadow-sm">
+        <summary class="flex items-center justify-between cursor-pointer px-6 py-4 text-sm font-semibold text-gray-900">
+          What file types are supported?
+          <svg class="h-4 w-4 text-gray-400 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </summary>
+        <div class="px-6 pb-4 text-sm text-gray-600 leading-relaxed">
+          PactSync works with all file types that Pact supports: PDFs, Word documents (.doc, .docx), spreadsheets (.xls, .xlsx), presentations (.pptx), images (.jpg, .png), and text files. System files like .DS_Store are automatically ignored.
+        </div>
+      </details>
+
+      <details class="group bg-white rounded-xl border border-gray-200 shadow-sm">
+        <summary class="flex items-center justify-between cursor-pointer px-6 py-4 text-sm font-semibold text-gray-900">
+          How often does it sync?
+          <svg class="h-4 w-4 text-gray-400 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </summary>
+        <div class="px-6 pb-4 text-sm text-gray-600 leading-relaxed">
+          PactSync monitors your folders in real-time and detects new files within seconds. It also runs periodic checks (configurable from 15 seconds to 5 minutes) to catch any changes made on the web. You can also click "Sync Now" at any time.
+        </div>
+      </details>
+
+      <details class="group bg-white rounded-xl border border-gray-200 shadow-sm">
+        <summary class="flex items-center justify-between cursor-pointer px-6 py-4 text-sm font-semibold text-gray-900">
+          What happens if I edit a file on both sides?
+          <svg class="h-4 w-4 text-gray-400 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </summary>
+        <div class="px-6 pb-4 text-sm text-gray-600 leading-relaxed">
+          If the same file is modified on your Mac and in Pact before a sync, the most recently modified version wins. This keeps things simple and predictable.
+        </div>
+      </details>
+
+      <details class="group bg-white rounded-xl border border-gray-200 shadow-sm">
+        <summary class="flex items-center justify-between cursor-pointer px-6 py-4 text-sm font-semibold text-gray-900">
+          Where do synced files appear in Pact?
+          <svg class="h-4 w-4 text-gray-400 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </summary>
+        <div class="px-6 pb-4 text-sm text-gray-600 leading-relaxed">
+          PactSync creates a "Desktop Sync" folder in your Pact account with subfolders matching each local folder name. For example, if you sync ~/Documents/Contracts, your files appear in Pact under Desktop Sync &rarr; Contracts.
+        </div>
+      </details>
+
+      <details class="group bg-white rounded-xl border border-gray-200 shadow-sm">
+        <summary class="flex items-center justify-between cursor-pointer px-6 py-4 text-sm font-semibold text-gray-900">
+          Does PactSync run in the background?
+          <svg class="h-4 w-4 text-gray-400 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </summary>
+        <div class="px-6 pb-4 text-sm text-gray-600 leading-relaxed">
+          Yes. PactSync lives in your menu bar and runs quietly in the background. It uses minimal CPU and memory. There's no Dock icon and no extra windows &mdash; just the menu bar icon showing your sync status.
+        </div>
+      </details>
+
+      <details class="group bg-white rounded-xl border border-gray-200 shadow-sm">
+        <summary class="flex items-center justify-between cursor-pointer px-6 py-4 text-sm font-semibold text-gray-900">
+          Is there a Windows version?
+          <svg class="h-4 w-4 text-gray-400 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </summary>
+        <div class="px-6 pb-4 text-sm text-gray-600 leading-relaxed">
+          Not yet. PactSync is currently available for Mac only. A Windows version is on our roadmap.
+        </div>
+      </details>
+    </div>
+  </div>
+</section>
