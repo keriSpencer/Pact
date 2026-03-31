@@ -4,9 +4,18 @@ class FoldersController < ApplicationController
   before_action :check_folder_access, only: [:show, :edit, :update, :destroy, :confirm_delete]
 
   def index
-    all_folders = Folder.visible_to_with_shared(current_user)
-    @folders = all_folders.select { |f| f.parent_id.nil? }.sort_by(&:name)
+    own_root = Folder.visible_to(current_user).root_folders.order(:name).to_a
 
+    # Cross-org shared folders always appear at root level
+    shared_folder_ids = FolderShare.where(user_id: current_user.id).active.pluck(:folder_id)
+    cross_org_ids = shared_folder_ids - own_root.map(&:id)
+    shared_cross_org = if cross_org_ids.any?
+      Folder.with_public_search_path { Folder.unscoped.where(deleted_at: nil, id: cross_org_ids).order(:name).to_a }
+    else
+      []
+    end
+
+    @folders = (own_root + shared_cross_org).sort_by(&:name)
     @unfiled_count = current_user.documents.active.where(folder_id: nil).count
   end
 
