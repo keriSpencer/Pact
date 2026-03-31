@@ -1,0 +1,20 @@
+<div class="flex items-center justify-between py-2" id="<%= dom_id(share) %>">
+  <div class="flex items-center gap-2 min-w-0">
+    <% if share.internal? %>
+      <span class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/30 text-xs font-medium text-blue-600 dark:text-blue-400 shrink-0"><%= share.user.full_name.chars.first.upcase %></span>
+      <div class="min-w-0">
+        <p class="text-sm font-medium text-gray-900 dark:text-gray-100 truncate"><%= share.user.full_name %></p>
+        <p class="text-xs text-gray-500 dark:text-gray-400 truncate"><%= share.email %></p>
+      </div>
+    <% else %>
+      <span class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-700 text-xs font-medium text-gray-500 dark:text-gray-400 shrink-0"><%= share.email.chars.first.upcase %></span>
+      <div class="min-w-0">
+        <p class="text-sm font-medium text-gray-900 dark:text-gray-100 truncate"><%= share.email %></p>
+        <p class="text-xs text-gray-400 dark:text-gray-500">External &middot; link shared</p>
+      </div>
+    <% end %>
+  </div>
+  <%= link_to folder_folder_share_path(folder, share), data: { "turbo-method": "delete", turbo_confirm: "Remove access for #{share.email}?" }, class: "p-1 text-gray-400 hover:text-red-500 transition-colors shrink-0" do %>
+    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+  <% end %>
+</div>

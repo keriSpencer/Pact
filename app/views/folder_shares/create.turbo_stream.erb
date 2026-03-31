@@ -1,0 +1,10 @@
+<%= turbo_stream.append "folder_shares_list" do %>
+  <%= render "folder_shares/share_entry", share: @share, folder: @folder %>
+<% end %>
+<%= turbo_stream.replace "share_form_errors" do %>
+  <div id="share_form_errors"></div>
+<% end %>
+<%= turbo_stream.replace "share_email_input" do %>
+  <input type="email" name="email" id="share_email_input" placeholder="Enter email address" required
+         class="flex-1 min-w-0 text-sm rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+<% end %>

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_31_005439) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_31_023836) do
   create_table "action_push_native_devices", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "name"
@@ -163,6 +163,26 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_31_005439) do
     t.index ["organization_id"], name: "index_documents_on_organization_id"
     t.index ["status", "visibility"], name: "index_documents_on_status_and_visibility"
     t.index ["user_id"], name: "index_documents_on_user_id"
+  end
+
+  create_table "folder_shares", force: :cascade do |t|
+    t.integer "access_count", default: 0, null: false
+    t.datetime "accessed_at"
+    t.datetime "created_at", null: false
+    t.string "email", null: false
+    t.datetime "expires_at"
+    t.datetime "first_access_at"
+    t.integer "folder_id", null: false
+    t.integer "permission_level", default: 0, null: false
+    t.string "share_token"
+    t.integer "shared_by_id", null: false
+    t.datetime "updated_at", null: false
+    t.integer "user_id"
+    t.index ["folder_id", "email"], name: "index_folder_shares_on_folder_id_and_email", unique: true
+    t.index ["folder_id"], name: "index_folder_shares_on_folder_id"
+    t.index ["share_token"], name: "index_folder_shares_on_share_token", unique: true
+    t.index ["shared_by_id"], name: "index_folder_shares_on_shared_by_id"
+    t.index ["user_id"], name: "index_folder_shares_on_user_id"
   end
 
   create_table "folders", force: :cascade do |t|
@@ -431,6 +451,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_31_005439) do
   add_foreign_key "documents", "folders"
   add_foreign_key "documents", "organizations"
   add_foreign_key "documents", "users"
+  add_foreign_key "folder_shares", "folders"
   add_foreign_key "folders", "folders", column: "parent_id"
   add_foreign_key "folders", "organizations"
   add_foreign_key "folders", "users"

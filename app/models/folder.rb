@@ -7,6 +7,7 @@ class Folder < ApplicationRecord
 
   has_many :subfolders, class_name: "Folder", foreign_key: "parent_id", dependent: :destroy
   has_many :documents, dependent: :nullify
+  has_many :folder_shares, dependent: :destroy
 
   validates :name, presence: true, length: { minimum: 1, maximum: 255 }
   validates :path, presence: true, uniqueness: { scope: :organization_id }
@@ -24,11 +25,13 @@ class Folder < ApplicationRecord
   scope :for_organization, ->(org) { where(organization: org) }
 
   scope :visible_to, ->(user) {
+    shared_folder_ids = FolderShare.where(user_id: user.id).active.select(:folder_id)
     where(organization_id: user.organization_id)
       .where(
-        "(visibility = ? AND user_id = ?) OR visibility IN (?, ?)",
+        "(visibility = ? AND user_id = ?) OR visibility IN (?, ?) OR id IN (?)",
         visibilities[:folder_private], user.id,
-        visibilities[:organization], visibilities[:folder_public]
+        visibilities[:organization], visibilities[:folder_public],
+        shared_folder_ids
       )
   }
 
@@ -77,6 +80,7 @@ class Folder < ApplicationRecord
 
   def can_access?(user)
     return false unless user.organization_id == organization_id
+    return true if folder_shares.where(user_id: user.id).active.exists?
     case visibility
     when "folder_private"
       self.user == user
@@ -85,6 +89,15 @@ class Folder < ApplicationRecord
     else
       false
     end
+  end
+
+  def shared_with?(user)
+    folder_shares.where(user_id: user.id).active.exists?
+  end
+
+  def shared_by_for(user)
+    share = folder_shares.where(user_id: user.id).active.first
+    share&.shared_by
   end
 
   def document_count

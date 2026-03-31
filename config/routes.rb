@@ -11,6 +11,7 @@ Rails.application.routes.draw do
       get :confirm_delete
       patch :restore
     end
+    resources :folder_shares, only: [:create, :destroy]
   end
 
   resources :documents, only: [:index, :show, :new, :create, :edit, :update, :destroy] do
@@ -64,6 +65,14 @@ Rails.application.routes.draw do
   resources :shared_documents, only: [:show], param: :share_token, path: "shared" do
     member do
       get :download
+    end
+  end
+
+  # Public folder share routes (no auth)
+  resources :shared_folders, only: [:show], param: :share_token, path: "shared-folders" do
+    member do
+      get "folder/:subfolder_id", action: :subfolder, as: :subfolder
+      get "download/:document_id", action: :download, as: :download
     end
   end
 

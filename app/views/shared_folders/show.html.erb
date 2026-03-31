@@ -1,0 +1,82 @@
+<% content_for(:title) { "#{@folder.name} - Shared Folder" } %>
+
+<div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+  <div class="bg-white rounded-lg shadow-sm">
+    <!-- Header -->
+    <div class="px-6 py-4 border-b border-gray-200">
+      <% if @folder != @folder_share.folder %>
+        <nav class="mb-2 text-sm">
+          <%= link_to @folder_share.folder.name, shared_folder_path(@folder_share.share_token), class: "text-blue-600 hover:text-blue-800 transition-colors" %>
+          <% build_breadcrumb_to(@folder_share.folder, @folder).drop(1).each do |crumb| %>
+            <span class="text-gray-400 mx-1">/</span>
+            <% if crumb == @folder %>
+              <span class="text-gray-900 font-medium"><%= crumb.name %></span>
+            <% else %>
+              <%= link_to crumb.name, subfolder_shared_folder_path(@folder_share.share_token, subfolder_id: crumb.id), class: "text-blue-600 hover:text-blue-800 transition-colors" %>
+            <% end %>
+          <% end %>
+        </nav>
+      <% end %>
+      <div class="flex items-center gap-3">
+        <div class="h-10 w-10 rounded-lg bg-blue-50 flex items-center justify-center shrink-0">
+          <svg class="h-5 w-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
+        </div>
+        <div>
+          <h2 class="text-lg font-semibold text-gray-900"><%= @folder.name %></h2>
+          <% if @folder.description.present? %>
+            <p class="text-sm text-gray-500"><%= @folder.description %></p>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <div class="divide-y divide-gray-100">
+      <!-- Subfolders -->
+      <% @subfolders.each do |subfolder| %>
+        <%= link_to subfolder_shared_folder_path(@folder_share.share_token, subfolder_id: subfolder.id), class: "flex items-center gap-3 px-6 py-3 hover:bg-gray-50 transition-colors" do %>
+          <div class="h-8 w-8 rounded-lg bg-blue-50 flex items-center justify-center shrink-0">
+            <svg class="h-4 w-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
+          </div>
+          <div class="min-w-0 flex-1">
+            <p class="text-sm font-medium text-gray-900"><%= subfolder.name %></p>
+            <p class="text-xs text-gray-500"><%= subfolder.document_count %> documents</p>
+          </div>
+          <svg class="h-4 w-4 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+        <% end %>
+      <% end %>
+
+      <!-- Documents -->
+      <% @documents.each do |doc| %>
+        <div class="flex items-center gap-3 px-6 py-3">
+          <div class="h-8 w-8 rounded-lg bg-gray-50 flex items-center justify-center shrink-0">
+            <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+          </div>
+          <div class="min-w-0 flex-1">
+            <p class="text-sm font-medium text-gray-900"><%= doc.name %></p>
+            <p class="text-xs text-gray-500"><%= doc.formatted_file_size %></p>
+          </div>
+          <%= link_to download_shared_folder_path(@folder_share.share_token, document_id: doc.id), class: "px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 rounded-md hover:bg-blue-100 transition-colors shrink-0" do %>
+            Download
+          <% end %>
+        </div>
+      <% end %>
+
+      <% if @subfolders.empty? && @documents.empty? %>
+        <div class="px-6 py-12 text-center">
+          <svg class="mx-auto h-10 w-10 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
+          <p class="mt-2 text-sm text-gray-500">This folder is empty.</p>
+        </div>
+      <% end %>
+    </div>
+
+    <!-- Footer -->
+    <div class="px-6 py-3 border-t border-gray-100">
+      <p class="text-xs text-gray-500">
+        Shared by <%= @folder_share.shared_by.full_name %>
+        <% if @folder_share.expires_at.present? %>
+          &middot; Expires <%= @folder_share.expires_at.strftime("%B %d, %Y") %>
+        <% end %>
+      </p>
+    </div>
+  </div>
+</div>
