@@ -17,6 +17,7 @@ class User < ApplicationRecord
   has_many :assigned_contacts, through: :contact_assignments, source: :contact
   has_many :contact_notes, dependent: :nullify
   has_many :folders, dependent: :destroy
+  has_many :folder_shares, dependent: :destroy
   has_many :documents, dependent: :destroy
   has_many :push_devices, class_name: "ApplicationPushDevice", as: :owner, dependent: :destroy
 

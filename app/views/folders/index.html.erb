@@ -45,14 +45,24 @@
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
       <% @folders.each do |folder| %>
         <%= link_to folder_path(folder), class: "bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 hover:shadow-md transition-shadow flex items-center" do %>
-          <div class="h-10 w-10 rounded-lg bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center mr-3">
+          <div class="h-10 w-10 rounded-lg bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center mr-3 relative">
             <svg class="h-5 w-5 text-blue-500 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/>
             </svg>
+            <% if folder.shared_with?(current_user) %>
+              <span class="absolute -top-1 -right-1 h-4 w-4 bg-blue-500 rounded-full flex items-center justify-center" title="Shared by <%= folder.shared_by_for(current_user)&.full_name %>">
+                <svg class="h-2.5 w-2.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
+              </span>
+            <% end %>
           </div>
           <div>
             <p class="text-sm font-medium text-gray-900 dark:text-gray-100"><%= folder.name %></p>
-            <p class="text-xs text-gray-500 dark:text-gray-400"><%= folder.document_count %> documents, <%= folder.subfolder_count %> folders</p>
+            <p class="text-xs text-gray-500 dark:text-gray-400">
+              <%= folder.document_count %> documents, <%= folder.subfolder_count %> folders
+              <% if folder.shared_with?(current_user) %>
+                <span class="text-blue-500 dark:text-blue-400">&middot; Shared by <%= folder.shared_by_for(current_user)&.full_name %></span>
+              <% end %>
+            </p>
           </div>
         <% end %>
       <% end %>
