@@ -26,6 +26,10 @@
 - [x] **Self-Service Registration** — Auto org creation, welcome email (partner contribution)
 - [x] **RubyNative iOS App** — Native shell, push notifications (partner contribution)
 - [x] **Brand Kit** — Favicon, logos, OG image (partner contribution)
+- [x] **REST API (v1)** — Token auth, documents, folders, sync endpoints for PactSync (partner contribution)
+- [x] **PactSync Desktop App** — macOS sync app, landing page, setup guide (partner contribution)
+- [x] **Folder Sharing** — Share folders internally/externally, cross-org, email notifications, public links (partner contribution)
+- [x] **Document Quick Share** — Copyable share links with Turbo Stream UI (partner contribution)
 
 ### Skipped
 - [ ] **Phase 5: Activities** — Audit log (nice-to-have, not needed for core flow)
@@ -83,6 +87,14 @@
 - Fix: page crash from rendering base64 data as text
 - Merged partner's changes: Stripe billing, landing page, RubyNative,
   brand kit, registration, timezone support, mobile fixes
+
+### March 31, 2026
+- Merged partner's changes:
+  - REST API v1 (token auth, documents, folders, sync) for PactSync desktop app
+  - PactSync macOS app (1.0.0 DMG, landing page, setup guide)
+  - Folder sharing (internal/external, cross-org, email notifications, public token links)
+  - Document quick share (copyable links, Turbo Stream UI)
+  - 26 new tests (214 total, 342 assertions, 0 failures)
 
 ### March 28, 2026
 - Custom domain: pactapp.io

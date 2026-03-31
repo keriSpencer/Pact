@@ -84,9 +84,20 @@ Pact is a Contacts + Document Signing application. Multi-tenant contact manageme
 - Professional branded email templates (HTML + text)
 - Brand kit (favicon, logos, OG image)
 
+**API & Desktop:**
+- REST API v1 with token authentication (auth, documents, folders, sync)
+- PactSync macOS desktop app for file synchronization
+- API endpoints for document upload, folder management, change detection
+
+**Sharing:**
+- Folder sharing (internal users + external emails, cross-org)
+- Document quick share links with Turbo Stream UI
+- Email notifications for shared folders
+- Public folder access via token links
+
 **Native App:**
 - RubyNative iOS app support
 - Push notifications for signed documents
 - Profile tab for native users
 
-**Test suite: 188 tests, 278 assertions, 0 failures**
+**Test suite: 214 tests, 342 assertions, 0 failures**
