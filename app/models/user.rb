@@ -114,6 +114,15 @@ class User < ApplicationRecord
     email_notifications
   end
 
+  # API token methods
+  def generate_api_token!
+    update!(api_token: SecureRandom.hex(32), api_token_created_at: Time.current)
+  end
+
+  def revoke_api_token!
+    update!(api_token: nil, api_token_created_at: nil)
+  end
+
   # Soft delete methods
   def soft_delete!
     update_column(:deleted_at, Time.current)

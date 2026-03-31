@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_30_100002) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_31_005439) do
   create_table "action_push_native_devices", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "name"
@@ -374,6 +374,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_30_100002) do
   end
 
   create_table "users", force: :cascade do |t|
+    t.string "api_token"
+    t.datetime "api_token_created_at"
     t.datetime "created_at", null: false
     t.datetime "deleted_at"
     t.string "email", default: "", null: false
@@ -398,6 +400,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_30_100002) do
     t.string "timezone", default: "UTC"
     t.string "title"
     t.datetime "updated_at", null: false
+    t.index ["api_token"], name: "index_users_on_api_token", unique: true
     t.index ["deleted_at"], name: "index_users_on_deleted_at"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["invitation_token"], name: "index_users_on_invitation_token", unique: true

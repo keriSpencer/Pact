@@ -130,6 +130,19 @@ Rails.application.routes.draw do
   get "search", to: "search#index"
   get "search/suggestions", to: "search#suggestions"
 
+  # API
+  namespace :api do
+    namespace :v1 do
+      post "auth/login", to: "auth#login"
+      delete "auth/logout", to: "auth#logout"
+      get "sync/status", to: "sync#status"
+      resources :documents, only: [:show, :create, :update, :destroy] do
+        get :download, on: :member
+      end
+      resources :folders, only: [:index, :show, :create]
+    end
+  end
+
   # Health check
   get "up" => "rails/health#show", as: :rails_health_check
 end
