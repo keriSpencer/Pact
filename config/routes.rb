@@ -70,6 +70,7 @@ Rails.application.routes.draw do
   get "launch", to: "pages#launch"
   root "pages#home"
   get "contact", to: "pages#contact", as: :contact_us
+  get "sync", to: "pages#sync", as: :sync_guide
   post "contact", to: "pages#submit_contact", as: :submit_contact
 
   # Authenticated dashboard
