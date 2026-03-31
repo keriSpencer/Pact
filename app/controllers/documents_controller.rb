@@ -31,6 +31,15 @@ class DocumentsController < ApplicationController
   end
 
   def show
+    respond_to do |format|
+      format.html
+      format.json do
+        # Status check for polling — returns a hash of all envelope/request statuses
+        statuses = @document.signing_envelopes.map { |e| "#{e.id}:#{e.status}" }.join(",")
+        statuses += @document.signature_requests.map { |sr| "#{sr.id}:#{sr.status}" }.join(",")
+        render json: { status: Digest::MD5.hexdigest(statuses) }
+      end
+    end
   end
 
   def new
@@ -105,7 +114,7 @@ class DocumentsController < ApplicationController
 
   def preview
     if @document.file.attached?
-      redirect_to rails_blob_path(@document.file, disposition: "inline")
+      redirect_to rails_blob_path(@document.file, disposition: "inline", filename: "Pact - #{@document.name}")
     else
       head :not_found
     end

@@ -478,7 +478,7 @@ export default class extends Controller {
   }
 
   drawFieldMarker(ctx, canvas, field, number, isSelected) {
-    if (this.multiSignerValue && field.role_id && this.hiddenRoles.has(field.role_id)) return
+    if (this.multiSignerValue && field.role_id && this.hiddenRoles.has(String(field.role_id))) return
     const x = (field.x / 100) * canvas.width, y = (field.y / 100) * canvas.height
     const w = (field.width / 100) * canvas.width, h = (field.height / 100) * canvas.height
     const colors = (this.multiSignerValue && field.role_color)
@@ -536,7 +536,18 @@ export default class extends Controller {
     const card = this.roleCardTargets.find(c => c.dataset.roleId === field.role_id)
     if (!card) return null
     const labelInput = card.querySelector('input[type="text"]')
-    return labelInput ? labelInput.value : 'S'
+    if (!labelInput) return 'S'
+
+    const fullLabel = labelInput.value.trim()
+    // Generate a short 2-char abbreviation:
+    // "Signer 1" → "S1", "Buyer" → "Bu", "Alex Spencer" → "AS"
+    const parts = fullLabel.split(/[\s]+/)
+    if (parts.length >= 2) {
+      // Multi-word: use first letter of each word (e.g., "S1", "AS")
+      return parts.map(p => p[0]).join('').substring(0, 2).toUpperCase()
+    }
+    // Single word: first 2 chars
+    return fullLabel.substring(0, 2)
   }
 
   drawResizeHandles(ctx, canvas, field, colors) {
@@ -603,7 +614,7 @@ export default class extends Controller {
           const shortLabel = roleLabel ? roleLabel.substring(0, 2) : ''
           roleIndicator = `<span class="inline-flex items-center space-x-1 shrink-0"><span class="inline-block w-2.5 h-2.5 rounded-full" style="background-color: ${field.role_color}"></span>${shortLabel ? `<span class="text-xs font-medium text-gray-600">${shortLabel}</span>` : ''}</span>`
         }
-        const isRoleHidden = isMultiSigner && field.role_id && this.hiddenRoles.has(field.role_id)
+        const isRoleHidden = isMultiSigner && field.role_id && this.hiddenRoles.has(String(field.role_id))
         const hiddenStyle = isRoleHidden ? ' opacity-50' : ''
         return `<div class="flex items-center justify-between py-2 px-3 ${sel}${hiddenStyle} rounded-lg cursor-pointer transition-colors" data-action="click->pdf-signature-placement#selectField" data-field-id="${field.id}">
           <div class="flex items-center space-x-2 min-w-0">
