@@ -192,10 +192,13 @@
         <% if @signature_request.draft? && @signature_request.signing_envelope_id.nil? %>
           <div class="text-center py-2">
             <span class="text-xs text-gray-400 dark:text-gray-500">Need multiple signers?</span>
-            <%= link_to "Switch to Multi-Signer",
-                  convert_to_multi_signer_document_signature_request_path(@document, @signature_request),
-                  data: { "turbo-method": "post", turbo_confirm: "This will convert to multi-signer mode. Your placed fields will be preserved as Signer 1's fields." },
-                  class: "block text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors mt-1" %>
+            <button type="submit" name="convert_to_multi" value="1"
+                    formaction="<%= convert_to_multi_signer_document_signature_request_path(@document, @signature_request) %>"
+                    formmethod="post"
+                    onclick="return confirm('This will convert to multi-signer mode. Your placed fields will be preserved as Signer 1\'s fields.')"
+                    class="block w-full text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors mt-1 cursor-pointer">
+              Switch to Multi-Signer
+            </button>
           </div>
         <% end %>
       <% end %>

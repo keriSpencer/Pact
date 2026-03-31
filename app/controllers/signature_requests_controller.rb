@@ -96,6 +96,11 @@ class SignatureRequestsController < ApplicationController
     return redirect_to document_path(@document), alert: "Only drafts can be converted." unless @signature_request.draft?
     return redirect_to document_path(@document), alert: "Already part of a multi-signer envelope." if @signature_request.signing_envelope_id.present?
 
+    # Save pending fields from the form before converting
+    @signature_request.assign_attributes(signature_request_params)
+    sync_fields_from_json
+    @signature_request.save!
+
     # Create the envelope
     envelope = @document.signing_envelopes.create!(
       requester: current_user,
