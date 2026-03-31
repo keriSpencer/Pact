@@ -1,0 +1,14 @@
+A folder has been shared with you
+
+Hello,
+
+<%= @shared_by.full_name %> has shared a folder with you on Pact.
+
+Folder: <%= @folder.name %>
+From: <%= @shared_by.full_name %>
+<% if @folder_share.expires_at.present? -%>
+Expires: <%= @folder_share.expires_at.strftime("%B %d, %Y") %>
+<% end -%>
+
+You can browse the folder contents and download files using this link:
+<%= @share_url %>

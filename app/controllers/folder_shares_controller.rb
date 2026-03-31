@@ -11,6 +11,7 @@ class FolderSharesController < ApplicationController
     )
 
     if @share.save
+      FolderShareMailer.folder_shared(@share).deliver_later
       respond_to do |format|
         format.html { redirect_to @folder, notice: "Folder shared with #{@share.email}." }
         format.turbo_stream

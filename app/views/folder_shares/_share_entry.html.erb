@@ -8,9 +8,16 @@
       </div>
     <% else %>
       <span class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-700 text-xs font-medium text-gray-500 dark:text-gray-400 shrink-0"><%= share.email.chars.first.upcase %></span>
-      <div class="min-w-0">
+      <div class="min-w-0 flex-1">
         <p class="text-sm font-medium text-gray-900 dark:text-gray-100 truncate"><%= share.email %></p>
-        <p class="text-xs text-gray-400 dark:text-gray-500">External &middot; link shared</p>
+        <p class="text-xs text-gray-400 dark:text-gray-500">External &middot; email sent</p>
+        <div class="mt-1 flex items-center gap-1">
+          <input type="text" value="<%= share.share_url %>" readonly
+                 class="text-xs py-0.5 px-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded text-gray-600 dark:text-gray-300 w-full min-w-0"
+                 id="share_link_<%= share.id %>">
+          <button type="button" onclick="navigator.clipboard.writeText(document.getElementById('share_link_<%= share.id %>').value).then(() => { this.textContent = 'Copied!'; setTimeout(() => this.textContent = 'Copy', 2000) })"
+                  class="text-xs px-2 py-0.5 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors whitespace-nowrap cursor-pointer">Copy</button>
+        </div>
       </div>
     <% end %>
   </div>
