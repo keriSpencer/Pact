@@ -6,7 +6,7 @@ export default class extends Controller {
     "canvasContainer", "fieldsList", "fieldCount", "addFieldType",
     "labelInput", "fieldLabel", "fieldTypePill",
     "customLabelInput", "customLabelField", "templateNameInput",
-    "typePicker", "fieldInspector", "roleCard"
+    "typePicker", "fieldInspector", "roleCard", "visibilityToggle"
   ]
   static values = {
     pdfUrl: String,
@@ -35,6 +35,8 @@ export default class extends Controller {
   get MAX_HEIGHT_PCT(){ return 30 }
   get HANDLE_SIZE()   { return 8 }
   get DRAG_THRESHOLD(){ return 5 }
+  get SNAP_THRESHOLD() { return 5 }
+  get GUIDE_COLOR() { return '#2563EB' }
 
   connect() {
     this.signatureFields = []
@@ -46,10 +48,12 @@ export default class extends Controller {
     this.dragStarted = false
     this.customFieldMode = false
     this.mouseDownPos = null
+    this.activeGuides = []
 
     // Multi-signer role tracking
     this.currentRoleId = null
     this.currentRoleColor = null
+    this.hiddenRoles = new Set()
 
     this._onMouseMove = this.onDocumentMouseMove.bind(this)
     this._onMouseUp = this.onDocumentMouseUp.bind(this)
@@ -244,6 +248,8 @@ export default class extends Controller {
     this.dragState = null
     this.mouseDownPos = null
     this.dragStarted = false
+    this.activeGuides = []
+    this.redrawFields()
     this.canvasTarget.style.cursor = 'crosshair'
   }
 
@@ -338,9 +344,19 @@ export default class extends Controller {
     const field = this.signatureFields.find(f => f.id === this.dragState.fieldId)
     if (!field) return
     let newX = xPct - this.dragState.offsetXPct, newY = yPct - this.dragState.offsetYPct
+
+    // Find and apply snap guides
+    this.activeGuides = this.findSnapGuides(field, newX, newY)
+    if (this.activeGuides.length > 0) {
+      const snapped = this.applySnap(field, this.activeGuides, newX, newY)
+      newX = snapped.x
+      newY = snapped.y
+    }
+
     field.x = parseFloat(Math.max(field.width/2, Math.min(100 - field.width/2, newX)).toFixed(2))
     field.y = parseFloat(Math.max(field.height/2, Math.min(100 - field.height/2, newY)).toFixed(2))
     this.redrawFields()
+    this.drawSnapGuides()
   }
 
   // Create
@@ -462,6 +478,7 @@ export default class extends Controller {
   }
 
   drawFieldMarker(ctx, canvas, field, number, isSelected) {
+    if (this.multiSignerValue && field.role_id && this.hiddenRoles.has(field.role_id)) return
     const x = (field.x / 100) * canvas.width, y = (field.y / 100) * canvas.height
     const w = (field.width / 100) * canvas.width, h = (field.height / 100) * canvas.height
     const colors = (this.multiSignerValue && field.role_color)
@@ -586,7 +603,9 @@ export default class extends Controller {
           const shortLabel = roleLabel ? roleLabel.substring(0, 2) : ''
           roleIndicator = `<span class="inline-flex items-center space-x-1 shrink-0"><span class="inline-block w-2.5 h-2.5 rounded-full" style="background-color: ${field.role_color}"></span>${shortLabel ? `<span class="text-xs font-medium text-gray-600">${shortLabel}</span>` : ''}</span>`
         }
-        return `<div class="flex items-center justify-between py-2 px-3 ${sel} rounded-lg cursor-pointer transition-colors" data-action="click->pdf-signature-placement#selectField" data-field-id="${field.id}">
+        const isRoleHidden = isMultiSigner && field.role_id && this.hiddenRoles.has(field.role_id)
+        const hiddenStyle = isRoleHidden ? ' opacity-50' : ''
+        return `<div class="flex items-center justify-between py-2 px-3 ${sel}${hiddenStyle} rounded-lg cursor-pointer transition-colors" data-action="click->pdf-signature-placement#selectField" data-field-id="${field.id}">
           <div class="flex items-center space-x-2 min-w-0">
             ${roleIndicator}
             <span class="flex items-center justify-center h-6 w-6 rounded-full ${cfg.badge} text-white text-xs font-bold shrink-0">${index + 1}</span>
@@ -811,7 +830,9 @@ export default class extends Controller {
         const shortLabel = roleLabel ? roleLabel.substring(0, 2) : ''
         roleIndicator = `<span class="inline-flex items-center space-x-1 shrink-0"><span class="inline-block w-2.5 h-2.5 rounded-full" style="background-color: ${field.role_color}"></span>${shortLabel ? `<span class="text-xs font-medium text-gray-600">${shortLabel}</span>` : ''}</span>`
       }
-      return `<div class="flex items-center justify-between py-2 px-3 ${sel} rounded-lg cursor-pointer transition-colors" data-action="click->pdf-signature-placement#selectField" data-field-id="${field.id}">
+      const isRoleHidden = isMultiSigner && field.role_id && this.hiddenRoles.has(field.role_id)
+      const hiddenStyle = isRoleHidden ? ' opacity-50' : ''
+      return `<div class="flex items-center justify-between py-2 px-3 ${sel}${hiddenStyle} rounded-lg cursor-pointer transition-colors" data-action="click->pdf-signature-placement#selectField" data-field-id="${field.id}">
         <div class="flex items-center space-x-2 min-w-0">
           ${roleIndicator}
           <span class="flex items-center justify-center h-6 w-6 rounded-full ${cfg.badge} text-white text-xs font-bold shrink-0">${index + 1}</span>
@@ -879,9 +900,9 @@ export default class extends Controller {
     this.highlightActiveRole()
   }
 
-  buildRoleDropdown(field) {
+  buildRoleOptions(field) {
     if (!this.hasRoleCardTarget) return ''
-    const options = this.roleCardTargets.map(card => {
+    return this.roleCardTargets.map(card => {
       const roleId = card.dataset.roleId
       const roleColor = card.dataset.roleColor
       const labelInput = card.querySelector('input[type="text"]')
@@ -893,14 +914,17 @@ export default class extends Controller {
       const selected = field.role_id === roleId ? 'selected' : ''
       return `<option value="${roleId}" data-color="${roleColor}" ${selected}>${displayName}</option>`
     }).join('')
+  }
 
+  buildRoleDropdown(field) {
+    if (!this.hasRoleCardTarget) return ''
     return `
       <div>
         <label class="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Assigned to</label>
         <select data-action="change->pdf-signature-placement#reassignFieldRole"
                 data-field-id="${field.id}"
                 class="block w-full text-sm rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 py-1.5 px-2.5">
-          ${options}
+          ${this.buildRoleOptions(field)}
         </select>
       </div>
     `
@@ -944,6 +968,145 @@ export default class extends Controller {
     if (fieldsContainer) {
       fieldsContainer.classList.toggle('hidden', event.currentTarget.checked)
     }
+  }
+
+  // Task 50: Live-update signer name in assignment dropdown
+  onRoleDetailChanged() {
+    if (this.selectedFieldId === null || !this.hasFieldInspectorTarget) return
+
+    const dropdown = this.fieldInspectorTarget.querySelector('select')
+    if (!dropdown) return
+
+    const currentValue = dropdown.value
+    const field = this.signatureFields.find(f => f.id === this.selectedFieldId)
+    if (!field) return
+
+    dropdown.innerHTML = this.buildRoleOptions(field)
+    dropdown.value = currentValue
+  }
+
+  // Task 49: Toggle visibility of a role's fields on canvas
+  toggleRoleVisibility(event) {
+    const button = event.currentTarget.closest('[data-role-id]') ? event.currentTarget : event.currentTarget.closest('button')
+    const roleId = button.dataset.roleId
+    if (!roleId) return
+
+    if (this.hiddenRoles.has(roleId)) {
+      this.hiddenRoles.delete(roleId)
+    } else {
+      this.hiddenRoles.add(roleId)
+    }
+
+    // Update the toggle button icon and role card opacity
+    this.visibilityToggleTargets.forEach(toggle => {
+      const tRoleId = toggle.dataset.roleId
+      const isHidden = this.hiddenRoles.has(tRoleId)
+      const card = document.getElementById(`role-card-${tRoleId}`)
+
+      // Update card opacity
+      if (card) {
+        card.style.opacity = isHidden ? '0.5' : ''
+      }
+
+      // Update icon
+      if (isHidden) {
+        toggle.innerHTML = `<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21"/></svg>`
+      } else {
+        toggle.innerHTML = `<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>`
+      }
+    })
+
+    this.redrawFields()
+    this.updateFieldsListOnly()
+  }
+
+  // Task 47: Snap-to-Align Guides
+  findSnapGuides(movingField, newX, newY) {
+    const guides = []
+    const threshold = this.SNAP_THRESHOLD
+    const canvas = this.canvasTarget
+
+    const mx = (newX / 100) * canvas.width
+    const my = (newY / 100) * canvas.height
+    const mw = (movingField.width / 100) * canvas.width
+    const mh = (movingField.height / 100) * canvas.height
+
+    const mLeft = mx - mw/2, mRight = mx + mw/2, mCenterX = mx
+    const mTop = my - mh/2, mBottom = my + mh/2, mCenterY = my
+
+    this.signatureFields.forEach(other => {
+      if (other.id === movingField.id || other.page !== this.currentPageValue) return
+
+      const ox = (other.x / 100) * canvas.width
+      const oy = (other.y / 100) * canvas.height
+      const ow = (other.width / 100) * canvas.width
+      const oh = (other.height / 100) * canvas.height
+      const oLeft = ox - ow/2, oRight = ox + ow/2, oCenterX = ox
+      const oTop = oy - oh/2, oBottom = oy + oh/2, oCenterY = oy
+
+      // Horizontal alignments (snap X)
+      if (Math.abs(mLeft - oLeft) < threshold) guides.push({ axis: 'v', pos: oLeft, snap: 'left-left' })
+      if (Math.abs(mRight - oRight) < threshold) guides.push({ axis: 'v', pos: oRight, snap: 'right-right' })
+      if (Math.abs(mCenterX - oCenterX) < threshold) guides.push({ axis: 'v', pos: oCenterX, snap: 'center-center' })
+      if (Math.abs(mLeft - oRight) < threshold) guides.push({ axis: 'v', pos: oRight, snap: 'left-right' })
+      if (Math.abs(mRight - oLeft) < threshold) guides.push({ axis: 'v', pos: oLeft, snap: 'right-left' })
+
+      // Vertical alignments (snap Y)
+      if (Math.abs(mTop - oTop) < threshold) guides.push({ axis: 'h', pos: oTop, snap: 'top-top' })
+      if (Math.abs(mBottom - oBottom) < threshold) guides.push({ axis: 'h', pos: oBottom, snap: 'bottom-bottom' })
+      if (Math.abs(mCenterY - oCenterY) < threshold) guides.push({ axis: 'h', pos: oCenterY, snap: 'center-center' })
+      if (Math.abs(mTop - oBottom) < threshold) guides.push({ axis: 'h', pos: oBottom, snap: 'top-bottom' })
+      if (Math.abs(mBottom - oTop) < threshold) guides.push({ axis: 'h', pos: oTop, snap: 'bottom-top' })
+    })
+
+    return guides
+  }
+
+  applySnap(field, guides, newX, newY) {
+    const canvas = this.canvasTarget
+    let snappedX = newX, snappedY = newY
+
+    guides.forEach(guide => {
+      if (guide.axis === 'v') {
+        const posPct = (guide.pos / canvas.width) * 100
+        if (guide.snap.startsWith('left')) snappedX = posPct + field.width / 2
+        else if (guide.snap.startsWith('right')) snappedX = posPct - field.width / 2
+        else snappedX = posPct
+      } else {
+        const posPct = (guide.pos / canvas.height) * 100
+        if (guide.snap.startsWith('top')) snappedY = posPct + field.height / 2
+        else if (guide.snap.startsWith('bottom')) snappedY = posPct - field.height / 2
+        else snappedY = posPct
+      }
+    })
+
+    return { x: snappedX, y: snappedY }
+  }
+
+  drawSnapGuides() {
+    if (!this.activeGuides || this.activeGuides.length === 0) return
+    const canvas = this.canvasTarget
+    const ctx = canvas.getContext('2d')
+
+    ctx.strokeStyle = this.GUIDE_COLOR
+    ctx.lineWidth = 0.5
+    ctx.setLineDash([4, 4])
+
+    this.activeGuides.forEach(guide => {
+      if (guide.axis === 'v') {
+        ctx.beginPath()
+        ctx.moveTo(guide.pos, 0)
+        ctx.lineTo(guide.pos, canvas.height)
+        ctx.stroke()
+      } else {
+        ctx.beginPath()
+        ctx.moveTo(0, guide.pos)
+        ctx.lineTo(canvas.width, guide.pos)
+        ctx.stroke()
+      }
+    })
+
+    ctx.setLineDash([])
   }
 
   roleFieldColor(hexColor) {
