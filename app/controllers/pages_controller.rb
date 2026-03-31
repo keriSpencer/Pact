@@ -16,6 +16,11 @@ class PagesController < ApplicationController
   def sync
   end
 
+  def download_pactsync
+    path = Rails.root.join("public", "PactSync-1.0.0.dmg")
+    send_file path, filename: "PactSync-1.0.0.dmg", type: "application/x-apple-diskimage"
+  end
+
   def submit_contact
     name = params[:name].to_s.strip
     email = params[:email].to_s.strip
