@@ -39,6 +39,14 @@ class SigningEnvelope < ApplicationRecord
     end
   end
 
+  def signed_version
+    # Find the document version created when this envelope completed
+    document.versions.where(version_type: "signed")
+            .where("created_at >= ? AND created_at <= ?", completed_at - 1.minute, completed_at + 5.minutes)
+            .order(created_at: :desc)
+            .first
+  end
+
   def next_signing_order
     return nil unless sequential?
     signing_roles.left_joins(:signature_request)

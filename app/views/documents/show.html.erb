@@ -213,7 +213,16 @@
       <!-- Signing Envelopes -->
       <% envelopes = @document.signing_envelopes.where.not(status: :draft).includes(signing_roles: :signature_request).order(created_at: :desc) %>
       <% if envelopes.any? %>
-        <% envelopes.each do |envelope| %>
+        <%
+          completed_envelopes = envelopes.select(&:completed?)
+          non_completed_envelopes = envelopes.reject(&:completed?)
+          most_recent_completed = completed_envelopes.first
+          older_completed = completed_envelopes.drop(1)
+        %>
+
+        <%# Active/voided/cancelled envelopes always show expanded %>
+        <% non_completed_envelopes.each do |envelope| %>
+          <%= render_envelope_card(envelope) if respond_to?(:render_envelope_card) %>
           <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
             <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
               <div>
@@ -276,6 +285,138 @@
               <% end %>
             </div>
           </div>
+        <% end %>
+
+        <%# Most recent completed envelope shows expanded %>
+        <% if most_recent_completed %>
+          <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+              <div>
+                <h2 class="text-sm font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-wider">Multi-Signer Envelope</h2>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                  <%= most_recent_completed.signing_mode.humanize %> signing
+                  <span class="mx-1">&middot;</span>
+                  <span class="text-green-600"><%= most_recent_completed.status.humanize %></span>
+                  <% if most_recent_completed.completed_at %>
+                    <span class="mx-1">&middot;</span>
+                    <span><%= most_recent_completed.completed_at.strftime("%b %d, %Y") %></span>
+                  <% end %>
+                </p>
+              </div>
+            </div>
+
+            <!-- Progress bar -->
+            <div class="px-6 py-3 border-b border-gray-200 dark:border-gray-700">
+              <div class="flex items-center justify-between mb-1">
+                <span class="text-xs text-gray-500 dark:text-gray-400">Progress</span>
+                <span class="text-xs font-medium text-gray-700 dark:text-gray-300"><%= most_recent_completed.completion_progress %>%</span>
+              </div>
+              <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5">
+                <div class="bg-green-500 h-1.5 rounded-full transition-all" style="width: <%= most_recent_completed.completion_progress %>%"></div>
+              </div>
+            </div>
+
+            <!-- Signer list -->
+            <div class="divide-y divide-gray-200 dark:divide-gray-700">
+              <% most_recent_completed.signing_roles.in_order.each do |role| %>
+                <div class="px-6 py-3 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                  <div class="flex items-center space-x-3">
+                    <span class="inline-block w-2.5 h-2.5 rounded-full shrink-0" style="background-color: <%= role.color %>"></span>
+                    <div>
+                      <p class="text-sm font-medium text-gray-900 dark:text-gray-100"><%= role.display_name %></p>
+                      <p class="text-xs text-gray-500 dark:text-gray-400"><%= role.display_email %></p>
+                    </div>
+                  </div>
+                  <div class="flex items-center space-x-2">
+                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
+                      <svg class="h-3 w-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                      <%= role.status_text %>
+                    </span>
+                  </div>
+                </div>
+              <% end %>
+            </div>
+
+            <%# Per-envelope View Signed PDF button %>
+            <% signed_ver = most_recent_completed.signed_version %>
+            <% if most_recent_completed.completed? && signed_ver&.file&.attached? %>
+              <div class="px-6 py-3 border-t border-gray-200 dark:border-gray-700 flex space-x-2">
+                <%= link_to "View Signed PDF", rails_blob_path(signed_ver.file, disposition: "inline"), target: "_blank", class: "text-xs text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium transition-colors" %>
+                <%= link_to "Download", rails_blob_path(signed_ver.file, disposition: "attachment"), class: "text-xs text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium transition-colors" %>
+              </div>
+            <% end %>
+          </div>
+        <% end %>
+
+        <%# Older completed envelopes collapsed %>
+        <% if older_completed.any? %>
+          <details class="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+            <summary class="px-6 py-4 cursor-pointer text-sm text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors list-none flex items-center justify-between">
+              <span><%= older_completed.size %> previous signing session<%= older_completed.size != 1 ? 's' : '' %></span>
+              <span class="text-xs text-blue-600 dark:text-blue-400 font-medium">Show</span>
+            </summary>
+            <div class="border-t border-gray-200 dark:border-gray-700">
+              <% older_completed.each do |envelope| %>
+                <div class="border-b border-gray-200 dark:border-gray-700 last:border-b-0">
+                  <div class="px-6 py-4 flex items-center justify-between">
+                    <div>
+                      <h2 class="text-sm font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-wider">Multi-Signer Envelope</h2>
+                      <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                        <%= envelope.signing_mode.humanize %> signing
+                        <span class="mx-1">&middot;</span>
+                        <span class="text-green-600"><%= envelope.status.humanize %></span>
+                        <% if envelope.completed_at %>
+                          <span class="mx-1">&middot;</span>
+                          <span><%= envelope.completed_at.strftime("%b %d, %Y") %></span>
+                        <% end %>
+                      </p>
+                    </div>
+                  </div>
+
+                  <!-- Progress bar -->
+                  <div class="px-6 py-3 border-t border-gray-200 dark:border-gray-700">
+                    <div class="flex items-center justify-between mb-1">
+                      <span class="text-xs text-gray-500 dark:text-gray-400">Progress</span>
+                      <span class="text-xs font-medium text-gray-700 dark:text-gray-300"><%= envelope.completion_progress %>%</span>
+                    </div>
+                    <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5">
+                      <div class="bg-green-500 h-1.5 rounded-full transition-all" style="width: <%= envelope.completion_progress %>%"></div>
+                    </div>
+                  </div>
+
+                  <!-- Signer list -->
+                  <div class="divide-y divide-gray-200 dark:divide-gray-700">
+                    <% envelope.signing_roles.in_order.each do |role| %>
+                      <div class="px-6 py-3 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                        <div class="flex items-center space-x-3">
+                          <span class="inline-block w-2.5 h-2.5 rounded-full shrink-0" style="background-color: <%= role.color %>"></span>
+                          <div>
+                            <p class="text-sm font-medium text-gray-900 dark:text-gray-100"><%= role.display_name %></p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400"><%= role.display_email %></p>
+                          </div>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                          <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
+                            <svg class="h-3 w-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                            <%= role.status_text %>
+                          </span>
+                        </div>
+                      </div>
+                    <% end %>
+                  </div>
+
+                  <%# Per-envelope View Signed PDF button %>
+                  <% signed_ver = envelope.signed_version %>
+                  <% if envelope.completed? && signed_ver&.file&.attached? %>
+                    <div class="px-6 py-3 border-t border-gray-200 dark:border-gray-700 flex space-x-2">
+                      <%= link_to "View Signed PDF", rails_blob_path(signed_ver.file, disposition: "inline"), target: "_blank", class: "text-xs text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium transition-colors" %>
+                      <%= link_to "Download", rails_blob_path(signed_ver.file, disposition: "attachment"), class: "text-xs text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium transition-colors" %>
+                    </div>
+                  <% end %>
+                </div>
+              <% end %>
+            </div>
+          </details>
         <% end %>
       <% end %>
 

@@ -5,7 +5,7 @@ class SigningRole < ApplicationRecord
   has_one :signature_request, dependent: :nullify
   has_many :signature_fields, dependent: :nullify
 
-  COLORS = %w[#3B82F6 #EF4444 #10B981 #F59E0B #8B5CF6 #EC4899 #06B6D4 #F97316].freeze
+  COLORS = %w[#2563EB #DC2626 #059669 #D97706 #7C3AED #DB2777 #0891B2 #EA580C].freeze
 
   validates :label, presence: true
   validates :label, uniqueness: { scope: :signing_envelope_id }

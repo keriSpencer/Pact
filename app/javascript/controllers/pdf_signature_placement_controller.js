@@ -477,10 +477,49 @@ export default class extends Controller {
     ctx.fillStyle = colors.solid; ctx.beginPath(); ctx.arc(x - w/2 + 12, y - h/2 + 12, 12, 0, 2 * Math.PI); ctx.fill()
     ctx.fillStyle = '#fff'; ctx.font = 'bold 12px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'
     ctx.fillText(number.toString(), x - w/2 + 12, y - h/2 + 12)
+    // Role indicator badge for multi-signer mode (accessibility: non-color indicator)
+    if (this.multiSignerValue && field.role_id) {
+      const roleLabel = this.getRoleLabelForField(field)
+      if (roleLabel) {
+        const shortLabel = roleLabel.substring(0, 2)
+        const badgeX = x + w/2 - 14
+        const badgeY = y - h/2 + 10
+        const badgeW = ctx.measureText(shortLabel).width + 8
+        // Draw rounded badge background
+        ctx.fillStyle = colors.solid
+        const radius = 4
+        ctx.beginPath()
+        ctx.moveTo(badgeX - badgeW/2 + radius, badgeY - 8)
+        ctx.lineTo(badgeX + badgeW/2 - radius, badgeY - 8)
+        ctx.arcTo(badgeX + badgeW/2, badgeY - 8, badgeX + badgeW/2, badgeY - 8 + radius, radius)
+        ctx.lineTo(badgeX + badgeW/2, badgeY + 8 - radius)
+        ctx.arcTo(badgeX + badgeW/2, badgeY + 8, badgeX + badgeW/2 - radius, badgeY + 8, radius)
+        ctx.lineTo(badgeX - badgeW/2 + radius, badgeY + 8)
+        ctx.arcTo(badgeX - badgeW/2, badgeY + 8, badgeX - badgeW/2, badgeY + 8 - radius, radius)
+        ctx.lineTo(badgeX - badgeW/2, badgeY - 8 + radius)
+        ctx.arcTo(badgeX - badgeW/2, badgeY - 8, badgeX - badgeW/2 + radius, badgeY - 8, radius)
+        ctx.closePath()
+        ctx.fill()
+        // Draw white text
+        ctx.fillStyle = '#fff'
+        ctx.font = 'bold 10px sans-serif'
+        ctx.textAlign = 'center'
+        ctx.textBaseline = 'middle'
+        ctx.fillText(shortLabel, badgeX, badgeY)
+      }
+    }
     // Label
-    ctx.fillStyle = colors.solid; ctx.font = 'bold 14px sans-serif'
+    ctx.fillStyle = colors.solid; ctx.font = 'bold 14px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'
     ctx.fillText(this.fieldDefaultLabel(field), x, y)
     if (isSelected) this.drawResizeHandles(ctx, canvas, field, colors)
+  }
+
+  getRoleLabelForField(field) {
+    if (!this.hasRoleCardTarget || !field.role_id) return null
+    const card = this.roleCardTargets.find(c => c.dataset.roleId === field.role_id)
+    if (!card) return null
+    const labelInput = card.querySelector('input[type="text"]')
+    return labelInput ? labelInput.value : 'S'
   }
 
   drawResizeHandles(ctx, canvas, field, colors) {
@@ -541,10 +580,15 @@ export default class extends Controller {
         const isSelected = field.id === this.selectedFieldId
         const sel = isSelected ? 'ring-2 ring-purple-400 bg-purple-50' : 'bg-gray-50 hover:bg-gray-100'
         const displayLabel = field.label ? `"${field.label}"` : ''
-        const roleDot = (isMultiSigner && field.role_color) ? `<span class="inline-block w-2.5 h-2.5 rounded-full shrink-0" style="background-color: ${field.role_color}"></span>` : ''
+        let roleIndicator = ''
+        if (isMultiSigner && field.role_color) {
+          const roleLabel = this.getRoleLabelForField(field)
+          const shortLabel = roleLabel ? roleLabel.substring(0, 2) : ''
+          roleIndicator = `<span class="inline-flex items-center space-x-1 shrink-0"><span class="inline-block w-2.5 h-2.5 rounded-full" style="background-color: ${field.role_color}"></span>${shortLabel ? `<span class="text-xs font-medium text-gray-600">${shortLabel}</span>` : ''}</span>`
+        }
         return `<div class="flex items-center justify-between py-2 px-3 ${sel} rounded-lg cursor-pointer transition-colors" data-action="click->pdf-signature-placement#selectField" data-field-id="${field.id}">
           <div class="flex items-center space-x-2 min-w-0">
-            ${roleDot}
+            ${roleIndicator}
             <span class="flex items-center justify-center h-6 w-6 rounded-full ${cfg.badge} text-white text-xs font-bold shrink-0">${index + 1}</span>
             <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${cfg.color} shrink-0">${cfg.label}</span>
             ${displayLabel ? `<span class="text-xs text-gray-500 truncate">${displayLabel}</span>` : ''}
@@ -761,10 +805,15 @@ export default class extends Controller {
       const isSelected = field.id === this.selectedFieldId
       const sel = isSelected ? 'ring-2 ring-purple-400 bg-purple-50' : 'bg-gray-50 hover:bg-gray-100'
       const displayLabel = field.label ? `"${field.label}"` : ''
-      const roleDot = (isMultiSigner && field.role_color) ? `<span class="inline-block w-2.5 h-2.5 rounded-full shrink-0" style="background-color: ${field.role_color}"></span>` : ''
+      let roleIndicator = ''
+      if (isMultiSigner && field.role_color) {
+        const roleLabel = this.getRoleLabelForField(field)
+        const shortLabel = roleLabel ? roleLabel.substring(0, 2) : ''
+        roleIndicator = `<span class="inline-flex items-center space-x-1 shrink-0"><span class="inline-block w-2.5 h-2.5 rounded-full" style="background-color: ${field.role_color}"></span>${shortLabel ? `<span class="text-xs font-medium text-gray-600">${shortLabel}</span>` : ''}</span>`
+      }
       return `<div class="flex items-center justify-between py-2 px-3 ${sel} rounded-lg cursor-pointer transition-colors" data-action="click->pdf-signature-placement#selectField" data-field-id="${field.id}">
         <div class="flex items-center space-x-2 min-w-0">
-          ${roleDot}
+          ${roleIndicator}
           <span class="flex items-center justify-center h-6 w-6 rounded-full ${cfg.badge} text-white text-xs font-bold shrink-0">${index + 1}</span>
           <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${cfg.color} shrink-0">${cfg.label}</span>
           ${displayLabel ? `<span class="text-xs text-gray-500 truncate">${displayLabel}</span>` : ''}

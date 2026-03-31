@@ -34,6 +34,9 @@ export default class extends Controller {
     this.animationFrame = null
     this.pulsePhase = 0
 
+    this.cachedSignature = null
+    this.cachedInitials = null
+
     this.findFirstIncompleteField()
     this.updateProgress()
     this.loadPdf()
@@ -332,6 +335,25 @@ export default class extends Controller {
     if (type === "signature" || type === "initials") {
       const label = type === "signature" ? "Sign Here" : "Initial Here"
       const placeholder = type === "signature" ? "Type your signature..." : "Type your initials..."
+      const cachedData = type === "signature" ? this.cachedSignature : this.cachedInitials
+      const cachedPreviewHtml = cachedData ? `
+          <div class="stepper-cached-preview border border-green-200 bg-green-50 rounded-lg p-3">
+            <p class="text-xs text-green-700 font-medium mb-2">Use previous ${type}:</p>
+            ${cachedData.startsWith("data:image/")
+              ? `<img src="${cachedData}" alt="Previous ${type}" class="max-h-16 mx-auto mb-2 bg-white rounded border border-gray-200 p-1">`
+              : `<p class="text-lg text-center mb-2" style="font-family: 'Brush Script MT', 'Segoe Script', cursive;">${this.escapeHtml(cachedData)}</p>`
+            }
+            <button type="button" data-action="signing-stepper#useCachedArtifact"
+                    class="w-full px-4 py-1.5 bg-green-600 text-white rounded-lg font-medium text-xs hover:bg-green-700 transition-colors cursor-pointer">
+              Use previous ${type}
+            </button>
+          </div>
+          <div class="relative flex items-center my-1">
+            <div class="flex-grow border-t border-gray-200"></div>
+            <span class="flex-shrink mx-3 text-xs text-gray-400">or draw a new one</span>
+            <div class="flex-grow border-t border-gray-200"></div>
+          </div>
+      ` : ''
       html = `
         <div class="space-y-4">
           <div class="flex items-center justify-between">
@@ -343,6 +365,7 @@ export default class extends Controller {
                       class="stepper-type-btn px-3 py-1 text-xs font-medium bg-white text-gray-700 cursor-pointer">Type</button>
             </div>
           </div>
+          ${cachedPreviewHtml}
           <div class="stepper-draw-mode">
             <canvas class="stepper-signing-canvas w-full border-2 border-dashed border-gray-300 rounded-lg cursor-crosshair touch-none"
                     style="height: min(180px, 25vh); background-color: #ffffff; color-scheme: light;"></canvas>
@@ -672,6 +695,13 @@ export default class extends Controller {
         }
       }
 
+      // Cache the artifact for reuse on subsequent fields of the same type
+      if (type === "signature") {
+        this.cachedSignature = artifactData
+      } else if (type === "initials") {
+        this.cachedInitials = artifactData
+      }
+
       // Mark field completed locally
       field.completed = true
       field.artifact_value = artifactData
@@ -681,6 +711,49 @@ export default class extends Controller {
       console.error("Error completing field:", error)
       alert("Failed to complete field. Please try again.")
       if (applyBtn) { applyBtn.disabled = false; applyBtn.textContent = "Apply" }
+    }
+  }
+
+  async useCachedArtifact() {
+    const field = this.currentField
+    if (!field) return
+
+    const type = field.type
+    const cachedData = type === "signature" ? this.cachedSignature : this.cachedInitials
+    if (!cachedData) return
+
+    const captureMethod = cachedData.startsWith("data:image/") ? "drawn" : "typed"
+
+    // Disable button during request
+    const btn = this.fieldPanelTarget.querySelector('[data-action="signing-stepper#useCachedArtifact"]')
+    if (btn) { btn.disabled = true; btn.textContent = "Applying..." }
+
+    try {
+      const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content
+
+      const captureResp = await fetch(this.captureArtifactUrlValue, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Accept": "application/json", "X-CSRF-Token": csrfToken },
+        body: JSON.stringify({
+          artifact_type: type,
+          artifact_data: cachedData,
+          capture_method: captureMethod,
+          field_id: field.id
+        })
+      })
+      const captureResult = await captureResp.json()
+      if (!captureResult.success) {
+        throw new Error(captureResult.error || "Failed to capture artifact")
+      }
+
+      field.completed = true
+      field.artifact_value = cachedData
+      this.updateProgress()
+      this.advanceToNextField()
+    } catch (error) {
+      console.error("Error applying cached artifact:", error)
+      alert("Failed to apply. Please try again.")
+      if (btn) { btn.disabled = false; btn.textContent = `Use previous ${type}` }
     }
   }
 
