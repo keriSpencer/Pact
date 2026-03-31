@@ -24,7 +24,8 @@ class SignatureTemplate < ApplicationRecord
         field_type: tf.field_type,
         label: tf.label,
         required: tf.required,
-        position: tf.position
+        position: tf.position,
+        role_label: tf.role_label
       }
     end
   end

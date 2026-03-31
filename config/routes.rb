@@ -30,6 +30,7 @@ Rails.application.routes.draw do
         post :cancel
         post :resend
         post :void
+        post :convert_to_multi_signer
       end
     end
     resources :signature_templates, only: [:index, :create, :destroy] do

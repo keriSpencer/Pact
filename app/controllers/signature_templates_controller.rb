@@ -19,6 +19,12 @@ class SignatureTemplatesController < ApplicationController
     if params[:fields].present?
       fields = params[:fields].is_a?(String) ? JSON.parse(params[:fields]) : params[:fields]
       fields.each do |fd|
+        role_label = nil
+        if fd["role_id"].present?
+          role = SigningRole.find_by(id: fd["role_id"])
+          role_label = role&.label
+        end
+
         @template.template_fields.build(
           page_number: fd["page_number"],
           x_percent: fd["x_percent"],
@@ -28,7 +34,8 @@ class SignatureTemplatesController < ApplicationController
           field_type: fd["field_type"],
           label: fd["label"],
           required: fd["required"] != false,
-          position: fd["position"]
+          position: fd["position"],
+          role_label: role_label
         )
       end
     end
@@ -50,52 +57,8 @@ class SignatureTemplatesController < ApplicationController
 
     respond_to do |format|
       format.json { render json: { fields: @template.fields_as_json } }
-      format.html do
-        # Find the latest draft signature request for this document, or redirect back
-        sr = @document.signature_requests.where(status: :draft).order(created_at: :desc).first
-        if sr
-          # Apply template fields to the signature request
-          sr.signature_fields.destroy_all
-          @template.template_fields.each do |tf|
-            sr.signature_fields.create!(
-              page_number: tf.page_number,
-              x_percent: tf.x_percent,
-              y_percent: tf.y_percent,
-              width_percent: tf.width_percent,
-              height_percent: tf.height_percent,
-              field_type: tf.field_type,
-              label: tf.label,
-              required: tf.required,
-              position: tf.position
-            )
-          end
-          redirect_to edit_document_signature_request_path(@document, sr), notice: "Template '#{@template.name}' applied."
-        else
-          redirect_back fallback_location: document_path(@document), notice: "Template applied."
-        end
-      end
-      format.turbo_stream do
-        sr = @document.signature_requests.where(status: :draft).order(created_at: :desc).first
-        if sr
-          sr.signature_fields.destroy_all
-          @template.template_fields.each do |tf|
-            sr.signature_fields.create!(
-              page_number: tf.page_number,
-              x_percent: tf.x_percent,
-              y_percent: tf.y_percent,
-              width_percent: tf.width_percent,
-              height_percent: tf.height_percent,
-              field_type: tf.field_type,
-              label: tf.label,
-              required: tf.required,
-              position: tf.position
-            )
-          end
-          redirect_to edit_document_signature_request_path(@document, sr), notice: "Template '#{@template.name}' applied."
-        else
-          redirect_back fallback_location: document_path(@document), notice: "Template applied."
-        end
-      end
+      format.html { apply_template_to_draft }
+      format.turbo_stream { apply_template_to_draft }
     end
   end
 
@@ -118,5 +81,64 @@ class SignatureTemplatesController < ApplicationController
 
   def template_params
     params.permit(:name, :description)
+  end
+
+  def apply_template_to_draft
+    # Determine if we're in multi-signer (envelope) or single-signer mode
+    envelope = nil
+    roles = []
+
+    if params[:signing_envelope_id].present?
+      envelope = @document.signing_envelopes.find_by(id: params[:signing_envelope_id])
+    end
+
+    if envelope
+      sr = envelope.signature_requests.where(status: :draft).first
+      roles = envelope.signing_roles.in_order.to_a
+      redirect_path = sr ? edit_document_signing_envelope_path(@document, envelope) : document_path(@document)
+    else
+      sr = @document.signature_requests.where(status: :draft).order(created_at: :desc).first
+      # Check if the draft request belongs to an envelope
+      if sr&.signing_envelope.present?
+        envelope = sr.signing_envelope
+        roles = envelope.signing_roles.in_order.to_a
+        redirect_path = edit_document_signing_envelope_path(@document, envelope)
+      else
+        redirect_path = sr ? edit_document_signature_request_path(@document, sr) : document_path(@document)
+      end
+    end
+
+    unless sr
+      redirect_back fallback_location: document_path(@document), alert: "No draft request found."
+      return
+    end
+
+    sr.signature_fields.destroy_all
+
+    @template.template_fields.order(:position).each do |tf|
+      # Match role by label if in multi-signer mode
+      signing_role = nil
+      if roles.any?
+        if tf.role_label.present?
+          signing_role = roles.find { |r| r.label == tf.role_label }
+        end
+        signing_role ||= roles.first
+      end
+
+      sr.signature_fields.create!(
+        page_number: tf.page_number,
+        x_percent: tf.x_percent,
+        y_percent: tf.y_percent,
+        width_percent: tf.width_percent,
+        height_percent: tf.height_percent,
+        field_type: tf.field_type,
+        label: tf.label,
+        required: tf.required,
+        position: tf.position,
+        signing_role: signing_role
+      )
+    end
+
+    redirect_to redirect_path, notice: "Template '#{@template.name}' applied."
   end
 end

@@ -1,7 +1,7 @@
 class SignatureRequestsController < ApplicationController
   before_action :authenticate_user!
   before_action :set_document
-  before_action :set_signature_request, only: [:edit, :update, :autosave, :discard_draft, :cancel, :resend, :void]
+  before_action :set_signature_request, only: [:edit, :update, :autosave, :discard_draft, :cancel, :resend, :void, :convert_to_multi_signer]
   before_action :check_document_access
 
   def new
@@ -90,6 +90,40 @@ class SignatureRequestsController < ApplicationController
     else
       redirect_to document_path(@document), alert: "Unable to void this signature request."
     end
+  end
+
+  def convert_to_multi_signer
+    return redirect_to document_path(@document), alert: "Only drafts can be converted." unless @signature_request.draft?
+    return redirect_to document_path(@document), alert: "Already part of a multi-signer envelope." if @signature_request.signing_envelope_id.present?
+
+    # Create the envelope
+    envelope = @document.signing_envelopes.create!(
+      requester: current_user,
+      status: :draft,
+      signing_mode: :parallel
+    )
+
+    # Create Signer 1 role from existing request data
+    role1 = envelope.signing_roles.create!(
+      label: "Signer 1",
+      color: SigningRole::COLORS[0],
+      signing_order: 0,
+      signer_email: @signature_request.signer_email,
+      signer_name: @signature_request.signer_name
+    )
+
+    # Create Signer 2 role (empty, for the admin to fill)
+    envelope.signing_roles.create!(
+      label: "Signer 2",
+      color: SigningRole::COLORS[1],
+      signing_order: 1
+    )
+
+    # Move the draft request to the envelope and assign fields to role 1
+    @signature_request.update!(signing_envelope: envelope, signing_role: role1)
+    @signature_request.signature_fields.update_all(signing_role_id: role1.id)
+
+    redirect_to edit_document_signing_envelope_path(@document, envelope), notice: "Converted to multi-signer. Your fields are assigned to Signer 1."
   end
 
   private
