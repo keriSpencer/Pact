@@ -25,15 +25,54 @@ class Folder < ApplicationRecord
   scope :for_organization, ->(org) { where(organization: org) }
 
   scope :visible_to, ->(user) {
-    shared_folder_ids = FolderShare.where(user_id: user.id).active.select(:folder_id)
     where(organization_id: user.organization_id)
       .where(
-        "(visibility = ? AND user_id = ?) OR visibility IN (?, ?) OR id IN (?)",
+        "(visibility = ? AND user_id = ?) OR visibility IN (?, ?)",
         visibilities[:folder_private], user.id,
-        visibilities[:organization], visibilities[:folder_public],
-        shared_folder_ids
+        visibilities[:organization], visibilities[:folder_public]
       )
   }
+
+  # Returns own folders + cross-organization shared folders
+  def self.visible_to_with_shared(user)
+    own = visible_to(user).to_a
+    shared_folder_ids = FolderShare.where(user_id: user.id).active.pluck(:folder_id)
+    shared_from_other_orgs = shared_folder_ids - own.map(&:id)
+    if shared_from_other_orgs.any?
+      cross_org = with_public_search_path { unscoped.where(deleted_at: nil, id: shared_from_other_orgs).to_a }
+      own + cross_org
+    else
+      own
+    end
+  end
+
+  def self.with_public_search_path
+    conn = ActiveRecord::Base.connection
+    return yield unless conn.adapter_name.downcase.include?("postgresql")
+    old_path = conn.execute("SHOW search_path").first["search_path"]
+    conn.execute("SET search_path TO public")
+    result = yield
+    conn.execute("SET search_path TO #{old_path}")
+    result
+  end
+
+  # Find a folder by id, checking cross-org if needed for shared access
+  def self.find_shared(id, user)
+    folder = find_by(id: id)
+    return folder if folder
+    # Check cross-org: find folder and walk ancestors to verify share access
+    with_public_search_path do
+      folder = unscoped.where(deleted_at: nil).find_by(id: id)
+      return nil unless folder
+      # Check if this folder or any ancestor is shared with the user
+      current = folder
+      while current
+        return folder if FolderShare.where(folder_id: current.id, user_id: user.id).active.exists?
+        current = current.parent_id ? unscoped.where(deleted_at: nil).find_by(id: current.parent_id) : nil
+      end
+      nil
+    end
+  end
 
   def destroy
     update(deleted_at: Time.current)
@@ -79,8 +118,9 @@ class Folder < ApplicationRecord
   end
 
   def can_access?(user)
-    return false unless user.organization_id == organization_id
     return true if folder_shares.where(user_id: user.id).active.exists?
+    return true if shared_via_ancestor?(user)
+    return false unless user.organization_id == organization_id
     case visibility
     when "folder_private"
       self.user == user
@@ -98,6 +138,16 @@ class Folder < ApplicationRecord
   def shared_by_for(user)
     share = folder_shares.where(user_id: user.id).active.first
     share&.shared_by
+  end
+
+  # Check if an ancestor folder was shared with this user
+  def shared_via_ancestor?(user)
+    current = parent
+    while current
+      return true if current.folder_shares.where(user_id: user.id).active.exists?
+      current = current.parent
+    end
+    false
   end
 
   def document_count
