@@ -63,6 +63,7 @@ Rails.application.routes.draw do
   root "pages#home"
   get "contact", to: "pages#contact", as: :contact_us
   get "sync", to: "pages#sync", as: :sync_guide
+  get "PactSync-1.0.0.dmg", to: "pages#download_pactsync", as: :download_pactsync
   post "contact", to: "pages#submit_contact", as: :submit_contact
 
   # Authenticated dashboard
