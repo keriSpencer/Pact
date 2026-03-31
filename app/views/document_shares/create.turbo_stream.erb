@@ -1,0 +1,19 @@
+<%= turbo_stream.replace "share_link_section" do %>
+  <div id="share_link_section">
+    <div class="flex items-center gap-2 bg-gray-50 dark:bg-gray-700 rounded-lg p-3 border border-gray-200 dark:border-gray-600">
+      <svg class="h-4 w-4 text-green-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-1.102-4.243a4 4 0 015.656 0l4 4a4 4 0 01-5.656 5.656l-1.1-1.1"/></svg>
+      <input type="text" value="<%= @share.share_url %>" readonly
+             class="flex-1 text-sm bg-transparent border-none p-0 text-gray-700 dark:text-gray-200 focus:ring-0 select-all"
+             id="share_url_input"
+             onclick="this.select()">
+      <button onclick="navigator.clipboard.writeText(document.getElementById('share_url_input').value).then(() => { this.textContent = 'Copied!'; setTimeout(() => this.textContent = 'Copy', 2000) })"
+              class="px-3 py-1 text-xs font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 rounded-md hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors cursor-pointer whitespace-nowrap">
+        Copy
+      </button>
+      <%= link_to document_document_share_path(@document, @share), data: { "turbo-method": "delete", turbo_confirm: "Remove this share link?" }, class: "p-1 text-gray-400 hover:text-red-500 transition-colors" do %>
+        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      <% end %>
+    </div>
+    <p class="mt-1.5 text-xs text-gray-400 dark:text-gray-500">Anyone with this link can view and download. Expires <%= @share.expires_at.strftime("%b %d, %Y") %>.</p>
+  </div>
+<% end %>

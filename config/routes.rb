@@ -44,6 +44,7 @@ Rails.application.routes.draw do
         post :void
       end
     end
+    resources :document_shares, only: [:create, :destroy]
   end
 
   # Public signature routes (no auth)

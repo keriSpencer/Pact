@@ -18,10 +18,10 @@ class DocumentShareTest < ActiveSupport::TestCase
     assert share.valid?
   end
 
-  test "invalid without any recipient" do
+  test "valid as public link without recipient" do
     share = build(:document_share, document: @document, shared_by: @user)
-    assert_not share.valid?
-    assert_includes share.errors.full_messages.join, "user or a contact"
+    assert share.valid?
+    assert share.public_link?
   end
 
   test "generates share_token for contact shares" do
