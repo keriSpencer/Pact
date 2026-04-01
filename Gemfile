@@ -63,6 +63,6 @@ end
 
 gem "stripe", "~> 19.0"
 
-gem "ruby_native", "~> 0.3.2"
+gem "ruby_native", "~> 0.4.1"
 
 gem "action_push_native", "~> 0.3.1"
