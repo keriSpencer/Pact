@@ -918,11 +918,23 @@ export default class extends Controller {
       const roleColor = card.dataset.roleColor
       const labelInput = card.querySelector('input[type="text"]')
       const roleLabel = labelInput ? labelInput.value : 'Signer'
-      const nameInput = card.querySelector('input[placeholder="Full name"]')
-      const emailInput = card.querySelector('input[type="email"]')
-      const signerName = nameInput?.value || emailInput?.value || ''
+
+      // Check if self-signer — name is in a <span class="font-medium"> inside the card
+      const selfSignCheckbox = card.querySelector('input[type="checkbox"][value="1"]')
+      const isSelfSigner = selfSignCheckbox?.checked
+      let signerName = ''
+
+      if (isSelfSigner) {
+        const selfNameSpan = card.querySelector('.font-medium')
+        signerName = selfNameSpan?.textContent?.trim() || 'Me'
+      } else {
+        const nameInput = card.querySelector('input[placeholder="Full name"]')
+        const emailInput = card.querySelector('input[type="email"]')
+        signerName = nameInput?.value || emailInput?.value || ''
+      }
+
       const displayName = signerName ? `${roleLabel} — ${signerName}` : roleLabel
-      const selected = field.role_id === roleId ? 'selected' : ''
+      const selected = String(field.role_id) === String(roleId) ? 'selected' : ''
       return `<option value="${roleId}" data-color="${roleColor}" ${selected}>${displayName}</option>`
     }).join('')
   }
