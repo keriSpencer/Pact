@@ -15,7 +15,10 @@
         on <%= @signature_request.signed_at&.strftime("%B %d, %Y at %l:%M %p") %>.
       </p>
 
-      <% signed_version = @signature_request.signed_version %>
+      <%# Check individual signed version first, then envelope's, then document's latest %>
+      <% signed_version = @signature_request.signed_version ||
+           @signature_request.signing_envelope&.signed_version ||
+           @signature_request.document.latest_signed_version %>
       <% if signed_version&.file&.attached? %>
         <div class="mt-6 flex justify-center space-x-4">
           <%= link_to rails_blob_path(signed_version.file, disposition: "inline"), target: "_blank", class: "inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors" do %>
@@ -26,6 +29,12 @@
             <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
             Download
           <% end %>
+        </div>
+      <% elsif @signature_request.signing_envelope.present? && !@signature_request.signing_envelope.completed? %>
+        <div class="mt-6 p-4 bg-amber-50 rounded-lg">
+          <p class="text-sm text-amber-800 text-center">
+            Your signature has been recorded. The signed document will be available once all parties have signed.
+          </p>
         </div>
       <% end %>
 
