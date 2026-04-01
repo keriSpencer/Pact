@@ -222,27 +222,37 @@ class SigningEnvelopesController < ApplicationController
       role_fields.each do |field|
         next if field.completed?
 
-        artifact_data = case field.field_type
-        when "signature"
-          current_user.full_name
-        when "initials"
-          current_user.full_name.split.map { |n| n[0] }.join
-        when "date"
-          Time.current.strftime("%B %d, %Y at %l:%M %p")
-        when "name"
-          current_user.full_name
-        when "email"
-          current_user.email
+        # Check if self-sign data was provided from the editor
+        self_sign_data = find_self_sign_data_for_field(field)
+
+        artifact_data = if self_sign_data.present? && self_sign_data["artifact_data"].present?
+          self_sign_data["artifact_data"]
         else
-          "[Self-signed]"
+          # Fallback to typed text
+          case field.field_type
+          when "signature"
+            current_user.full_name
+          when "initials"
+            current_user.full_name.split.map { |n| n[0] }.join
+          when "date"
+            Time.current.strftime("%B %d, %Y at %l:%M %p")
+          when "name"
+            current_user.full_name
+          when "email"
+            current_user.email
+          else
+            "[Self-signed]"
+          end
         end
+
+        capture_method = self_sign_data&.dig("capture_method") || "typed"
 
         artifact = SignatureArtifact.find_or_create_for(
           signature_request: draft_request,
           signer_email: current_user.email,
           artifact_type: field.field_type,
           artifact_data: artifact_data,
-          capture_method: "typed"
+          capture_method: capture_method
         )
 
         field.complete!(
@@ -250,6 +260,17 @@ class SigningEnvelopesController < ApplicationController
           signer_email: current_user.email
         ) if artifact.persisted?
       end
+    end
+  end
+
+  def find_self_sign_data_for_field(field)
+    return nil unless params[:self_sign_data].present?
+    begin
+      data = JSON.parse(params[:self_sign_data])
+      # Match by field position since field IDs are created during sync
+      data[field.position.to_s]
+    rescue JSON::ParserError
+      nil
     end
   end
 end

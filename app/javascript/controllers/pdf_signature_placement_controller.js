@@ -6,7 +6,8 @@ export default class extends Controller {
     "canvasContainer", "fieldsList", "fieldCount", "addFieldType",
     "labelInput", "fieldLabel", "fieldTypePill",
     "customLabelInput", "customLabelField", "templateNameInput",
-    "typePicker", "fieldInspector", "roleCard", "visibilityToggle"
+    "typePicker", "fieldInspector", "roleCard", "visibilityToggle",
+    "selfSignDataInput", "sendButton", "selfSignWarning"
   ]
   static values = {
     pdfUrl: String,
@@ -55,6 +56,10 @@ export default class extends Controller {
     this.currentRoleColor = null
     this.hiddenRoles = new Set()
 
+    // Self-sign tracking
+    this.selfSignerRoles = new Set()
+    this.selfSignPulseFrame = 0
+
     this._onMouseMove = this.onDocumentMouseMove.bind(this)
     this._onMouseUp = this.onDocumentMouseUp.bind(this)
 
@@ -70,6 +75,10 @@ export default class extends Controller {
         this.highlightActiveRole()
       }
     }
+
+    // Detect self-signer roles from checkboxes
+    this.detectSelfSignerRoles()
+    this.updateSendButtonState()
   }
 
   restoreFields() {
@@ -90,7 +99,8 @@ export default class extends Controller {
         required: data.required !== false,
         position: data.position || (index + 1),
         role_id: data.role_id || null,
-        role_color: data.role_color || null
+        role_color: data.role_color || null,
+        selfSignData: null
       }))
       this.updateFieldsList()
     } catch (e) {
@@ -170,6 +180,12 @@ export default class extends Controller {
     const clickedField = this.hitTestField(xPct, yPct)
     if (clickedField) {
       this.selectedFieldId = clickedField.id
+      // If this is a self-sign field, show the signing panel
+      if (this.isSelfSignField(clickedField)) {
+        this.redrawFields()
+        this.updateFieldsList()
+        return
+      }
       this.dragState = { mode: 'moving', fieldId: clickedField.id, offsetXPct: xPct - clickedField.x, offsetYPct: yPct - clickedField.y }
       canvas.style.cursor = 'grabbing'
       this.redrawFields()
@@ -525,9 +541,79 @@ export default class extends Controller {
         ctx.fillText(shortLabel, badgeX, badgeY)
       }
     }
-    // Label
-    ctx.fillStyle = colors.solid; ctx.font = 'bold 14px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'
-    ctx.fillText(this.fieldDefaultLabel(field), x, y)
+    // Self-sign overlay: completed or pending
+    const isSelfSign = this.isSelfSignField(field)
+    if (isSelfSign && field.selfSignData) {
+      // Completed: green overlay with signature image or text
+      ctx.fillStyle = 'rgba(22, 163, 74, 0.08)'
+      ctx.fillRect(x - w/2, y - h/2, w, h)
+      ctx.strokeStyle = '#16a34a'
+      ctx.lineWidth = 2
+      ctx.setLineDash([])
+      ctx.strokeRect(x - w/2, y - h/2, w, h)
+
+      if (field.selfSignData.artifact_data && field.selfSignData.artifact_data.startsWith('data:image')) {
+        // Draw the signature image
+        const img = this._selfSignImages && this._selfSignImages[field.id]
+        if (img && img.complete) {
+          const padding = 4
+          const drawW = w - padding * 2
+          const drawH = h - padding * 2
+          const scale = Math.min(drawW / img.width, drawH / img.height)
+          const imgW = img.width * scale
+          const imgH = img.height * scale
+          ctx.drawImage(img, x - imgW/2, y - imgH/2, imgW, imgH)
+        }
+      } else if (field.selfSignData.artifact_data) {
+        ctx.fillStyle = '#16a34a'
+        ctx.font = 'italic 13px Georgia, serif'
+        ctx.textAlign = 'center'
+        ctx.textBaseline = 'middle'
+        ctx.fillText(field.selfSignData.artifact_data, x, y)
+      }
+
+      // Green check badge
+      const checkX = x + w/2 - 10
+      const checkY = y - h/2 + 10
+      ctx.fillStyle = '#16a34a'
+      ctx.beginPath()
+      ctx.arc(checkX, checkY, 8, 0, 2 * Math.PI)
+      ctx.fill()
+      ctx.fillStyle = '#fff'
+      ctx.font = 'bold 10px sans-serif'
+      ctx.textAlign = 'center'
+      ctx.textBaseline = 'middle'
+      ctx.fillText('\u2713', checkX, checkY)
+    } else if (isSelfSign && !field.selfSignData) {
+      // Pending: pulsing "Sign" badge
+      const badgeText = (field.type === 'signature' || field.type === 'initials') ? 'Sign' : 'Fill'
+      const badgeW = 40
+      const badgeH = 18
+      const badgeX = x + w/2 - badgeW/2 - 4
+      const badgeY = y + h/2 - badgeH/2 - 4
+
+      // Pulsing glow
+      ctx.shadowColor = '#2563eb'
+      ctx.shadowBlur = 6
+      ctx.fillStyle = '#2563eb'
+      this.roundRect(ctx, badgeX - badgeW/2, badgeY - badgeH/2, badgeW, badgeH, 4)
+      ctx.fill()
+      ctx.shadowBlur = 0
+
+      ctx.fillStyle = '#fff'
+      ctx.font = 'bold 10px sans-serif'
+      ctx.textAlign = 'center'
+      ctx.textBaseline = 'middle'
+      ctx.fillText(badgeText, badgeX, badgeY)
+
+      // Normal label
+      ctx.fillStyle = colors.solid; ctx.font = 'bold 14px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'
+      ctx.fillText(this.fieldDefaultLabel(field), x, y)
+    } else {
+      // Normal label
+      ctx.fillStyle = colors.solid; ctx.font = 'bold 14px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'
+      ctx.fillText(this.fieldDefaultLabel(field), x, y)
+    }
     if (isSelected) this.drawResizeHandles(ctx, canvas, field, colors)
   }
 
@@ -648,6 +734,12 @@ export default class extends Controller {
       this.typePickerTarget.classList.add('hidden')
       this.fieldInspectorTarget.classList.remove('hidden')
 
+      // If this is a self-sign field, show the signing panel instead
+      if (this.isSelfSignField(selectedField)) {
+        this.renderSelfSignPanel(selectedField)
+        return
+      }
+
       const typeConfig = {
         signature: { label: 'Signature', color: 'bg-purple-100 text-purple-800' },
         initials: { label: 'Initials', color: 'bg-cyan-100 text-cyan-800' },
@@ -723,6 +815,7 @@ export default class extends Controller {
       field_type: f.type, required: f.required, position: f.position, label: f.label || null,
       role_id: f.role_id || null, role_color: f.role_color || null
     })))
+    this.updateSelfSignData()
   }
 
   // Page navigation
@@ -991,6 +1084,12 @@ export default class extends Controller {
     if (fieldsContainer) {
       fieldsContainer.classList.toggle('hidden', event.currentTarget.checked)
     }
+    this.detectSelfSignerRoles()
+    // Auto-complete non-drawable self-sign fields
+    this.autoCompleteSelfSignTextFields()
+    this.updateSelfSignData()
+    this.updateSendButtonState()
+    this.redrawFields()
   }
 
   // Task 50: Live-update signer name in assignment dropdown
@@ -1130,6 +1229,435 @@ export default class extends Controller {
     })
 
     ctx.setLineDash([])
+  }
+
+  // ─── Self-Sign Methods ───────────────────────────────────────────────
+
+  detectSelfSignerRoles() {
+    this.selfSignerRoles = new Set()
+    if (!this.hasRoleCardTarget) return
+    this.roleCardTargets.forEach(card => {
+      const checkbox = card.querySelector('input[type="checkbox"][value="1"]')
+      if (checkbox && checkbox.checked) {
+        this.selfSignerRoles.add(card.dataset.roleId)
+      }
+    })
+  }
+
+  isSelfSignField(field) {
+    return field.role_id && this.selfSignerRoles.has(String(field.role_id))
+  }
+
+  isDrawableFieldType(type) {
+    return type === 'signature' || type === 'initials'
+  }
+
+  autoCompleteSelfSignTextFields() {
+    this.signatureFields.forEach(field => {
+      if (!this.isSelfSignField(field)) {
+        // If role was un-checked as self-signer, clear selfSignData
+        if (field.selfSignData && !this.isSelfSignField(field)) {
+          // Only clear if the role is no longer a self-signer
+        }
+        return
+      }
+      // Only auto-complete non-drawable fields
+      if (this.isDrawableFieldType(field.type)) return
+      if (field.selfSignData) return // already completed
+
+      let autoValue = null
+      switch (field.type) {
+        case 'date':
+          autoValue = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+          break
+        case 'name':
+          autoValue = this.getCurrentUserName()
+          break
+        case 'email':
+          autoValue = this.getCurrentUserEmail()
+          break
+        case 'checkbox':
+          autoValue = '\u2713'
+          break
+        default:
+          autoValue = '[Self-signed]'
+      }
+
+      if (autoValue) {
+        field.selfSignData = {
+          artifact_data: autoValue,
+          artifact_type: field.type,
+          capture_method: 'typed'
+        }
+      }
+    })
+  }
+
+  getCurrentUserName() {
+    // Read from the self-signer role card info
+    if (!this.hasRoleCardTarget) return 'Signer'
+    for (const card of this.roleCardTargets) {
+      const checkbox = card.querySelector('input[type="checkbox"][value="1"]')
+      if (checkbox && checkbox.checked) {
+        const nameSpan = card.querySelector('.font-medium')
+        if (nameSpan) return nameSpan.textContent.trim()
+      }
+    }
+    return 'Signer'
+  }
+
+  getCurrentUserEmail() {
+    if (!this.hasRoleCardTarget) return ''
+    for (const card of this.roleCardTargets) {
+      const checkbox = card.querySelector('input[type="checkbox"][value="1"]')
+      if (checkbox && checkbox.checked) {
+        // Email is in parentheses after the name
+        const infoP = card.querySelector('p.text-xs')
+        if (infoP) {
+          const match = infoP.textContent.match(/\(([^)]+)\)/)
+          if (match) return match[1]
+        }
+      }
+    }
+    return ''
+  }
+
+  renderSelfSignPanel(field) {
+    const isDrawable = this.isDrawableFieldType(field.type)
+    const isCompleted = !!field.selfSignData
+
+    let panelContent = ''
+
+    if (isDrawable) {
+      // Signature/initials: draw/type toggle + canvas
+      const typeLabel = field.type === 'signature' ? 'Signature' : 'Initials'
+      panelContent = `
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-sm font-semibold text-gray-900 dark:text-gray-100">Sign This Field</span>
+            <button type="button" data-action="click->pdf-signature-placement#deselectField" class="text-xs text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">Cancel</button>
+          </div>
+          ${isCompleted ? `
+            <div class="mb-3 p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700 rounded-lg">
+              <div class="flex items-center space-x-2 mb-2">
+                <svg class="h-4 w-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                <span class="text-xs font-medium text-green-700 dark:text-green-400">${typeLabel} applied</span>
+              </div>
+              ${field.selfSignData.artifact_data && field.selfSignData.artifact_data.startsWith('data:image')
+                ? `<img src="${field.selfSignData.artifact_data}" class="h-12 mx-auto" alt="Your ${typeLabel.toLowerCase()}">`
+                : `<p class="text-center text-sm italic text-green-800 dark:text-green-300" style="font-family: 'Dancing Script', Georgia, serif">${field.selfSignData.artifact_data || ''}</p>`
+              }
+              <button type="button" data-action="click->pdf-signature-placement#clearSelfSign" data-field-id="${field.id}"
+                      class="mt-2 text-xs text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 block mx-auto">Re-sign</button>
+            </div>
+          ` : `
+            <div class="space-y-3">
+              <div class="flex rounded-lg overflow-hidden border border-gray-300 dark:border-gray-600">
+                <button type="button" data-action="click->pdf-signature-placement#setSelfSignMode" data-mode="draw"
+                        class="self-sign-mode-btn flex-1 py-1.5 text-xs font-medium bg-blue-600 text-white transition-colors">Draw</button>
+                <button type="button" data-action="click->pdf-signature-placement#setSelfSignMode" data-mode="type"
+                        class="self-sign-mode-btn flex-1 py-1.5 text-xs font-medium bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 transition-colors">Type</button>
+              </div>
+              <div class="self-sign-draw-area">
+                <canvas class="self-sign-canvas w-full border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg cursor-crosshair"
+                        style="height: 120px; background-color: #ffffff; color-scheme: light;"></canvas>
+              </div>
+              <div class="self-sign-type-area hidden">
+                <input type="text" class="self-sign-type-input block w-full text-lg rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 py-2 px-3 transition-colors"
+                       style="font-family: 'Dancing Script', Georgia, cursive; font-size: 22px;"
+                       placeholder="Type your ${typeLabel.toLowerCase()}"
+                       data-action="input->pdf-signature-placement#onSelfSignTypeInput">
+                <div class="self-sign-type-preview mt-2 p-3 border border-gray-200 dark:border-gray-600 rounded-lg bg-white min-h-[60px] flex items-center justify-center">
+                  <span class="text-gray-300 text-sm italic">Preview</span>
+                </div>
+              </div>
+              <div class="flex justify-between">
+                <button type="button" data-action="click->pdf-signature-placement#clearSelfSignCanvas" class="text-xs text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors">Clear</button>
+                <button type="button" data-action="click->pdf-signature-placement#applySelfSign" data-field-id="${field.id}"
+                        class="px-4 py-1.5 text-xs font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 transition-colors cursor-pointer">Apply ${typeLabel}</button>
+              </div>
+            </div>
+          `}
+          <div class="flex justify-between items-center pt-3 mt-3 border-t border-gray-200 dark:border-gray-700">
+            <button type="button" data-action="click->pdf-signature-placement#deleteSelectedField"
+                    class="text-xs text-red-600 hover:text-red-800 transition-colors">Delete Field</button>
+            ${this.multiSignerValue ? `<span class="text-xs text-gray-400">Self-sign</span>` : ''}
+          </div>
+        </div>
+      `
+    } else {
+      // Non-drawable fields: auto-completed
+      const autoValue = field.selfSignData ? field.selfSignData.artifact_data : 'Auto-filled on send'
+      panelContent = `
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-sm font-semibold text-gray-900 dark:text-gray-100">Self-Sign Field</span>
+            <button type="button" data-action="click->pdf-signature-placement#deselectField" class="text-xs text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">Done</button>
+          </div>
+          <div class="p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700 rounded-lg">
+            <div class="flex items-center space-x-2 mb-1">
+              <svg class="h-4 w-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+              <span class="text-xs font-medium text-green-700 dark:text-green-400">Auto-completed</span>
+            </div>
+            <p class="text-sm text-green-800 dark:text-green-300">${autoValue}</p>
+          </div>
+          <div class="flex justify-between items-center pt-3 mt-3 border-t border-gray-200 dark:border-gray-700">
+            <button type="button" data-action="click->pdf-signature-placement#deleteSelectedField"
+                    class="text-xs text-red-600 hover:text-red-800 transition-colors">Delete Field</button>
+          </div>
+        </div>
+      `
+    }
+
+    this.fieldInspectorTarget.innerHTML = panelContent
+
+    // Initialize the drawing canvas if showing draw mode
+    if (isDrawable && !isCompleted) {
+      this.selfSignMode = 'draw'
+      requestAnimationFrame(() => this.initSelfSignCanvas())
+    }
+  }
+
+  initSelfSignCanvas() {
+    const canvas = this.fieldInspectorTarget.querySelector('.self-sign-canvas')
+    if (!canvas) return
+
+    // Set actual canvas dimensions
+    const rect = canvas.getBoundingClientRect()
+    canvas.width = rect.width * 2 // retina
+    canvas.height = 120 * 2
+    canvas.style.height = '120px'
+
+    const ctx = canvas.getContext('2d')
+    ctx.scale(2, 2) // retina
+    ctx.fillStyle = '#ffffff'
+    ctx.fillRect(0, 0, rect.width, 120)
+    ctx.strokeStyle = '#1a1a1a'
+    ctx.lineWidth = 2
+    ctx.lineCap = 'round'
+    ctx.lineJoin = 'round'
+
+    this.selfSignDrawing = false
+    this.selfSignCanvas = canvas
+
+    // Mouse events
+    canvas.addEventListener('mousedown', (e) => this.selfSignMouseDown(e))
+    canvas.addEventListener('mousemove', (e) => this.selfSignMouseMove(e))
+    canvas.addEventListener('mouseup', () => this.selfSignMouseUp())
+    canvas.addEventListener('mouseleave', () => this.selfSignMouseUp())
+
+    // Touch events
+    canvas.addEventListener('touchstart', (e) => { e.preventDefault(); this.selfSignMouseDown(e.touches[0]) }, { passive: false })
+    canvas.addEventListener('touchmove', (e) => { e.preventDefault(); this.selfSignMouseMove(e.touches[0]) }, { passive: false })
+    canvas.addEventListener('touchend', () => this.selfSignMouseUp())
+  }
+
+  selfSignMouseDown(e) {
+    this.selfSignDrawing = true
+    const canvas = this.selfSignCanvas
+    const rect = canvas.getBoundingClientRect()
+    const x = e.clientX - rect.left
+    const y = e.clientY - rect.top
+    const ctx = canvas.getContext('2d')
+    ctx.beginPath()
+    ctx.moveTo(x, y)
+  }
+
+  selfSignMouseMove(e) {
+    if (!this.selfSignDrawing || !this.selfSignCanvas) return
+    const canvas = this.selfSignCanvas
+    const rect = canvas.getBoundingClientRect()
+    const x = e.clientX - rect.left
+    const y = e.clientY - rect.top
+    const ctx = canvas.getContext('2d')
+    ctx.lineTo(x, y)
+    ctx.stroke()
+  }
+
+  selfSignMouseUp() {
+    this.selfSignDrawing = false
+  }
+
+  setSelfSignMode(event) {
+    const mode = event.currentTarget.dataset.mode
+    this.selfSignMode = mode
+
+    // Update button styles
+    const buttons = this.fieldInspectorTarget.querySelectorAll('.self-sign-mode-btn')
+    buttons.forEach(btn => {
+      if (btn.dataset.mode === mode) {
+        btn.classList.remove('bg-white', 'dark:bg-gray-700', 'text-gray-700', 'dark:text-gray-300')
+        btn.classList.add('bg-blue-600', 'text-white')
+      } else {
+        btn.classList.remove('bg-blue-600', 'text-white')
+        btn.classList.add('bg-white', 'dark:bg-gray-700', 'text-gray-700', 'dark:text-gray-300')
+      }
+    })
+
+    // Show/hide areas
+    const drawArea = this.fieldInspectorTarget.querySelector('.self-sign-draw-area')
+    const typeArea = this.fieldInspectorTarget.querySelector('.self-sign-type-area')
+
+    if (mode === 'draw') {
+      drawArea.classList.remove('hidden')
+      typeArea.classList.add('hidden')
+      this.initSelfSignCanvas()
+    } else {
+      drawArea.classList.add('hidden')
+      typeArea.classList.remove('hidden')
+      const input = this.fieldInspectorTarget.querySelector('.self-sign-type-input')
+      if (input) input.focus()
+    }
+  }
+
+  onSelfSignTypeInput(event) {
+    const text = event.currentTarget.value
+    const preview = this.fieldInspectorTarget.querySelector('.self-sign-type-preview')
+    if (!preview) return
+
+    if (text.trim()) {
+      preview.innerHTML = `<span style="font-family: 'Dancing Script', Georgia, cursive; font-size: 24px; color: #1a1a1a;">${text}</span>`
+    } else {
+      preview.innerHTML = '<span class="text-gray-300 text-sm italic">Preview</span>'
+    }
+  }
+
+  clearSelfSignCanvas() {
+    if (this.selfSignMode === 'draw' && this.selfSignCanvas) {
+      const canvas = this.selfSignCanvas
+      const ctx = canvas.getContext('2d')
+      const rect = canvas.getBoundingClientRect()
+      ctx.fillStyle = '#ffffff'
+      ctx.fillRect(0, 0, rect.width, 120)
+    } else {
+      const input = this.fieldInspectorTarget.querySelector('.self-sign-type-input')
+      if (input) input.value = ''
+      const preview = this.fieldInspectorTarget.querySelector('.self-sign-type-preview')
+      if (preview) preview.innerHTML = '<span class="text-gray-300 text-sm italic">Preview</span>'
+    }
+  }
+
+  applySelfSign(event) {
+    const fieldId = parseInt(event.currentTarget.dataset.fieldId)
+    const field = this.signatureFields.find(f => f.id === fieldId)
+    if (!field) return
+
+    let artifactData, captureMethod
+
+    if (this.selfSignMode === 'draw') {
+      if (!this.selfSignCanvas) return
+      // Check if canvas has been drawn on (not just white)
+      const canvas = this.selfSignCanvas
+      const ctx = canvas.getContext('2d')
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height)
+      let hasContent = false
+      for (let i = 0; i < imageData.data.length; i += 4) {
+        // If any pixel is not white
+        if (imageData.data[i] < 250 || imageData.data[i+1] < 250 || imageData.data[i+2] < 250) {
+          hasContent = true
+          break
+        }
+      }
+      if (!hasContent) return // Don't apply empty drawing
+
+      artifactData = canvas.toDataURL('image/png')
+      captureMethod = 'drawn'
+    } else {
+      const input = this.fieldInspectorTarget.querySelector('.self-sign-type-input')
+      if (!input || !input.value.trim()) return
+      artifactData = input.value.trim()
+      captureMethod = 'typed'
+    }
+
+    field.selfSignData = {
+      artifact_data: artifactData,
+      artifact_type: field.type,
+      capture_method: captureMethod
+    }
+
+    // Cache the image for canvas rendering
+    if (artifactData.startsWith('data:image')) {
+      if (!this._selfSignImages) this._selfSignImages = {}
+      const img = new Image()
+      img.onload = () => { this.redrawFields() }
+      img.src = artifactData
+      this._selfSignImages[field.id] = img
+    }
+
+    this.updateFormData()
+    this.updateSelfSignData()
+    this.updateSendButtonState()
+    this.redrawFields()
+    this.updateFieldsList()
+  }
+
+  clearSelfSign(event) {
+    const fieldId = parseInt(event.currentTarget.dataset.fieldId)
+    const field = this.signatureFields.find(f => f.id === fieldId)
+    if (!field) return
+
+    field.selfSignData = null
+    if (this._selfSignImages) delete this._selfSignImages[fieldId]
+
+    this.updateFormData()
+    this.updateSelfSignData()
+    this.updateSendButtonState()
+    this.redrawFields()
+    this.updateFieldsList()
+  }
+
+  updateSelfSignData() {
+    if (!this.hasSelfSignDataInputTarget) return
+    const data = {}
+    this.signatureFields.forEach(f => {
+      if (f.selfSignData) {
+        const key = f.position || f.id
+        data[key] = f.selfSignData
+      }
+    })
+    this.selfSignDataInputTarget.value = JSON.stringify(data)
+  }
+
+  updateSendButtonState() {
+    if (!this.hasSendButtonTarget) return
+
+    const incompleteSelfSignFields = this.signatureFields.filter(f =>
+      this.isSelfSignField(f) && this.isDrawableFieldType(f.type) && !f.selfSignData
+    )
+
+    const isDisabled = incompleteSelfSignFields.length > 0
+
+    this.sendButtonTarget.disabled = isDisabled
+    if (isDisabled) {
+      this.sendButtonTarget.classList.add('opacity-50', 'cursor-not-allowed')
+      this.sendButtonTarget.classList.remove('hover:bg-blue-700', 'cursor-pointer')
+    } else {
+      this.sendButtonTarget.classList.remove('opacity-50', 'cursor-not-allowed')
+      this.sendButtonTarget.classList.add('hover:bg-blue-700', 'cursor-pointer')
+    }
+
+    if (this.hasSelfSignWarningTarget) {
+      if (isDisabled) {
+        this.selfSignWarningTarget.classList.remove('hidden')
+        this.selfSignWarningTarget.textContent = `Complete your ${incompleteSelfSignFields.length} signature field${incompleteSelfSignFields.length !== 1 ? 's' : ''} before sending.`
+      } else {
+        this.selfSignWarningTarget.classList.add('hidden')
+      }
+    }
+  }
+
+  roundRect(ctx, x, y, w, h, r) {
+    ctx.beginPath()
+    ctx.moveTo(x + r, y)
+    ctx.lineTo(x + w - r, y)
+    ctx.arcTo(x + w, y, x + w, y + r, r)
+    ctx.lineTo(x + w, y + h - r)
+    ctx.arcTo(x + w, y + h, x + w - r, y + h, r)
+    ctx.lineTo(x + r, y + h)
+    ctx.arcTo(x, y + h, x, y + h - r, r)
+    ctx.lineTo(x, y + r)
+    ctx.arcTo(x, y, x + r, y, r)
+    ctx.closePath()
   }
 
   roleFieldColor(hexColor) {

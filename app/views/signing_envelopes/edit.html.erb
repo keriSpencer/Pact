@@ -55,6 +55,7 @@
       <%= form_with url: document_signing_envelope_path(@document, @envelope), method: :patch, local: true do |f| %>
         <input type="hidden" name="fields_json" data-pdf-signature-placement-target="fieldsInput"
                value="<%= (@draft_request&.signature_fields || []).map { |sf| { page_number: sf.page_number, x_percent: sf.x_percent, y_percent: sf.y_percent, width_percent: sf.width_percent, height_percent: sf.height_percent, field_type: sf.field_type, required: sf.required, position: sf.position, label: sf.read_attribute(:label), role_id: sf.signing_role_id, role_color: sf.signing_role&.color } }.to_json %>">
+        <input type="hidden" name="self_sign_data" data-pdf-signature-placement-target="selfSignDataInput" value="{}">
 
         <!-- Signing Roles Panel -->
         <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
@@ -200,7 +201,11 @@
 
         <!-- Actions -->
         <div class="space-y-3">
-          <button type="submit" name="send_envelope" value="1" class="w-full px-4 py-3 text-sm font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors cursor-pointer shadow-sm" data-turbo-submits-with="Sending...">
+          <p data-pdf-signature-placement-target="selfSignWarning" class="hidden text-xs text-amber-600 dark:text-amber-400 text-center"></p>
+          <button type="submit" name="send_envelope" value="1"
+                  data-pdf-signature-placement-target="sendButton"
+                  class="w-full px-4 py-3 text-sm font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors cursor-pointer shadow-sm"
+                  data-turbo-submits-with="Sending...">
             Send to <%= @roles.where(is_self_signer: false).count %> Signer<%= @roles.where(is_self_signer: false).count != 1 ? 's' : '' %>
           </button>
           <button type="submit" class="w-full px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors cursor-pointer" data-turbo-submits-with="Saving...">
