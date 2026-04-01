@@ -34,20 +34,25 @@
 ### Skipped
 - [ ] **Phase 5: Activities** — Audit log (nice-to-have, not needed for core flow)
 
+### Recently Completed (March 31 - April 1)
+- [x] **Password show/hide toggle** — Eye icon on all password fields
+- [x] **Reuse drawn signature** — "Use previous" button on subsequent fields
+- [x] **Snap-to-align guides** — Blue guide lines when dragging fields (Keynote-style)
+- [x] **Accessibility: non-color indicators** — Role badges (S1, S2) on fields, colorblind-safe palette
+- [x] **Signer field visibility toggles** — Eye icon to show/hide each signer's fields
+- [x] **Live-update signer dropdown** — Real-time name updates in assignment dropdown
+- [x] **Collapse completed envelopes** — Only latest expanded, older ones collapsed
+- [x] **Per-envelope signed PDF view** — View/Download buttons on each completed envelope
+- [x] **Auto-refresh document status** — Page polls and reloads when signatures complete
+- [x] **Preview filename prefix** — "Pact - Document Name" in browser tabs
+- [x] **Convert single→multi-signer** — Switch modes without losing placed fields
+- [x] **Cross-compatible templates** — Templates work across single/multi-signer modes
+
 ### Up Next
 - [ ] **Google OAuth** — Sign in with Google
-- [ ] **Password show/hide toggle** — Eye icon on login/signup forms
-- [ ] **Reuse drawn signature** — Pre-fill subsequent fields after first signature
-- [ ] **Snap-to-align guides** — Alignment lines when placing fields (Keynote-style)
-- [ ] **Accessibility: non-color indicators** — Signer initials/labels on fields for colorblind users
-- [ ] **Signer field visibility toggles** — Eye icon to show/hide each signer's fields
-- [ ] **Live-update signer dropdown** — Reflect name changes in assignment dropdown
-- [ ] **Collapse completed envelopes** — Don't push preview off-screen
-- [ ] **Per-envelope signed PDF view** — Each envelope card links to its specific signed version
 - [ ] **Saved signature in profile** — Store drawn signature for reuse across sessions
 - [ ] Bulk document operations
 - [ ] Calendar view for follow-ups
-- [ ] API endpoints for external integrations
 
 ---
 
@@ -88,13 +93,28 @@
 - Merged partner's changes: Stripe billing, landing page, RubyNative,
   brand kit, registration, timezone support, mobile fixes
 
-### March 31, 2026
+### March 31 - April 1, 2026
+- Password show/hide toggle on all auth forms
+- Collapse completed envelopes (latest expanded, older collapsed)
+- Per-envelope "View Signed PDF" / "Download" buttons
+- Signature reuse: "Use previous signature" on subsequent fields
+- Accessibility: role badges (S1, S2), colorblind-safe colors
+- Signer field visibility toggles (eye icon, Figma-style)
+- Live-update signer dropdown when typing names
+- Snap-to-align guides (Keynote-style blue guide lines)
+- Auto-refresh document page when signatures complete (15s poll)
+- Preview tab shows "Pact - Document Name"
+- Convert single→multi-signer without losing fields
+- Cross-compatible templates (single↔multi-signer)
+- Fix: badge labels show "S1" not "Si"
+- Fix: visibility toggle hides ALL fields for a signer (type mismatch)
+- Fix: fields preserved when converting single→multi
 - Merged partner's changes:
   - REST API v1 (token auth, documents, folders, sync) for PactSync desktop app
   - PactSync macOS app (1.0.0 DMG, landing page, setup guide)
   - Folder sharing (internal/external, cross-org, email notifications, public token links)
   - Document quick share (copyable links, Turbo Stream UI)
-  - 26 new tests (214 total, 342 assertions, 0 failures)
+- 214 tests, 342 assertions, 0 failures
 
 ### March 28, 2026
 - Custom domain: pactapp.io
