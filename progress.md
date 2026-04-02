@@ -116,6 +116,16 @@
   - Document quick share (copyable links, Turbo Stream UI)
 - 214 tests, 342 assertions, 0 failures
 
+### April 1-2, 2026
+- Admin self-sign in editor (DocuSign-style): draw signature before sending
+- Self-sign fields show pulsing "Sign" badge, inline draw/type pad
+- Send button disabled until all self-sign fields completed
+- Signature reuse in self-sign editor ("Use previous signature")
+- Fix: self-sign fields draggable on canvas (click = sign, drag = move)
+- Fix: signed PDF download on multi-signer confirmation page
+- Fix: admin name shown in "Assigned to" dropdown for self-signer roles
+- Fix: multi-signer amber message when waiting for other signers
+
 ### March 28, 2026
 - Custom domain: pactapp.io
 - Resend SMTP email configuration
