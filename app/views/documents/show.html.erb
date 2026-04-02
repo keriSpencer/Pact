@@ -569,6 +569,34 @@
         </div>
       <% end %>
 
+      <!-- Send Signed Copy -->
+      <% if @document.has_signed_version? %>
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+          <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+            <h2 class="text-sm font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-wider">Send Signed Copy</h2>
+          </div>
+          <div class="px-6 py-4">
+            <%= form_with url: send_signed_copy_document_path(@document), method: :post, class: "space-y-3" do |f| %>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Recipients</label>
+                <input type="text" name="recipient_emails" placeholder="email@example.com, another@example.com"
+                       class="block w-full text-sm rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 shadow-sm focus:border-blue-500 focus:ring-blue-500" required>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Separate multiple emails with commas</p>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Message (optional)</label>
+                <textarea name="message" rows="2" class="block w-full text-sm rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                          placeholder="Here is the signed copy of..."></textarea>
+              </div>
+              <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors cursor-pointer"
+                      data-turbo-submits-with="Sending...">
+                Send Signed Copy
+              </button>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+
       <!-- Document Preview with Version Toggle -->
       <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm" data-controller="version-toggle">
         <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">

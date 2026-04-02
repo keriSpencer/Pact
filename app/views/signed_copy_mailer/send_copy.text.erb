@@ -1,0 +1,16 @@
+Signed Document
+
+<%= @sender.full_name %> has shared a signed document with you.
+
+Document: <%= @document.name %>
+Sent by: <%= @sender.full_name %>
+Date: <%= Time.current.strftime("%B %d, %Y") %>
+<% if @message.present? %>
+
+Message from <%= @sender.full_name %>:
+"<%= @message %>"
+<% end %>
+
+The signed PDF is attached to this email. You can download and save it for your records.
+
+This document was signed and sent via Pact.

@@ -1,8 +1,8 @@
 class DocumentsController < ApplicationController
   before_action :authenticate_user!
   before_action :check_document_limit, only: [:new, :create]
-  before_action :set_document, only: [:show, :edit, :update, :destroy, :download, :preview, :versions]
-  before_action :check_document_access, only: [:show, :edit, :update, :destroy, :download, :preview, :versions]
+  before_action :set_document, only: [:show, :edit, :update, :destroy, :download, :preview, :versions, :send_signed_copy]
+  before_action :check_document_access, only: [:show, :edit, :update, :destroy, :download, :preview, :versions, :send_signed_copy]
 
   def index
     @documents = current_user.documents.active
@@ -122,6 +122,33 @@ class DocumentsController < ApplicationController
 
   def versions
     @versions = @document.versions.in_order.includes(:signature_request)
+  end
+
+  def send_signed_copy
+    emails = params[:recipient_emails].to_s.split(/[,;\s]+/).map(&:strip).select { |e| e.match?(URI::MailTo::EMAIL_REGEXP) }
+
+    if emails.empty?
+      redirect_to @document, alert: "Please enter at least one valid email address."
+      return
+    end
+
+    signed_version = @document.latest_signed_version
+    unless signed_version&.file&.attached?
+      redirect_to @document, alert: "No signed version available to share."
+      return
+    end
+
+    emails.each do |email|
+      SignedCopyMailer.send_copy(
+        document: @document,
+        signed_version: signed_version,
+        recipient_email: email,
+        sender: current_user,
+        message: params[:message]
+      ).deliver_later
+    end
+
+    redirect_to @document, notice: "Signed copy sent to #{emails.count} #{'recipient'.pluralize(emails.count)}."
   end
 
   private

@@ -1,0 +1,23 @@
+<h2>Signed Document</h2>
+
+<p><strong><%= @sender.full_name %></strong> has shared a signed document with you.</p>
+
+<div class="highlight">
+  <p><strong>Document:</strong> <%= @document.name %></p>
+  <p><strong>Sent by:</strong> <%= @sender.full_name %></p>
+  <p><strong>Date:</strong> <%= Time.current.strftime("%B %d, %Y") %></p>
+</div>
+
+<% if @message.present? %>
+  <div class="message-block">
+    <p><%= @message %></p>
+  </div>
+<% end %>
+
+<p>
+  The signed PDF is attached to this email. You can download and save it for your records.
+</p>
+
+<p class="meta-text">
+  This document was signed and sent via Pact.
+</p>

@@ -22,6 +22,7 @@ Rails.application.routes.draw do
       get :download
       get :preview
       get :versions
+      post :send_signed_copy
     end
     resources :signature_requests, only: [:new, :create, :edit, :update] do
       member do
