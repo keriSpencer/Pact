@@ -1352,6 +1352,16 @@ export default class extends Controller {
             </div>
           ` : `
             <div class="space-y-3">
+              ${this.getCachedSelfSign(field.type) ? `
+                <button type="button" data-action="click->pdf-signature-placement#useCachedSelfSign" data-field-id="${field.id}" data-field-type="${field.type}"
+                        class="w-full p-3 border border-green-200 dark:border-green-700 bg-green-50 dark:bg-green-900/20 rounded-lg hover:bg-green-100 dark:hover:bg-green-900/30 transition-colors cursor-pointer text-center">
+                  ${this.getCachedSelfSign(field.type).startsWith('data:image')
+                    ? `<img src="${this.getCachedSelfSign(field.type)}" class="h-10 mx-auto mb-1" alt="Previous ${field.type}">`
+                    : `<span class="text-sm italic" style="font-family: Georgia, serif">${this.getCachedSelfSign(field.type)}</span>`}
+                  <span class="block text-xs font-medium text-green-700 dark:text-green-400">Use previous ${field.type}</span>
+                </button>
+                <div class="text-center text-xs text-gray-400">or draw a new one</div>
+              ` : ''}
               <div class="flex rounded-lg overflow-hidden border border-gray-300 dark:border-gray-600">
                 <button type="button" data-action="click->pdf-signature-placement#setSelfSignMode" data-mode="draw"
                         class="self-sign-mode-btn flex-1 py-1.5 text-xs font-medium bg-blue-600 text-white transition-colors">Draw</button>
@@ -1537,6 +1547,46 @@ export default class extends Controller {
     }
   }
 
+  getCachedSelfSign(fieldType) {
+    if (fieldType === 'signature') return this.cachedSelfSignSignature || null
+    if (fieldType === 'initials') return this.cachedSelfSignInitials || null
+    return null
+  }
+
+  useCachedSelfSign(event) {
+    const fieldId = parseInt(event.currentTarget.dataset.fieldId)
+    const fieldType = event.currentTarget.dataset.fieldType
+    const field = this.signatureFields.find(f => f.id === fieldId)
+    if (!field) return
+
+    const cachedData = this.getCachedSelfSign(fieldType)
+    if (!cachedData) return
+
+    const captureMethod = cachedData.startsWith('data:image') ? 'drawn' : 'typed'
+
+    field.selfSignData = {
+      artifact_data: cachedData,
+      artifact_type: field.type,
+      capture_method: captureMethod
+    }
+
+    // Cache the image for canvas rendering
+    if (cachedData.startsWith('data:image')) {
+      if (!this._selfSignImages) this._selfSignImages = {}
+      const img = new Image()
+      img.onload = () => { this.redrawFields() }
+      img.src = cachedData
+      this._selfSignImages[field.id] = img
+    }
+
+    this.selectedFieldId = null
+    this.updateFormData()
+    this.updateSelfSignData()
+    this.updateSendButtonState()
+    this.redrawFields()
+    this.updateFieldsList()
+  }
+
   applySelfSign(event) {
     const fieldId = parseInt(event.currentTarget.dataset.fieldId)
     const field = this.signatureFields.find(f => f.id === fieldId)
@@ -1574,6 +1624,10 @@ export default class extends Controller {
       artifact_type: field.type,
       capture_method: captureMethod
     }
+
+    // Cache for reuse on subsequent fields of the same type
+    if (field.type === 'signature') this.cachedSelfSignSignature = artifactData
+    if (field.type === 'initials') this.cachedSelfSignInitials = artifactData
 
     // Cache the image for canvas rendering
     if (artifactData.startsWith('data:image')) {
