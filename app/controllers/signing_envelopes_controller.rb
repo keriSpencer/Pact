@@ -60,6 +60,22 @@ class SigningEnvelopesController < ApplicationController
         return
       end
 
+      # Check every signer role has at least one field assigned
+      if @draft_request
+        roles_without_fields = @envelope.signing_roles.reload.select do |role|
+          @draft_request.signature_fields.where(signing_role: role).none?
+        end
+
+        if roles_without_fields.any?
+          names = roles_without_fields.map(&:display_name).join(", ")
+          flash.now[:alert] = "#{names} #{roles_without_fields.count == 1 ? 'has' : 'have'} no fields assigned. Assign fields or remove #{roles_without_fields.count == 1 ? 'this signer' : 'these signers'}."
+          @roles = @envelope.signing_roles.reload.in_order
+          @signature_fields = @draft_request.signature_fields.reload.order(:position)
+          render :edit, status: :unprocessable_entity
+          return
+        end
+      end
+
       if @envelope.save
         # Auto-complete self-signer fields before activation
         auto_complete_self_signer_fields

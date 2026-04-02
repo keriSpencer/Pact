@@ -236,6 +236,8 @@
                   <span class="<%= envelope.completed? ? 'text-green-600' : envelope.voided? ? 'text-red-600' : 'text-blue-600' %>">
                     <%= envelope.status.humanize %>
                   </span>
+                  <span class="mx-1">&middot;</span>
+                  <span>Created <%= envelope.created_at.strftime("%b %d, %Y") %></span>
                 </p>
               </div>
               <% if envelope.active? %>
@@ -265,6 +267,21 @@
                     <div>
                       <p class="text-sm font-medium text-gray-900 dark:text-gray-100"><%= role.display_name %></p>
                       <p class="text-xs text-gray-500 dark:text-gray-400"><%= role.display_email %></p>
+                      <% sr = role.signature_request %>
+                      <p class="text-xs text-gray-500 dark:text-gray-400">
+                        <% if role.is_self_signer && role.signed? %>
+                          Self-signed <%= sr&.signed_at&.strftime("%b %d at %l:%M %p") %>
+                        <% elsif sr&.signed? %>
+                          Signed <%= sr.signed_at&.strftime("%b %d at %l:%M %p") %>
+                        <% elsif sr&.viewed? %>
+                          Viewed <%= sr.viewed_at&.strftime("%b %d at %l:%M %p") %>
+                          <% if sr.sent_at %> &middot; Sent <%= sr.sent_at&.strftime("%b %d") %><% end %>
+                        <% elsif sr&.sent? %>
+                          Sent <%= sr.sent_at&.strftime("%b %d at %l:%M %p") %>
+                        <% elsif sr&.pending? %>
+                          Sent <%= sr.sent_at&.strftime("%b %d at %l:%M %p") || "just now" %>
+                        <% end %>
+                      </p>
                     </div>
                   </div>
                   <div class="flex items-center space-x-2">
@@ -304,6 +321,8 @@
                     <span class="mx-1">&middot;</span>
                     <span><%= most_recent_completed.completed_at.strftime("%b %d, %Y") %></span>
                   <% end %>
+                  <span class="mx-1">&middot;</span>
+                  <span>Created <%= most_recent_completed.created_at.strftime("%b %d, %Y") %></span>
                 </p>
               </div>
             </div>
@@ -328,6 +347,21 @@
                     <div>
                       <p class="text-sm font-medium text-gray-900 dark:text-gray-100"><%= role.display_name %></p>
                       <p class="text-xs text-gray-500 dark:text-gray-400"><%= role.display_email %></p>
+                      <% sr = role.signature_request %>
+                      <p class="text-xs text-gray-500 dark:text-gray-400">
+                        <% if role.is_self_signer && role.signed? %>
+                          Self-signed <%= sr&.signed_at&.strftime("%b %d at %l:%M %p") %>
+                        <% elsif sr&.signed? %>
+                          Signed <%= sr.signed_at&.strftime("%b %d at %l:%M %p") %>
+                        <% elsif sr&.viewed? %>
+                          Viewed <%= sr.viewed_at&.strftime("%b %d at %l:%M %p") %>
+                          <% if sr.sent_at %> &middot; Sent <%= sr.sent_at&.strftime("%b %d") %><% end %>
+                        <% elsif sr&.sent? %>
+                          Sent <%= sr.sent_at&.strftime("%b %d at %l:%M %p") %>
+                        <% elsif sr&.pending? %>
+                          Sent <%= sr.sent_at&.strftime("%b %d at %l:%M %p") || "just now" %>
+                        <% end %>
+                      </p>
                     </div>
                   </div>
                   <div class="flex items-center space-x-2">
@@ -372,6 +406,8 @@
                           <span class="mx-1">&middot;</span>
                           <span><%= envelope.completed_at.strftime("%b %d, %Y") %></span>
                         <% end %>
+                        <span class="mx-1">&middot;</span>
+                        <span>Created <%= envelope.created_at.strftime("%b %d, %Y") %></span>
                       </p>
                     </div>
                   </div>
@@ -396,6 +432,21 @@
                           <div>
                             <p class="text-sm font-medium text-gray-900 dark:text-gray-100"><%= role.display_name %></p>
                             <p class="text-xs text-gray-500 dark:text-gray-400"><%= role.display_email %></p>
+                            <% sr = role.signature_request %>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">
+                              <% if role.is_self_signer && role.signed? %>
+                                Self-signed <%= sr&.signed_at&.strftime("%b %d at %l:%M %p") %>
+                              <% elsif sr&.signed? %>
+                                Signed <%= sr.signed_at&.strftime("%b %d at %l:%M %p") %>
+                              <% elsif sr&.viewed? %>
+                                Viewed <%= sr.viewed_at&.strftime("%b %d at %l:%M %p") %>
+                                <% if sr.sent_at %> &middot; Sent <%= sr.sent_at&.strftime("%b %d") %><% end %>
+                              <% elsif sr&.sent? %>
+                                Sent <%= sr.sent_at&.strftime("%b %d at %l:%M %p") %>
+                              <% elsif sr&.pending? %>
+                                Sent <%= sr.sent_at&.strftime("%b %d at %l:%M %p") || "just now" %>
+                              <% end %>
+                            </p>
                           </div>
                         </div>
                         <div class="flex items-center space-x-2">
