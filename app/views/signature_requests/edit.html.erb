@@ -189,18 +189,6 @@
           <%= f.submit "Save Draft", class: "w-full px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors cursor-pointer", data: { turbo_submits_with: "Saving..." } %>
         </div>
 
-        <% if @signature_request.draft? && @signature_request.signing_envelope_id.nil? %>
-          <div class="text-center py-2">
-            <span class="text-xs text-gray-400 dark:text-gray-500">Need multiple signers?</span>
-            <button type="submit" name="convert_to_multi" value="1"
-                    formaction="<%= convert_to_multi_signer_document_signature_request_path(@document, @signature_request) %>"
-                    formmethod="post"
-                    onclick="return confirm('This will convert to multi-signer mode. Your placed fields will be preserved as Signer 1\'s fields.')"
-                    class="block w-full text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors mt-1 cursor-pointer">
-              Switch to Multi-Signer
-            </button>
-          </div>
-        <% end %>
       <% end %>
     </div>
   </div>

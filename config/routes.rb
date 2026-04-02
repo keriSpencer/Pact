@@ -30,7 +30,7 @@ Rails.application.routes.draw do
         post :cancel
         post :resend
         post :void
-        post :convert_to_multi_signer
+
       end
     end
     resources :signature_templates, only: [:index, :create, :destroy] do
@@ -44,6 +44,7 @@ Rails.application.routes.draw do
         delete :remove_role
         post :send_envelope
         post :void
+        delete :discard_draft
       end
     end
     resources :document_shares, only: [:create, :destroy]

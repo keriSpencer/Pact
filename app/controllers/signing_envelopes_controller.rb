@@ -1,6 +1,6 @@
 class SigningEnvelopesController < ApplicationController
   before_action :set_document
-  before_action :set_envelope, only: [:edit, :update, :add_role, :remove_role, :send_envelope, :void]
+  before_action :set_envelope, only: [:edit, :update, :add_role, :remove_role, :send_envelope, :void, :discard_draft]
   before_action :check_document_access
 
   def new
@@ -10,18 +10,20 @@ class SigningEnvelopesController < ApplicationController
       signing_mode: :parallel
     )
 
-    # Create one default role
+    # Create one default role, pre-filling from params if provided
     @envelope.signing_roles.create!(
       label: "Signer 1",
       color: SigningRole::COLORS[0],
-      signing_order: 0
+      signing_order: 0,
+      signer_email: params[:signer_email].presence,
+      signer_name: params[:signer_name].presence
     )
 
     # Create a draft signature request to hold fields during editing
     @draft_request = @document.signature_requests.create!(
       requester: current_user,
       status: :draft,
-      signer_email: "",
+      signer_email: params[:signer_email] || "",
       signing_envelope: @envelope
     )
 
@@ -65,7 +67,14 @@ class SigningEnvelopesController < ApplicationController
         @envelope.activate!
         # Clean up the draft request (fields have been moved to per-signer requests)
         @draft_request&.destroy if @draft_request&.signature_fields&.reload&.empty?
-        redirect_to document_path(@document), notice: "Signing request sent to #{@envelope.signing_roles.where(is_self_signer: false).count} signer(s)."
+
+        non_self_roles = @envelope.signing_roles.where(is_self_signer: false)
+        notice_msg = if non_self_roles.count == 1
+          "Signature request sent to #{non_self_roles.first.signer_name.presence || non_self_roles.first.signer_email}."
+        else
+          "Sent to #{non_self_roles.count} signers."
+        end
+        redirect_to document_path(@document), notice: notice_msg
       else
         flash.now[:alert] = @envelope.errors.full_messages.join(", ")
         @roles = @envelope.signing_roles.reload.in_order
@@ -126,6 +135,17 @@ class SigningEnvelopesController < ApplicationController
     # The update action handles it via params[:send_envelope]
     params[:send_envelope] = "1"
     update
+  end
+
+  def discard_draft
+    if @envelope.draft?
+      @envelope.signature_requests.destroy_all
+      @envelope.signing_roles.destroy_all
+      @envelope.destroy
+      redirect_to document_path(@document), notice: "Draft discarded."
+    else
+      redirect_to document_path(@document), alert: "Only drafts can be discarded."
+    end
   end
 
   def void
