@@ -180,12 +180,7 @@ export default class extends Controller {
     const clickedField = this.hitTestField(xPct, yPct)
     if (clickedField) {
       this.selectedFieldId = clickedField.id
-      // If this is a self-sign field, show the signing panel
-      if (this.isSelfSignField(clickedField)) {
-        this.redrawFields()
-        this.updateFieldsList()
-        return
-      }
+      this._clickedSelfSign = this.isSelfSignField(clickedField)
       this.dragState = { mode: 'moving', fieldId: clickedField.id, offsetXPct: xPct - clickedField.x, offsetYPct: yPct - clickedField.y }
       canvas.style.cursor = 'grabbing'
       this.redrawFields()
@@ -255,7 +250,12 @@ export default class extends Controller {
     if (mode === 'resizing') {
       this.updateFormData(); this.updateFieldsList()
     } else if (mode === 'moving') {
-      if (this.dragStarted) { this.updateFormData(); this.updateFieldsList() }
+      if (this.dragStarted) {
+        this.updateFormData(); this.updateFieldsList()
+      } else if (this._clickedSelfSign) {
+        // Click (no drag) on a self-sign field — open the signing panel
+        this.updateFieldsList()
+      }
     } else if (mode === 'creating') {
       if (this.dragStarted) this.createFieldFromDrag()
       else if (!this.dragState.deselecting) this.placeNewField(this.mouseDownPos.xPct, this.mouseDownPos.yPct)
@@ -264,6 +264,7 @@ export default class extends Controller {
     this.dragState = null
     this.mouseDownPos = null
     this.dragStarted = false
+    this._clickedSelfSign = false
     this.activeGuides = []
     this.redrawFields()
     this.canvasTarget.style.cursor = 'crosshair'
