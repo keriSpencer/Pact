@@ -1,5 +1,8 @@
 <%= turbo_stream.replace "share_link_section" do %>
-  <div id="share_link_section">
-    <%= button_to "Share", document_document_shares_path(@document), method: :post, class: "px-3 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors cursor-pointer" %>
+  <div id="share_link_section" data-controller="share-toggle">
+    <div data-share-toggle-target="compact">
+      <%= button_to "Share", document_document_shares_path(@document), method: :post,
+            class: "px-3 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors cursor-pointer" %>
+    </div>
   </div>
 <% end %>
