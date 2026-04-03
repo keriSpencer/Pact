@@ -1264,9 +1264,28 @@ export default class extends Controller {
         }
         return
       }
-      // Only auto-complete non-drawable fields
-      if (this.isDrawableFieldType(field.type)) return
       if (field.selfSignData) return // already completed
+
+      // For drawable fields, auto-apply saved signature/initials if available
+      if (this.isDrawableFieldType(field.type)) {
+        const savedData = field.type === 'signature' ? this.savedSignatureValue : this.savedInitialsValue
+        if (savedData) {
+          field.selfSignData = {
+            artifact_data: savedData,
+            artifact_type: field.type,
+            capture_method: savedData.startsWith('data:image') ? 'drawn' : 'typed'
+          }
+          // Cache the image for canvas rendering
+          if (savedData.startsWith('data:image')) {
+            if (!this._selfSignImages) this._selfSignImages = {}
+            const img = new Image()
+            img.onload = () => { this.redrawFields() }
+            img.src = savedData
+            this._selfSignImages[field.id] = img
+          }
+        }
+        return
+      }
 
       let autoValue = null
       switch (field.type) {
