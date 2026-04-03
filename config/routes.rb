@@ -89,6 +89,7 @@ Rails.application.routes.draw do
 
   # Authenticated dashboard
   get "dashboard", to: "dashboard#index", as: :dashboard
+  get "signatures/pending", to: "pending_signatures#index", as: :pending_signatures
   get "profile", to: "users#profile_redirect", as: :my_profile
 
   # Billing & Subscriptions
