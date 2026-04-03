@@ -258,30 +258,35 @@ class SigningEnvelopesController < ApplicationController
       role_fields.each do |field|
         next if field.completed?
 
-        # Check if self-sign data was provided from the editor
+        # Check sources in order: editor self-sign data, saved profile signature, typed fallback
         self_sign_data = find_self_sign_data_for_field(field)
 
-        artifact_data = if self_sign_data.present? && self_sign_data["artifact_data"].present?
-          self_sign_data["artifact_data"]
+        artifact_data = nil
+        capture_method = "typed"
+
+        if self_sign_data.present? && self_sign_data["artifact_data"].present?
+          # 1. Use data drawn in the editor
+          artifact_data = self_sign_data["artifact_data"]
+          capture_method = self_sign_data["capture_method"] || "drawn"
+        elsif field.field_type == "signature" && current_user.has_saved_signature?
+          # 2. Use saved signature from profile
+          artifact_data = current_user.saved_signature
+          capture_method = current_user.saved_signature.start_with?("data:image") ? "drawn" : "typed"
+        elsif field.field_type == "initials" && current_user.has_saved_initials?
+          # 3. Use saved initials from profile
+          artifact_data = current_user.saved_initials
+          capture_method = current_user.saved_initials.start_with?("data:image") ? "drawn" : "typed"
         else
-          # Fallback to typed text
-          case field.field_type
-          when "signature"
-            current_user.full_name
-          when "initials"
-            current_user.full_name.split.map { |n| n[0] }.join
-          when "date"
-            Time.current.strftime("%B %d, %Y at %l:%M %p")
-          when "name"
-            current_user.full_name
-          when "email"
-            current_user.email
-          else
-            "[Self-signed]"
+          # 4. Fallback to typed text
+          artifact_data = case field.field_type
+          when "signature" then current_user.full_name
+          when "initials" then current_user.full_name.split.map { |n| n[0] }.join
+          when "date" then Time.current.strftime("%B %d, %Y at %l:%M %p")
+          when "name" then current_user.full_name
+          when "email" then current_user.email
+          else "[Self-signed]"
           end
         end
-
-        capture_method = self_sign_data&.dig("capture_method") || "typed"
 
         artifact = SignatureArtifact.find_or_create_for(
           signature_request: draft_request,
