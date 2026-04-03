@@ -34,9 +34,11 @@ class DocumentsController < ApplicationController
     respond_to do |format|
       format.html
       format.json do
-        # Status check for polling — returns a hash of all envelope/request statuses
+        # Status check for polling — includes envelope/request statuses AND version count
+        # so the page reloads when the signed PDF is generated (async job)
         statuses = @document.signing_envelopes.map { |e| "#{e.id}:#{e.status}" }.join(",")
         statuses += @document.signature_requests.map { |sr| "#{sr.id}:#{sr.status}" }.join(",")
+        statuses += ",versions:#{@document.versions.count}"
         render json: { status: Digest::MD5.hexdigest(statuses) }
       end
     end

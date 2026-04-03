@@ -1,4 +1,4 @@
-<% statuses = @document.signing_envelopes.map { |e| "#{e.id}:#{e.status}" }.join(",") + @document.signature_requests.map { |sr| "#{sr.id}:#{sr.status}" }.join(",") %>
+<% statuses = @document.signing_envelopes.map { |e| "#{e.id}:#{e.status}" }.join(",") + @document.signature_requests.map { |sr| "#{sr.id}:#{sr.status}" }.join(",") + ",versions:#{@document.versions.count}" %>
 <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8"
      data-controller="document-status-poll"
      data-document-status-poll-check-url-value="<%= document_path(@document, format: :json) %>"
