@@ -145,6 +145,10 @@
 - Auto-apply saved profile signature for self-sign fields
 - Faster polling (3s for first minute) + "Generating signed PDF..." spinner
 - Active Record encryption initializer for Heroku production
+- Auto-generate envelope names from signers ("Signature: Keri Spencer")
+- Clean up document show page (simplified subtitles, hidden empty sections)
+- Share button redesign: dropdown popover with Copy, Unshare
+- Fix: all copy-to-clipboard buttons CSP-compliant (documents + folders)
 - Fix: self-sign fields draggable on canvas (click = sign, drag = move)
 - Fix: signed PDF download on multi-signer confirmation page
 - Fix: admin name shown in "Assigned to" dropdown for self-signer roles
