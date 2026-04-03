@@ -51,6 +51,9 @@ Rails.application.routes.draw do
     resources :document_shares, only: [:create, :destroy]
   end
 
+  # Pending signatures dashboard (must be before public signatures route)
+  get "signatures/pending", to: "pending_signatures#index", as: :pending_signatures
+
   # Public signature routes (no auth)
   resources :signatures, only: [:show], param: :signature_token, controller: "public_signatures" do
     member do
@@ -89,7 +92,6 @@ Rails.application.routes.draw do
 
   # Authenticated dashboard
   get "dashboard", to: "dashboard#index", as: :dashboard
-  get "signatures/pending", to: "pending_signatures#index", as: :pending_signatures
   get "profile", to: "users#profile_redirect", as: :my_profile
 
   # Billing & Subscriptions
