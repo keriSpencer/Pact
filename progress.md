@@ -56,12 +56,15 @@
 - [x] **Timestamps on envelope cards** — Sent, viewed, signed dates per signer
 - [x] **Send signed copy to recipients** — Email signed PDF to additional parties post-signing
 - [x] **Saved signature in profile** — Draw/type signature, encrypted at rest, integrated into self-sign
-- [x] **Outstanding signature requests dashboard** — (pending)
-- [x] **Automatic follow-up reminders** — (pending)
+- [x] **Outstanding signature requests dashboard** — Pending/Signed tabs with actions
+- [x] **Auto-apply saved signature** — Saved profile signature auto-used for self-sign fields
+- [x] **Faster polling + generating spinner** — 3s polling for first minute, spinner while PDF generates
 
 ### Up Next
 - [ ] **Google OAuth** — Sign in with Google
-- [ ] **Outstanding signature requests dashboard** — Central view of all pending requests
+- [ ] **Auto-generate envelope names** — Show signer names instead of "Multi-Signer Envelope"
+- [ ] **Clean up document show page** — Hide legacy requests, fix self-sign messaging
+- [ ] **Fix mobile copy-to-clipboard** — Document share link copy button on mobile
 - [ ] **Automatic follow-up reminders** — Scheduled reminders for unsigned requests
 - [ ] Bulk document operations
 - [ ] Calendar view for follow-ups
@@ -138,10 +141,18 @@
 - Timestamps on envelope signer cards (sent, viewed, signed)
 - Send signed copy to additional recipients (PDF attached to email)
 - Saved signature in profile (encrypted at rest, integrated into self-sign)
+- Outstanding signature requests dashboard (/signatures/pending)
+- Auto-apply saved profile signature for self-sign fields
+- Faster polling (3s for first minute) + "Generating signed PDF..." spinner
+- Active Record encryption initializer for Heroku production
 - Fix: self-sign fields draggable on canvas (click = sign, drag = move)
 - Fix: signed PDF download on multi-signer confirmation page
 - Fix: admin name shown in "Assigned to" dropdown for self-signer roles
 - Fix: multi-signer amber message when waiting for other signers
+- Fix: all-self-signer envelopes now complete immediately (not stuck at Active)
+- Fix: saved signature used server-side for self-sign PDF stamping
+- Fix: pending signatures route ordering (was matching as token)
+- Fix: auto-refresh detects new document versions (not just status changes)
 
 ### March 28, 2026
 - Custom domain: pactapp.io
