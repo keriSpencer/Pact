@@ -102,6 +102,9 @@ class SigningEnvelope < ApplicationRecord
 
       update!(status: :active)
       send_invitations!
+
+      # Check if already complete (e.g., all signers are self-signers)
+      check_completion!
     end
     true
   end
