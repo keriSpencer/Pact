@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_31_023836) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_03_100000) do
   create_table "action_push_native_devices", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "name"
@@ -417,6 +417,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_31_023836) do
     t.datetime "reset_password_sent_at"
     t.string "reset_password_token"
     t.integer "role", default: 0, null: false
+    t.text "saved_initials"
+    t.text "saved_signature"
     t.string "timezone", default: "UTC"
     t.string "title"
     t.datetime "updated_at", null: false

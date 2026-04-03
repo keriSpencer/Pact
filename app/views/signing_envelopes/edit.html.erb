@@ -4,6 +4,8 @@
      data-controller="pdf-signature-placement"
      data-pdf-signature-placement-pdf-url-value="<%= rails_blob_path(@document.file, disposition: 'inline') %>"
      data-pdf-signature-placement-multi-signer-value="<%= !single_signer %>"
+     data-pdf-signature-placement-saved-signature-value="<%= current_user.saved_signature || '' %>"
+     data-pdf-signature-placement-saved-initials-value="<%= current_user.saved_initials || '' %>"
      tabindex="0"
      data-action="keydown->pdf-signature-placement#handleKeyDown">
 

@@ -4,6 +4,9 @@ class User < ApplicationRecord
 
   enum :role, { member: 0, admin: 2 }, default: :member
 
+  encrypts :saved_signature
+  encrypts :saved_initials
+
   belongs_to :organization
 
   # Soft delete: exclude deleted users by default
@@ -46,6 +49,14 @@ class User < ApplicationRecord
     else
       email
     end
+  end
+
+  def has_saved_signature?
+    saved_signature.present?
+  end
+
+  def has_saved_initials?
+    saved_initials.present?
   end
 
   def initials

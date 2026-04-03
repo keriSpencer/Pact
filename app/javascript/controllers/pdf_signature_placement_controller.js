@@ -13,7 +13,9 @@ export default class extends Controller {
     pdfUrl: String,
     currentPage: { type: Number, default: 1 },
     totalPages: { type: Number, default: 1 },
-    multiSigner: { type: Boolean, default: false }
+    multiSigner: { type: Boolean, default: false },
+    savedSignature: { type: String, default: '' },
+    savedInitials: { type: String, default: '' }
   }
 
   get fieldDefaults() {
@@ -1353,6 +1355,18 @@ export default class extends Controller {
             </div>
           ` : `
             <div class="space-y-3">
+              ${(() => {
+                const savedData = field.type === 'signature' ? this.savedSignatureValue : this.savedInitialsValue
+                return savedData ? `
+                  <button type="button" data-action="click->pdf-signature-placement#useSavedSignature" data-field-id="${field.id}" data-field-type="${field.type}"
+                          class="w-full p-3 border border-blue-200 dark:border-blue-700 bg-blue-50 dark:bg-blue-900/20 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors cursor-pointer text-center mb-2">
+                    ${savedData.startsWith('data:image')
+                      ? `<img src="${savedData}" class="h-10 mx-auto mb-1" alt="Saved ${field.type}">`
+                      : `<span class="text-sm italic" style="font-family: Georgia, serif">${savedData}</span>`}
+                    <span class="block text-xs font-medium text-blue-700 dark:text-blue-400">Use saved ${field.type}</span>
+                  </button>
+                ` : ''
+              })()}
               ${this.getCachedSelfSign(field.type) ? `
                 <button type="button" data-action="click->pdf-signature-placement#useCachedSelfSign" data-field-id="${field.id}" data-field-type="${field.type}"
                         class="w-full p-3 border border-green-200 dark:border-green-700 bg-green-50 dark:bg-green-900/20 rounded-lg hover:bg-green-100 dark:hover:bg-green-900/30 transition-colors cursor-pointer text-center">
@@ -1577,6 +1591,37 @@ export default class extends Controller {
       const img = new Image()
       img.onload = () => { this.redrawFields() }
       img.src = cachedData
+      this._selfSignImages[field.id] = img
+    }
+
+    this.selectedFieldId = null
+    this.updateFormData()
+    this.updateSelfSignData()
+    this.updateSendButtonState()
+    this.redrawFields()
+    this.updateFieldsList()
+  }
+
+  useSavedSignature(event) {
+    const fieldId = parseInt(event.currentTarget.dataset.fieldId)
+    const fieldType = event.currentTarget.dataset.fieldType
+    const savedData = fieldType === 'signature' ? this.savedSignatureValue : this.savedInitialsValue
+    if (!savedData) return
+
+    const field = this.signatureFields.find(f => f.id === fieldId)
+    if (!field) return
+
+    field.selfSignData = {
+      artifact_data: savedData,
+      artifact_type: field.type,
+      capture_method: savedData.startsWith('data:image') ? 'drawn' : 'typed'
+    }
+
+    if (savedData.startsWith('data:image')) {
+      if (!this._selfSignImages) this._selfSignImages = {}
+      const img = new Image()
+      img.onload = () => { this.redrawFields() }
+      img.src = savedData
       this._selfSignImages[field.id] = img
     }
 

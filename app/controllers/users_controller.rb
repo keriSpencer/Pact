@@ -1,7 +1,7 @@
 class UsersController < ApplicationController
   before_action :authenticate_user!
-  before_action :set_user, only: [:show, :edit, :update]
-  before_action :ensure_current_user, only: [:edit, :update]
+  before_action :set_user, only: [:show, :edit, :update, :update_signature, :update_initials, :clear_signature, :clear_initials]
+  before_action :ensure_current_user, only: [:edit, :update, :update_signature, :update_initials, :clear_signature, :clear_initials]
 
   def index
     @users = organization_users.where.not(id: current_user.id).order(:first_name, :last_name)
@@ -41,6 +41,26 @@ class UsersController < ApplicationController
     else
       render :edit, status: :unprocessable_entity
     end
+  end
+
+  def update_signature
+    current_user.update!(saved_signature: params[:signature_data])
+    redirect_to edit_user_path(current_user), notice: "Signature saved."
+  end
+
+  def update_initials
+    current_user.update!(saved_initials: params[:initials_data])
+    redirect_to edit_user_path(current_user), notice: "Initials saved."
+  end
+
+  def clear_signature
+    current_user.update!(saved_signature: nil)
+    redirect_to edit_user_path(current_user), notice: "Signature cleared."
+  end
+
+  def clear_initials
+    current_user.update!(saved_initials: nil)
+    redirect_to edit_user_path(current_user), notice: "Initials cleared."
   end
 
   private

@@ -121,6 +121,10 @@ Rails.application.routes.draw do
   resources :users, only: [:show, :edit, :update, :index] do
     member do
       get :profile
+      post :update_signature
+      post :update_initials
+      delete :clear_signature
+      delete :clear_initials
     end
   end
 
