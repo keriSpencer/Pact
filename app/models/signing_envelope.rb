@@ -14,6 +14,19 @@ class SigningEnvelope < ApplicationRecord
   validates :document, presence: true
   validates :requester, presence: true
 
+  def display_title
+    names = signing_roles.in_order.map(&:display_name).compact
+    if names.length == 1
+      "Signature: #{names.first}"
+    elsif names.length == 2
+      "Signatures: #{names.join(' & ')}"
+    elsif names.length > 2
+      "Signatures: #{names.first(2).join(', ')} + #{names.length - 2} more"
+    else
+      "Signature Request"
+    end
+  end
+
   def all_signers_completed?
     return false if signing_roles.empty?
     signing_roles.each do |role|

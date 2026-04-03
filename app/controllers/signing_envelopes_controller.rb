@@ -84,13 +84,15 @@ class SigningEnvelopesController < ApplicationController
         # Clean up the draft request (fields have been moved to per-signer requests)
         @draft_request&.destroy if @draft_request&.signature_fields&.reload&.empty?
 
-        non_self_roles = @envelope.signing_roles.where(is_self_signer: false)
-        notice_msg = if non_self_roles.count == 1
-          "Signature request sent to #{non_self_roles.first.signer_name.presence || non_self_roles.first.signer_email}."
+        non_self_count = @envelope.signing_roles.where(is_self_signer: false).count
+        if non_self_count == 0
+          redirect_to document_path(@document), notice: "Document signed and completed."
+        elsif non_self_count == 1
+          signer = @envelope.signing_roles.where(is_self_signer: false).first
+          redirect_to document_path(@document), notice: "Signature request sent to #{signer.display_name}."
         else
-          "Sent to #{non_self_roles.count} signers."
+          redirect_to document_path(@document), notice: "Sent to #{non_self_count} signers."
         end
-        redirect_to document_path(@document), notice: notice_msg
       else
         flash.now[:alert] = @envelope.errors.full_messages.join(", ")
         @roles = @envelope.signing_roles.reload.in_order

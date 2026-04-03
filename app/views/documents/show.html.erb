@@ -124,7 +124,9 @@
                 <%= link_to "Download", rails_blob_path(@document.file, disposition: "attachment"), class: "text-xs text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium transition-colors" %>
               </div>
             <% end %>
-            <% signed_versions.each do |sv| %>
+            <% recent_signed = signed_versions.first(3) %>
+            <% older_signed = signed_versions.drop(3) %>
+            <% recent_signed.each do |sv| %>
               <div class="flex items-center justify-between">
                 <div>
                   <span class="text-sm text-gray-700 dark:text-gray-300"><%= sv.display_label %></span>
@@ -134,6 +136,24 @@
                   <%= link_to "Download", rails_blob_path(sv.file, disposition: "attachment"), class: "text-xs text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium transition-colors" %>
                 <% end %>
               </div>
+            <% end %>
+            <% if older_signed.any? %>
+              <details>
+                <summary class="text-xs text-blue-600 dark:text-blue-400 font-medium cursor-pointer hover:text-blue-800 dark:hover:text-blue-300 transition-colors list-none">Show <%= older_signed.size %> more</summary>
+                <div class="mt-3 space-y-3">
+                  <% older_signed.each do |sv| %>
+                    <div class="flex items-center justify-between">
+                      <div>
+                        <span class="text-sm text-gray-700 dark:text-gray-300"><%= sv.display_label %></span>
+                        <span class="text-xs text-gray-500 dark:text-gray-400 block"><%= sv.formatted_date %></span>
+                      </div>
+                      <% if sv.file.attached? %>
+                        <%= link_to "Download", rails_blob_path(sv.file, disposition: "attachment"), class: "text-xs text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium transition-colors" %>
+                      <% end %>
+                    </div>
+                  <% end %>
+                </div>
+              </details>
             <% end %>
             <% audit_versions.each do |av| %>
               <div class="flex items-center justify-between">
@@ -150,8 +170,8 @@
         </div>
       <% end %>
 
-      <!-- Signature Metadata -->
-      <% signed_requests = @document.signature_requests.where(status: :signed).order(signed_at: :desc) %>
+      <!-- Signature Metadata (only legacy non-envelope requests) -->
+      <% signed_requests = @document.signature_requests.where(status: :signed, signing_envelope_id: nil).order(signed_at: :desc) %>
       <% if signed_requests.any? %>
         <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
           <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
@@ -229,15 +249,26 @@
           <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
             <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
               <div>
-                <h2 class="text-sm font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-wider">Multi-Signer Envelope</h2>
+                <h3 class="text-base font-semibold text-gray-900 dark:text-gray-100"><%= envelope.display_title %></h3>
                 <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                  <%= envelope.signing_mode.humanize %> signing
-                  <span class="mx-1">&middot;</span>
-                  <span class="<%= envelope.completed? ? 'text-green-600' : envelope.voided? ? 'text-red-600' : 'text-blue-600' %>">
-                    <%= envelope.status.humanize %>
-                  </span>
-                  <span class="mx-1">&middot;</span>
-                  <span>Created <%= envelope.created_at.strftime("%b %d, %Y") %></span>
+                  <% if envelope.active? %>
+                    <span>Sent <%= envelope.created_at.strftime("%b %d, %Y") %></span>
+                    <% signed_count = envelope.signing_roles.joins(:signature_request).where(signature_requests: { status: :signed }).count %>
+                    <span class="mx-1">&middot;</span>
+                    <span><%= signed_count %> of <%= envelope.signing_roles.count %> signed</span>
+                  <% elsif envelope.voided? %>
+                    <span class="text-red-600">Voided</span>
+                    <span class="mx-1">&middot;</span>
+                    <span><%= envelope.created_at.strftime("%b %d, %Y") %></span>
+                  <% elsif envelope.cancelled? %>
+                    <span class="text-gray-500">Cancelled</span>
+                    <span class="mx-1">&middot;</span>
+                    <span><%= envelope.created_at.strftime("%b %d, %Y") %></span>
+                  <% end %>
+                  <% if envelope.signing_roles.count > 1 %>
+                    <span class="mx-1">&middot;</span>
+                    <span><%= envelope.signing_mode.humanize %></span>
+                  <% end %>
                 </p>
               </div>
               <% if envelope.active? %>
@@ -312,17 +343,17 @@
           <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
             <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
               <div>
-                <h2 class="text-sm font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-wider">Multi-Signer Envelope</h2>
+                <h3 class="text-base font-semibold text-gray-900 dark:text-gray-100"><%= most_recent_completed.display_title %></h3>
                 <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                  <%= most_recent_completed.signing_mode.humanize %> signing
-                  <span class="mx-1">&middot;</span>
-                  <span class="text-green-600"><%= most_recent_completed.status.humanize %></span>
+                  <span class="text-green-600">Completed</span>
                   <% if most_recent_completed.completed_at %>
                     <span class="mx-1">&middot;</span>
                     <span><%= most_recent_completed.completed_at.strftime("%b %d, %Y") %></span>
                   <% end %>
-                  <span class="mx-1">&middot;</span>
-                  <span>Created <%= most_recent_completed.created_at.strftime("%b %d, %Y") %></span>
+                  <% if most_recent_completed.signing_roles.count > 1 %>
+                    <span class="mx-1">&middot;</span>
+                    <span><%= most_recent_completed.signing_mode.humanize %></span>
+                  <% end %>
                 </p>
               </div>
             </div>
@@ -409,17 +440,17 @@
                 <div class="border-b border-gray-200 dark:border-gray-700 last:border-b-0">
                   <div class="px-6 py-4 flex items-center justify-between">
                     <div>
-                      <h2 class="text-sm font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-wider">Multi-Signer Envelope</h2>
+                      <h3 class="text-base font-semibold text-gray-900 dark:text-gray-100"><%= envelope.display_title %></h3>
                       <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                        <%= envelope.signing_mode.humanize %> signing
-                        <span class="mx-1">&middot;</span>
-                        <span class="text-green-600"><%= envelope.status.humanize %></span>
+                        <span class="text-green-600">Completed</span>
                         <% if envelope.completed_at %>
                           <span class="mx-1">&middot;</span>
                           <span><%= envelope.completed_at.strftime("%b %d, %Y") %></span>
                         <% end %>
-                        <span class="mx-1">&middot;</span>
-                        <span>Created <%= envelope.created_at.strftime("%b %d, %Y") %></span>
+                        <% if envelope.signing_roles.count > 1 %>
+                          <span class="mx-1">&middot;</span>
+                          <span><%= envelope.signing_mode.humanize %></span>
+                        <% end %>
                       </p>
                     </div>
                   </div>
@@ -498,8 +529,7 @@
               <div class="px-6 py-3 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
                 <div>
                   <p class="text-sm text-gray-600 dark:text-gray-400">
-                    <%= envelope.signing_roles.count %> signer<%= envelope.signing_roles.count != 1 ? 's' : '' %> &middot;
-                    Created <%= time_ago_in_words(envelope.created_at) %> ago
+                    <%= envelope.signing_roles.map(&:display_name).join(', ') %> &middot; Created <%= time_ago_in_words(envelope.created_at) %> ago
                   </p>
                 </div>
                 <div class="flex items-center space-x-2">
