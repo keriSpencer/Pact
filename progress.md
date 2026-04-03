@@ -48,9 +48,21 @@
 - [x] **Convert single→multi-signer** — Switch modes without losing placed fields
 - [x] **Cross-compatible templates** — Templates work across single/multi-signer modes
 
+### Recently Completed (April 1-3)
+- [x] **Admin self-sign in editor** — Draw signature before sending (DocuSign-style)
+- [x] **Signature reuse in self-sign** — "Use previous" on subsequent fields
+- [x] **Unified signature editor** — One "Request Signature" flow, seamlessly add signers
+- [x] **Validate signers have fields** — Block send if any signer has no fields assigned
+- [x] **Timestamps on envelope cards** — Sent, viewed, signed dates per signer
+- [x] **Send signed copy to recipients** — Email signed PDF to additional parties post-signing
+- [x] **Saved signature in profile** — Draw/type signature, encrypted at rest, integrated into self-sign
+- [x] **Outstanding signature requests dashboard** — (pending)
+- [x] **Automatic follow-up reminders** — (pending)
+
 ### Up Next
 - [ ] **Google OAuth** — Sign in with Google
-- [ ] **Saved signature in profile** — Store drawn signature for reuse across sessions
+- [ ] **Outstanding signature requests dashboard** — Central view of all pending requests
+- [ ] **Automatic follow-up reminders** — Scheduled reminders for unsigned requests
 - [ ] Bulk document operations
 - [ ] Calendar view for follow-ups
 
@@ -116,11 +128,16 @@
   - Document quick share (copyable links, Turbo Stream UI)
 - 214 tests, 342 assertions, 0 failures
 
-### April 1-2, 2026
+### April 1-3, 2026
 - Admin self-sign in editor (DocuSign-style): draw signature before sending
 - Self-sign fields show pulsing "Sign" badge, inline draw/type pad
 - Send button disabled until all self-sign fields completed
 - Signature reuse in self-sign editor ("Use previous signature")
+- Unified signature editor: one "Request Signature" flow for single + multi-signer
+- Validate all signers have fields before sending (prevents stuck envelopes)
+- Timestamps on envelope signer cards (sent, viewed, signed)
+- Send signed copy to additional recipients (PDF attached to email)
+- Saved signature in profile (encrypted at rest, integrated into self-sign)
 - Fix: self-sign fields draggable on canvas (click = sign, drag = move)
 - Fix: signed PDF download on multi-signer confirmation page
 - Fix: admin name shown in "Assigned to" dropdown for self-signer roles
